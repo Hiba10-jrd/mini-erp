@@ -34,50 +34,7 @@ class RbacSeeder extends Seeder
             // 2. Permissions explicitement définies
             // dans la section 27 du CDC
 
-            $permissions = [
-                // Clients
-                'customers.view',
-                'customers.manage',
-
-                // Fournisseurs
-                'suppliers.view',
-                'suppliers.manage',
-
-                // Ventes
-                'sales.view',
-                'sales.create',
-                'sales.update',
-                'sales.delete',
-
-                // Achats
-                'purchases.view',
-                'purchases.create',
-                'purchases.update',
-                'purchases.delete',
-
-                // Stock
-                'stock.view',
-                'stock.manage',
-
-                // Factures
-                'invoices.view',
-                'invoices.create',
-                'invoices.validate',
-
-                // Paiements
-                'payments.view',
-                'payments.create',
-
-                // Rapports
-                'reports.view',
-
-                // Utilisateurs
-                'users.view',
-                'users.manage',
-
-                // Paramètres
-                'settings.manage',
-            ];
+            $permissions = config('erp.permissions', []);
 
             foreach ($permissions as $permission) {
                 Permission::query()->firstOrCreate([

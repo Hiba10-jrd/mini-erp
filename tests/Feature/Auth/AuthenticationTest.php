@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Volt\Volt;
@@ -58,9 +59,15 @@ class AuthenticationTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->actingAs($user);
+        $role = Role::firstOrCreate(
+            ['slug' => 'commercial'],
+            ['name' => 'Commercial']
+        );
 
-        $response = $this->get('/dashboard');
+        $user->roles()->attach($role);
+
+        $response = $this->actingAs($user)
+            ->get('/dashboard');
 
         $response
             ->assertOk()

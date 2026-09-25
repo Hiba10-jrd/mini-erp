@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Auth;
 
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Hash;
@@ -14,7 +15,7 @@ class PasswordUpdateTest extends TestCase
 
     public function test_password_can_be_updated(): void
     {
-        $user = User::factory()->create();
+        $user = $this->createAuthorizedUser();
 
         $this->actingAs($user);
 
@@ -33,7 +34,7 @@ class PasswordUpdateTest extends TestCase
 
     public function test_correct_password_must_be_provided_to_update_password(): void
     {
-        $user = User::factory()->create();
+        $user = $this->createAuthorizedUser();
 
         $this->actingAs($user);
 
@@ -46,5 +47,18 @@ class PasswordUpdateTest extends TestCase
         $component
             ->assertHasErrors(['current_password'])
             ->assertNoRedirect();
+    }
+
+    private function createAuthorizedUser(): User
+    {
+        $user = User::factory()->create();
+        $role = Role::firstOrCreate(
+            ['slug' => 'commercial'],
+            ['name' => 'Commercial']
+        );
+
+        $user->roles()->attach($role);
+
+        return $user;
     }
 }

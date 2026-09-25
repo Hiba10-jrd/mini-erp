@@ -19,11 +19,13 @@
                 </div>
             </div>
 
-            <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
-                <div class="max-w-xl">
-                    <livewire:profile.delete-user-form />
+            @unless (auth()->user()->isSuperAdministrator())
+                <div class="p-4 sm:p-8 bg-white shadow sm:rounded-lg">
+                    <div class="max-w-xl">
+                        <livewire:profile.delete-user-form />
+                    </div>
                 </div>
-            </div>
+            @endunless
         </div>
     </div>
 </x-app-layout>

@@ -1,7 +1,9 @@
 <?php
 
 use App\Livewire\Actions\Logout;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Livewire\Volt\Component;
 
 new class extends Component
@@ -13,17 +15,28 @@ new class extends Component
      */
     public function deleteUser(Logout $logout): void
     {
+        $user = Auth::user();
+
+        abort_unless($user instanceof User, 401);
+        Gate::forUser($user)->authorize('erp.access');
+        abort_if(
+            $user->isSuperAdministrator(),
+            403,
+            'The Super Administrator account cannot be deleted.'
+        );
+
         $this->validate([
             'password' => ['required', 'string', 'current_password'],
         ]);
 
-        tap(Auth::user(), $logout(...))->delete();
+        tap($user, $logout(...))->delete();
 
         $this->redirect('/', navigate: true);
     }
 }; ?>
 
 <section class="space-y-6">
+    @unless (auth()->user()?->isSuperAdministrator())
     <header>
         <h2 class="text-lg font-medium text-gray-900">
             {{ __('Delete Account') }}
@@ -76,4 +89,5 @@ new class extends Component
             </div>
         </form>
     </x-modal>
+    @endunless
 </section>

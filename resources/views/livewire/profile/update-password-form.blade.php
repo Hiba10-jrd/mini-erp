@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
@@ -9,7 +10,9 @@ use Livewire\Volt\Component;
 new class extends Component
 {
     public string $current_password = '';
+
     public string $password = '';
+
     public string $password_confirmation = '';
 
     /**
@@ -17,6 +20,8 @@ new class extends Component
      */
     public function updatePassword(): void
     {
+        Gate::authorize('erp.access');
+
         try {
             $validated = $this->validate([
                 'current_password' => ['required', 'string', 'current_password'],

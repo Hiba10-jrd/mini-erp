@@ -2,6 +2,7 @@
 
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Validation\Rule;
 use Livewire\Volt\Component;
@@ -9,6 +10,7 @@ use Livewire\Volt\Component;
 new class extends Component
 {
     public string $name = '';
+
     public string $email = '';
 
     /**
@@ -25,6 +27,8 @@ new class extends Component
      */
     public function updateProfileInformation(): void
     {
+        Gate::authorize('erp.access');
+
         $user = Auth::user();
 
         $validated = $this->validate([
@@ -48,6 +52,8 @@ new class extends Component
      */
     public function sendVerification(): void
     {
+        Gate::authorize('erp.access');
+
         $user = Auth::user();
 
         if ($user->hasVerifiedEmail()) {

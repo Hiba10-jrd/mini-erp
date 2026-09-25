@@ -3,6 +3,7 @@
 namespace Tests\Feature\Auth;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 use Tests\TestCase;
 
@@ -10,16 +11,17 @@ class RegistrationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_registration_screen_can_be_rendered(): void
+    public function test_public_registration_route_is_disabled(): void
     {
-        $response = $this->get('/register');
+        $this->assertFalse(
+            Route::has('register')
+        );
 
-        $response
-            ->assertOk()
-            ->assertSeeVolt('pages.auth.register');
+        $this->get('/register')
+            ->assertNotFound();
     }
 
-    public function test_new_users_can_register(): void
+    public function test_public_registration_action_is_forbidden(): void
     {
         $component = Volt::test('pages.auth.register')
             ->set('name', 'Test User')
@@ -27,10 +29,17 @@ class RegistrationTest extends TestCase
             ->set('password', 'password')
             ->set('password_confirmation', 'password');
 
-        $component->call('register');
+        $component->call('register')
+            ->assertForbidden();
 
-        $component->assertRedirect(route('dashboard', absolute: false));
+        $this->assertDatabaseCount('users', 0);
 
-        $this->assertAuthenticated();
+        $this->assertGuest();
+    }
+
+    public function test_login_page_remains_accessible(): void
+    {
+        $this->get('/login')
+            ->assertOk();
     }
 }

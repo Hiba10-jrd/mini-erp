@@ -5,9 +5,9 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
 {
@@ -35,7 +35,6 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    
     public function roles(): BelongsToMany
     {
         return $this->belongsToMany(
@@ -43,6 +42,7 @@ class User extends Authenticatable
             'role_user'
         );
     }
+
     /**
      * Get the attributes that should be cast.
      *
@@ -54,5 +54,43 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Determine whether the user is a Super Administrator.
+     */
+    public function isSuperAdministrator(): bool
+    {
+        return $this->roles()
+            ->where('slug', 'super-admin')
+            ->exists();
+    }
+
+    /**
+     * Determine whether the user has a given permission.
+     */
+    public function hasPermission(string $permission): bool
+    {
+        // Refuse permissions that are not defined in the ERP.
+        if (! in_array(
+            $permission,
+            config('erp.permissions', []),
+            true
+        )) {
+            return false;
+        }
+
+        // The Super Administrator has access to all
+        // registered ERP permissions.
+        if ($this->isSuperAdministrator()) {
+            return true;
+        }
+
+        // Check permissions assigned to the user's roles.
+        return $this->roles()
+            ->whereHas('permissions', function ($query) use ($permission) {
+                $query->where('name', $permission);
+            })
+            ->exists();
     }
 }
