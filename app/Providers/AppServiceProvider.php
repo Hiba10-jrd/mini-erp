@@ -56,6 +56,12 @@ class AppServiceProvider extends ServiceProvider
             return $user->isSuperAdministrator();
         });
 
+        // LOT 04-A keeps company settings exclusive to Super Administrators.
+        Gate::define('company.administer', function (User $user): bool {
+            return $user->isSuperAdministrator()
+                && $user->hasPermission('settings.manage');
+        });
+
         // Register all ERP permissions as Laravel Gates.
         foreach (config('erp.permissions', []) as $permission) {
             Gate::define(

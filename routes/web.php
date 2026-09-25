@@ -20,4 +20,8 @@ Route::view('administration/roles', 'admin.roles.index')
     ->middleware(['auth', 'auth.session', 'verified', 'can:roles.administer'])
     ->name('admin.roles.index');
 
+Route::view('administration/company', 'admin.company.index')
+    ->middleware(['auth', 'auth.session', 'verified', 'can:company.administer'])
+    ->name('admin.company.index');
+
 require __DIR__.'/auth.php';
