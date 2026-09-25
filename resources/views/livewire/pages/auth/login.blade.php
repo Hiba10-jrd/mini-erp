@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\Forms\LoginForm;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
@@ -19,6 +20,12 @@ new #[Layout('layouts.guest')] class extends Component
         $this->form->authenticate();
 
         Session::regenerate();
+
+        if (Auth::user()?->must_change_password) {
+            $this->redirectRoute('password.change.required', navigate: true);
+
+            return;
+        }
 
         $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
     }

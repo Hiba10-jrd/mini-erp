@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use App\Enums\UserAccountStatus;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -53,7 +54,24 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'must_change_password' => 'boolean',
+            'account_status' => UserAccountStatus::class,
         ];
+    }
+
+    public function isActive(): bool
+    {
+        return $this->account_status === UserAccountStatus::Active;
+    }
+
+    public function isDisabled(): bool
+    {
+        return $this->account_status === UserAccountStatus::Disabled;
+    }
+
+    public function isArchived(): bool
+    {
+        return $this->account_status === UserAccountStatus::Archived;
     }
 
     /**

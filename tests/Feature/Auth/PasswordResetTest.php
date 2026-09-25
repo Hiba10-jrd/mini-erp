@@ -60,7 +60,7 @@ class PasswordResetTest extends TestCase
     {
         Notification::fake();
 
-        $user = User::factory()->create();
+        $user = User::factory()->create(['must_change_password' => true]);
 
         Volt::test('pages.auth.forgot-password')
             ->set('email', $user->email)
@@ -69,14 +69,40 @@ class PasswordResetTest extends TestCase
         Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user) {
             $component = Volt::test('pages.auth.reset-password', ['token' => $notification->token])
                 ->set('email', $user->email)
-                ->set('password', 'password')
-                ->set('password_confirmation', 'password');
+                ->set('password', 'reset-password-2026')
+                ->set('password_confirmation', 'reset-password-2026');
 
             $component->call('resetPassword');
 
             $component
                 ->assertRedirect('/login')
                 ->assertHasNoErrors();
+
+            $this->assertFalse($user->fresh()->must_change_password);
+
+            return true;
+        });
+    }
+
+    public function test_password_reset_cannot_reuse_temporary_password(): void
+    {
+        Notification::fake();
+
+        $user = User::factory()->create(['must_change_password' => true]);
+
+        Volt::test('pages.auth.forgot-password')
+            ->set('email', $user->email)
+            ->call('sendPasswordResetLink');
+
+        Notification::assertSentTo($user, ResetPassword::class, function ($notification) use ($user) {
+            Volt::test('pages.auth.reset-password', ['token' => $notification->token])
+                ->set('email', $user->email)
+                ->set('password', 'password')
+                ->set('password_confirmation', 'password')
+                ->call('resetPassword')
+                ->assertHasErrors(['password']);
+
+            $this->assertTrue($user->fresh()->must_change_password);
 
             return true;
         });

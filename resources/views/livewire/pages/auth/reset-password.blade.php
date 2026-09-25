@@ -1,10 +1,9 @@
 <?php
 
+use App\Services\PasswordManagementService;
 use Illuminate\Auth\Events\PasswordReset;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Session;
-use Illuminate\Support\Str;
 use Illuminate\Validation\Rules;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
@@ -31,7 +30,7 @@ new #[Layout('layouts.guest')] class extends Component
     /**
      * Reset the password for the given user.
      */
-    public function resetPassword(): void
+    public function resetPassword(PasswordManagementService $passwordService): void
     {
         $this->validate([
             'token' => ['required'],
@@ -44,11 +43,8 @@ new #[Layout('layouts.guest')] class extends Component
         // database. Otherwise we will parse the error and return the response.
         $status = Password::reset(
             $this->only('email', 'password', 'password_confirmation', 'token'),
-            function ($user) {
-                $user->forceFill([
-                    'password' => Hash::make($this->password),
-                    'remember_token' => Str::random(60),
-                ])->save();
+            function ($user) use ($passwordService) {
+                $user = $passwordService->completeBrokerReset($user, $this->password);
 
                 event(new PasswordReset($user));
             }

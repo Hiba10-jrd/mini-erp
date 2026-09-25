@@ -1,8 +1,8 @@
 <?php
 
+use App\Services\PasswordManagementService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 use Illuminate\Validation\ValidationException;
 use Livewire\Volt\Component;
@@ -18,7 +18,7 @@ new class extends Component
     /**
      * Update the password for the currently authenticated user.
      */
-    public function updatePassword(): void
+    public function updatePassword(PasswordManagementService $passwordService): void
     {
         Gate::authorize('erp.access');
 
@@ -33,9 +33,12 @@ new class extends Component
             throw $e;
         }
 
-        Auth::user()->update([
-            'password' => Hash::make($validated['password']),
-        ]);
+        $passwordService->changeOwnPassword(
+            Auth::id(),
+            $validated['current_password'],
+            $validated['password'],
+            request()->hasSession() ? request()->session()->getId() : null
+        );
 
         $this->reset('current_password', 'password', 'password_confirmation');
 

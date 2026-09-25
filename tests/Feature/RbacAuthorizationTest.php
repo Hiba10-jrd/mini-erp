@@ -104,4 +104,33 @@ class RbacAuthorizationTest extends TestCase
             );
         }
     }
+
+    public function test_only_super_administrator_can_administer_users_in_lot_03_a(): void
+    {
+        $superAdministrator = User::factory()->create();
+        $superAdministrator->roles()->attach(Role::create([
+            'name' => 'Super Administrateur',
+            'slug' => 'super-admin',
+        ]));
+
+        $administrator = User::factory()->create();
+        $administratorRole = Role::create([
+            'name' => 'Administrateur',
+            'slug' => 'admin',
+        ]);
+        $administrator->roles()->attach($administratorRole);
+
+        foreach (['users.view', 'users.manage'] as $permissionName) {
+            $administratorRole->permissions()->attach(Permission::create([
+                'name' => $permissionName,
+            ]));
+        }
+
+        $this->assertTrue(
+            Gate::forUser($superAdministrator)->allows('users.administer')
+        );
+        $this->assertFalse(
+            Gate::forUser($administrator)->allows('users.administer')
+        );
+    }
 }
