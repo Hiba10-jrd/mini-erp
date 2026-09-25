@@ -39,6 +39,12 @@ new class extends Component
                             {{ __('Administration') }}
                         </x-nav-link>
                     @endcan
+
+                    @can('roles.administer')
+                        <x-nav-link :href="route('admin.roles.index')" :active="request()->routeIs('admin.roles.*')" wire:navigate>
+                            {{ __('Rôles et permissions') }}
+                        </x-nav-link>
+                    @endcan
                 </div>
             </div>
 
@@ -94,6 +100,12 @@ new class extends Component
             @can('users.administer')
                 <x-responsive-nav-link :href="route('admin.users.index')" :active="request()->routeIs('admin.users.*')" wire:navigate>
                     {{ __('Administration') }}
+                </x-responsive-nav-link>
+            @endcan
+
+            @can('roles.administer')
+                <x-responsive-nav-link :href="route('admin.roles.index')" :active="request()->routeIs('admin.roles.*')" wire:navigate>
+                    {{ __('Rôles et permissions') }}
                 </x-responsive-nav-link>
             @endcan
         </div>

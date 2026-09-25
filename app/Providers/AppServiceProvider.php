@@ -51,6 +51,11 @@ class AppServiceProvider extends ServiceProvider
                 && $user->hasPermission('users.manage');
         });
 
+        // LOT 03-B keeps role and permission administration exclusive to Super Administrators.
+        Gate::define('roles.administer', function (User $user): bool {
+            return $user->isSuperAdministrator();
+        });
+
         // Register all ERP permissions as Laravel Gates.
         foreach (config('erp.permissions', []) as $permission) {
             Gate::define(
