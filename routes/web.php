@@ -24,4 +24,8 @@ Route::view('administration/company', 'admin.company.index')
     ->middleware(['auth', 'auth.session', 'verified', 'can:company.administer'])
     ->name('admin.company.index');
 
+Route::view('administration/commercial', 'admin.commercial.index')
+    ->middleware(['auth', 'auth.session', 'verified', 'can:company.administer'])
+    ->name('admin.commercial.index');
+
 require __DIR__.'/auth.php';

@@ -50,6 +50,10 @@ new class extends Component
                         <x-nav-link :href="route('admin.company.index')" :active="request()->routeIs('admin.company.*')" wire:navigate>
                             {{ __('Paramètres de l’entreprise') }}
                         </x-nav-link>
+
+                        <x-nav-link :href="route('admin.commercial.index')" :active="request()->routeIs('admin.commercial.*')" wire:navigate>
+                            {{ __('Paramètres commerciaux') }}
+                        </x-nav-link>
                     @endcan
                 </div>
             </div>
@@ -118,6 +122,10 @@ new class extends Component
             @can('company.administer')
                 <x-responsive-nav-link :href="route('admin.company.index')" :active="request()->routeIs('admin.company.*')" wire:navigate>
                     {{ __('Paramètres de l’entreprise') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('admin.commercial.index')" :active="request()->routeIs('admin.commercial.*')" wire:navigate>
+                    {{ __('Paramètres commerciaux') }}
                 </x-responsive-nav-link>
             @endcan
         </div>
