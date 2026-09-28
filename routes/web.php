@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Customer;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome');
@@ -27,5 +28,15 @@ Route::view('administration/company', 'admin.company.index')
 Route::view('administration/commercial', 'admin.commercial.index')
     ->middleware(['auth', 'auth.session', 'verified', 'can:company.administer'])
     ->name('admin.commercial.index');
+
+Route::view('administration/customers', 'admin.customers.index')
+    ->middleware(['auth', 'auth.session', 'verified', 'can:customers.access'])
+    ->name('admin.customers.index');
+
+Route::get('administration/customers/{customer}', function (Customer $customer) {
+    return view('admin.customers.show', compact('customer'));
+})
+    ->middleware(['auth', 'auth.session', 'verified', 'can:customers.access'])
+    ->name('admin.customers.show');
 
 require __DIR__.'/auth.php';

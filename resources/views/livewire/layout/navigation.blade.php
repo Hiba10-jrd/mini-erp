@@ -55,6 +55,12 @@ new class extends Component
                             {{ __('Paramètres commerciaux') }}
                         </x-nav-link>
                     @endcan
+
+                    @can('customers.access')
+                        <x-nav-link :href="route('admin.customers.index')" :active="request()->routeIs('admin.customers.*')" wire:navigate>
+                            {{ __('Clients') }}
+                        </x-nav-link>
+                    @endcan
                 </div>
             </div>
 
@@ -126,6 +132,12 @@ new class extends Component
 
                 <x-responsive-nav-link :href="route('admin.commercial.index')" :active="request()->routeIs('admin.commercial.*')" wire:navigate>
                     {{ __('Paramètres commerciaux') }}
+                </x-responsive-nav-link>
+            @endcan
+
+            @can('customers.access')
+                <x-responsive-nav-link :href="route('admin.customers.index')" :active="request()->routeIs('admin.customers.*')" wire:navigate>
+                    {{ __('Clients') }}
                 </x-responsive-nav-link>
             @endcan
         </div>
