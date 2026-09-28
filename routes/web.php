@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Customer;
+use App\Models\Product;
 use App\Models\Supplier;
 use Illuminate\Support\Facades\Route;
 
@@ -49,5 +50,15 @@ Route::get('administration/suppliers/{supplier}', function (Supplier $supplier) 
 })
     ->middleware(['auth', 'auth.session', 'verified', 'can:suppliers.access'])
     ->name('admin.suppliers.show');
+
+Route::view('administration/products', 'admin.products.index')
+    ->middleware(['auth', 'auth.session', 'verified', 'can:products.access'])
+    ->name('admin.products.index');
+
+Route::get('administration/products/{product}', function (Product $product) {
+    return view('admin.products.show', compact('product'));
+})
+    ->middleware(['auth', 'auth.session', 'verified', 'can:products.access'])
+    ->name('admin.products.show');
 
 require __DIR__.'/auth.php';

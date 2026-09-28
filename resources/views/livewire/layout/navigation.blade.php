@@ -67,6 +67,12 @@ new class extends Component
                             {{ __('Fournisseurs') }}
                         </x-nav-link>
                     @endcan
+
+                    @can('products.access')
+                        <x-nav-link :href="route('admin.products.index')" :active="request()->routeIs('admin.products.*')" wire:navigate>
+                            {{ __('Produits et services') }}
+                        </x-nav-link>
+                    @endcan
                 </div>
             </div>
 
@@ -150,6 +156,12 @@ new class extends Component
             @can('suppliers.access')
                 <x-responsive-nav-link :href="route('admin.suppliers.index')" :active="request()->routeIs('admin.suppliers.*')" wire:navigate>
                     {{ __('Fournisseurs') }}
+                </x-responsive-nav-link>
+            @endcan
+
+            @can('products.access')
+                <x-responsive-nav-link :href="route('admin.products.index')" :active="request()->routeIs('admin.products.*')" wire:navigate>
+                    {{ __('Produits et services') }}
                 </x-responsive-nav-link>
             @endcan
         </div>
