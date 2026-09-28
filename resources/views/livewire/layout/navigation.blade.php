@@ -78,6 +78,10 @@ new class extends Component
                         <x-nav-link :href="route('admin.stock.index')" :active="request()->routeIs('admin.stock.*')" wire:navigate>
                             {{ __('Stocks et dépôts') }}
                         </x-nav-link>
+
+                        <x-nav-link :href="route('admin.inventories.index')" :active="request()->routeIs('admin.inventories.*')" wire:navigate>
+                            {{ __('Inventaires') }}
+                        </x-nav-link>
                     @endcan
                 </div>
             </div>
@@ -174,6 +178,10 @@ new class extends Component
             @can('stock.access')
                 <x-responsive-nav-link :href="route('admin.stock.index')" :active="request()->routeIs('admin.stock.*')" wire:navigate>
                     {{ __('Stocks et dépôts') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link :href="route('admin.inventories.index')" :active="request()->routeIs('admin.inventories.*')" wire:navigate>
+                    {{ __('Inventaires') }}
                 </x-responsive-nav-link>
             @endcan
         </div>

@@ -23,4 +23,9 @@ class Warehouse extends Model
     {
         return $this->hasMany(StockMovement::class);
     }
+
+    public function inventories(): HasMany
+    {
+        return $this->hasMany(StockInventory::class);
+    }
 }

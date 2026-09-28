@@ -60,6 +60,11 @@ class Product extends Model
         return $this->hasMany(StockMovement::class);
     }
 
+    public function inventoryLines(): HasMany
+    {
+        return $this->hasMany(StockInventoryLine::class);
+    }
+
     public function isService(): bool
     {
         return $this->type === 'service';

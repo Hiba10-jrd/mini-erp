@@ -2,6 +2,7 @@
 
 use App\Models\Customer;
 use App\Models\Product;
+use App\Models\StockInventory;
 use App\Models\Supplier;
 use Illuminate\Support\Facades\Route;
 
@@ -64,5 +65,15 @@ Route::get('administration/products/{product}', function (Product $product) {
 Route::view('administration/stock', 'admin.stock.index')
     ->middleware(['auth', 'auth.session', 'verified', 'can:stock.access'])
     ->name('admin.stock.index');
+
+Route::view('administration/inventories', 'admin.inventories.index')
+    ->middleware(['auth', 'auth.session', 'verified', 'can:stock.access'])
+    ->name('admin.inventories.index');
+
+Route::get('administration/inventories/{stockInventory}', function (StockInventory $stockInventory) {
+    return view('admin.inventories.show', compact('stockInventory'));
+})
+    ->middleware(['auth', 'auth.session', 'verified', 'can:stock.access'])
+    ->name('admin.inventories.show');
 
 require __DIR__.'/auth.php';
