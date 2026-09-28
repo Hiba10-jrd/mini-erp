@@ -442,7 +442,7 @@ class ProductManagementTest extends TestCase
         Storage::disk('public')->assertExists($unrelatedPath);
     }
 
-    public function test_product_details_show_thresholds_without_inventing_current_stock(): void
+    public function test_product_details_show_thresholds_and_computed_zero_stock(): void
     {
         $viewer = $this->createUserWithPermissions(['stock.view']);
         $unit = $this->createUnit();
@@ -459,8 +459,9 @@ class ProductManagementTest extends TestCase
             ->assertSee('Stock prepared product')
             ->assertSee('2.000')
             ->assertSee('10.000')
-            ->assertSee('Le stock réel sera disponible après activation du module Stocks et dépôts.')
-            ->assertDontSee('Quantité disponible');
+            ->assertSee('Stock total')
+            ->assertSee('0,000')
+            ->assertSee('Aucun dépôt configuré.');
     }
 
     public function test_product_identifier_is_locked_on_details_component(): void

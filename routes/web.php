@@ -61,4 +61,8 @@ Route::get('administration/products/{product}', function (Product $product) {
     ->middleware(['auth', 'auth.session', 'verified', 'can:products.access'])
     ->name('admin.products.show');
 
+Route::view('administration/stock', 'admin.stock.index')
+    ->middleware(['auth', 'auth.session', 'verified', 'can:stock.access'])
+    ->name('admin.stock.index');
+
 require __DIR__.'/auth.php';

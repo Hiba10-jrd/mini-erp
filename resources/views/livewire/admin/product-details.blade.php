@@ -1,9 +1,14 @@
 <?php
 
 use App\Models\Product;
+use App\Models\Warehouse;
+use App\Models\WarehouseStock;
+use Illuminate\Database\Query\JoinClause;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Locked;
+use Livewire\Attributes\On;
 use Livewire\Volt\Component;
 
 new class extends Component
@@ -18,14 +23,37 @@ new class extends Component
         Product::query()->findOrFail($productId);
     }
 
+    #[On('stock-updated')]
+    public function refreshProductStock(int $productId): void
+    {
+        Gate::authorize('products.access');
+    }
+
     public function with(): array
     {
         Gate::authorize('products.access');
         $product = Product::query()->with(['category', 'unit', 'taxRate'])->findOrFail($this->productId);
+        $stockRows = collect();
+        $totalStock = '0.000';
+
+        if (! $product->isService()) {
+            $stockRows = Warehouse::query()
+                ->select(['warehouses.*', DB::raw('COALESCE(warehouse_stocks.quantity, 0) as stock_quantity')])
+                ->leftJoin('warehouse_stocks', function (JoinClause $join) use ($product): void {
+                    $join->on('warehouse_stocks.warehouse_id', '=', 'warehouses.id')
+                        ->where('warehouse_stocks.product_id', '=', $product->id);
+                })
+                ->orderByDesc('warehouses.is_active')
+                ->orderBy('warehouses.name')
+                ->get();
+            $totalStock = (string) WarehouseStock::query()->where('product_id', $product->id)->sum('quantity');
+        }
 
         return [
             'product' => $product,
             'imageUrl' => $product->image_path ? Storage::disk('public')->url($product->image_path) : null,
+            'stockRows' => $stockRows,
+            'totalStock' => $totalStock,
         ];
     }
 }; ?>
@@ -81,12 +109,33 @@ new class extends Component
             <h4 class="font-medium text-gray-900">{{ __('Prestation de service') }}</h4>
             <p class="mt-2 text-sm text-gray-600">{{ __('Cette prestation ne possède aucun seuil ni mouvement de stock.') }}</p>
         @else
-            <h4 class="font-medium text-gray-900">{{ __('Paramètres de stock préparatoires') }}</h4>
+            <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                    <h4 class="font-medium text-gray-900">{{ __('Stock par dépôt') }}</h4>
+                    <p class="mt-1 text-sm text-gray-600">{{ __('Quantité calculée à partir des mouvements validés.') }}</p>
+                </div>
+                <div class="rounded-lg bg-indigo-50 px-4 py-2 text-right">
+                    <p class="text-xs font-medium uppercase text-indigo-600">{{ __('Stock total') }}</p>
+                    <p class="text-lg font-semibold text-indigo-900">{{ number_format((float) $totalStock, 3, ',', ' ') }}</p>
+                </div>
+            </div>
             <dl class="mt-3 grid gap-3 text-sm text-gray-600 sm:grid-cols-2">
                 <div><dt class="font-medium">{{ __('Minimum') }}</dt><dd>{{ $product->minimum_stock ?? __('Non défini') }}</dd></div>
                 <div><dt class="font-medium">{{ __('Maximum') }}</dt><dd>{{ $product->maximum_stock ?? __('Non défini') }}</dd></div>
             </dl>
-            <p class="mt-4 text-xs text-gray-500">{{ __('Le stock réel sera disponible après activation du module Stocks et dépôts.') }}</p>
+
+            <div class="mt-5 overflow-x-auto rounded-lg border border-gray-200">
+                <table class="min-w-full divide-y divide-gray-200 text-sm">
+                    <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500"><tr><th class="px-4 py-3">{{ __('Dépôt') }}</th><th class="px-4 py-3">{{ __('Statut') }}</th><th class="px-4 py-3 text-right">{{ __('Quantité disponible') }}</th></tr></thead>
+                    <tbody class="divide-y divide-gray-200 bg-white">
+                        @forelse ($stockRows as $stockRow)
+                            <tr><td class="px-4 py-3"><span class="font-medium text-gray-900">{{ $stockRow->code }}</span> — {{ $stockRow->name }}</td><td class="px-4 py-3 text-gray-600">{{ $stockRow->is_active ? __('Actif') : __('Inactif') }}</td><td class="px-4 py-3 text-right font-semibold text-gray-900">{{ number_format((float) $stockRow->stock_quantity, 3, ',', ' ') }}</td></tr>
+                        @empty
+                            <tr><td colspan="3" class="px-4 py-6 text-center text-gray-500">{{ __('Aucun dépôt configuré.') }}</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         @endif
     </div>
 </section>

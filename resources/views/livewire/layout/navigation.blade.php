@@ -73,6 +73,12 @@ new class extends Component
                             {{ __('Produits et services') }}
                         </x-nav-link>
                     @endcan
+
+                    @can('stock.access')
+                        <x-nav-link :href="route('admin.stock.index')" :active="request()->routeIs('admin.stock.*')" wire:navigate>
+                            {{ __('Stocks et dépôts') }}
+                        </x-nav-link>
+                    @endcan
                 </div>
             </div>
 
@@ -162,6 +168,12 @@ new class extends Component
             @can('products.access')
                 <x-responsive-nav-link :href="route('admin.products.index')" :active="request()->routeIs('admin.products.*')" wire:navigate>
                     {{ __('Produits et services') }}
+                </x-responsive-nav-link>
+            @endcan
+
+            @can('stock.access')
+                <x-responsive-nav-link :href="route('admin.stock.index')" :active="request()->routeIs('admin.stock.*')" wire:navigate>
+                    {{ __('Stocks et dépôts') }}
                 </x-responsive-nav-link>
             @endcan
         </div>
