@@ -67,6 +67,11 @@ class AppServiceProvider extends ServiceProvider
                 || $user->hasPermission('customers.manage');
         });
 
+        Gate::define('suppliers.access', function (User $user): bool {
+            return $user->hasPermission('suppliers.view')
+                || $user->hasPermission('suppliers.manage');
+        });
+
         // Register all ERP permissions as Laravel Gates.
         foreach (config('erp.permissions', []) as $permission) {
             Gate::define(

@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Customer;
+use App\Models\Supplier;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome');
@@ -38,5 +39,15 @@ Route::get('administration/customers/{customer}', function (Customer $customer) 
 })
     ->middleware(['auth', 'auth.session', 'verified', 'can:customers.access'])
     ->name('admin.customers.show');
+
+Route::view('administration/suppliers', 'admin.suppliers.index')
+    ->middleware(['auth', 'auth.session', 'verified', 'can:suppliers.access'])
+    ->name('admin.suppliers.index');
+
+Route::get('administration/suppliers/{supplier}', function (Supplier $supplier) {
+    return view('admin.suppliers.show', compact('supplier'));
+})
+    ->middleware(['auth', 'auth.session', 'verified', 'can:suppliers.access'])
+    ->name('admin.suppliers.show');
 
 require __DIR__.'/auth.php';
