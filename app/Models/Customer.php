@@ -40,6 +40,11 @@ class Customer extends Model
         return $this->hasMany(CustomerContact::class);
     }
 
+    public function quotes(): HasMany
+    {
+        return $this->hasMany(Quote::class);
+    }
+
     public function isArchived(): bool
     {
         return $this->status === 'archived';

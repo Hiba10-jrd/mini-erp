@@ -7,6 +7,7 @@ use App\Enums\UserAccountStatus;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -42,6 +43,11 @@ class User extends Authenticatable
             Role::class,
             'role_user'
         );
+    }
+
+    public function createdQuotes(): HasMany
+    {
+        return $this->hasMany(Quote::class, 'created_by');
     }
 
     /**

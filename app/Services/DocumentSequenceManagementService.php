@@ -5,9 +5,34 @@ namespace App\Services;
 use App\Models\DocumentSequence;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\ValidationException;
 
 class DocumentSequenceManagementService
 {
+    public function allocate(string $documentType, int $year): string
+    {
+        Gate::authorize('sales.create');
+
+        return DB::transaction(function () use ($documentType, $year): string {
+            $sequence = DocumentSequence::query()
+                ->where('document_type', $documentType)
+                ->where('year', $year)
+                ->lockForUpdate()
+                ->first();
+
+            if ($sequence === null) {
+                throw ValidationException::withMessages([
+                    'quoteDate' => __('La séquence documentaire des devis n’est pas configurée pour :year.', ['year' => $year]),
+                ]);
+            }
+
+            $sequence->counter++;
+            $sequence->save();
+
+            return $this->format($sequence->number_format, $sequence->prefix, $sequence->year, $sequence->counter);
+        });
+    }
+
     /** @param array{document_type: string, prefix: string, year: int, counter: int, number_format: string} $attributes */
     public function save(?int $sequenceId, array $attributes): DocumentSequence
     {
@@ -29,8 +54,17 @@ class DocumentSequenceManagementService
     {
         Gate::authorize('company.administer');
 
-        $format = $attributes['number_format'];
-        $counter = (string) ($attributes['counter'] + 1);
+        return $this->format(
+            $attributes['number_format'],
+            $attributes['prefix'],
+            $attributes['year'],
+            $attributes['counter'] + 1,
+        );
+    }
+
+    private function format(string $format, string $prefix, int $year, int $counterValue): string
+    {
+        $counter = (string) $counterValue;
 
         if (preg_match('/\{counter:0*([1-9][0-9]*)d\}/', $format, $matches) === 1) {
             $counter = str_pad($counter, (int) $matches[1], '0', STR_PAD_LEFT);
@@ -38,8 +72,8 @@ class DocumentSequenceManagementService
         }
 
         return strtr($format, [
-            '{prefix}' => $attributes['prefix'],
-            '{year}' => (string) $attributes['year'],
+            '{prefix}' => $prefix,
+            '{year}' => (string) $year,
             '{counter}' => $counter,
         ]);
     }

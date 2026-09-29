@@ -65,6 +65,11 @@ class Product extends Model
         return $this->hasMany(StockInventoryLine::class);
     }
 
+    public function quoteItems(): HasMany
+    {
+        return $this->hasMany(QuoteItem::class);
+    }
+
     public function isService(): bool
     {
         return $this->type === 'service';
