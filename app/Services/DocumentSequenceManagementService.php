@@ -21,8 +21,19 @@ class DocumentSequenceManagementService
                 ->first();
 
             if ($sequence === null) {
+                $document = match ($documentType) {
+                    'quote' => __('des devis'),
+                    'order' => __('des commandes clients'),
+                    default => __('demandée'),
+                };
+                $field = match ($documentType) {
+                    'quote' => 'quoteDate',
+                    'order' => 'orderDate',
+                    default => 'document',
+                };
+
                 throw ValidationException::withMessages([
-                    'quoteDate' => __('La séquence documentaire des devis n’est pas configurée pour :year.', ['year' => $year]),
+                    $field => __('La séquence documentaire :document n’est pas configurée pour :year.', ['document' => $document, 'year' => $year]),
                 ]);
             }
 

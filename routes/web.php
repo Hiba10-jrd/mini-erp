@@ -4,6 +4,7 @@ use App\Http\Controllers\QuotePdfController;
 use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Quote;
+use App\Models\SalesOrder;
 use App\Models\StockInventory;
 use App\Models\Supplier;
 use Illuminate\Support\Facades\Route;
@@ -101,5 +102,25 @@ Route::get('sales/quotes/{quote}', function (Quote $quote) {
 })
     ->middleware(['auth', 'auth.session', 'verified', 'can:sales.view'])
     ->name('sales.quotes.show');
+
+Route::view('sales/orders', 'admin.sales-orders.index')
+    ->middleware(['auth', 'auth.session', 'verified', 'can:sales.view'])
+    ->name('sales.orders.index');
+
+Route::view('sales/orders/create', 'admin.sales-orders.form')
+    ->middleware(['auth', 'auth.session', 'verified', 'can:sales.create'])
+    ->name('sales.orders.create');
+
+Route::get('sales/orders/{salesOrder}/edit', function (SalesOrder $salesOrder) {
+    return view('admin.sales-orders.form', compact('salesOrder'));
+})
+    ->middleware(['auth', 'auth.session', 'verified', 'can:sales.update'])
+    ->name('sales.orders.edit');
+
+Route::get('sales/orders/{salesOrder}', function (SalesOrder $salesOrder) {
+    return view('admin.sales-orders.show', compact('salesOrder'));
+})
+    ->middleware(['auth', 'auth.session', 'verified', 'can:sales.view'])
+    ->name('sales.orders.show');
 
 require __DIR__.'/auth.php';

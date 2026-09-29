@@ -70,6 +70,11 @@ class Product extends Model
         return $this->hasMany(QuoteItem::class);
     }
 
+    public function salesOrderItems(): HasMany
+    {
+        return $this->hasMany(SalesOrderItem::class);
+    }
+
     public function isService(): bool
     {
         return $this->type === 'service';

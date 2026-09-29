@@ -28,11 +28,18 @@ new class extends \Livewire\Volt\Component
         $service->archiveDraft(Quote::query()->findOrFail($this->quoteId));
     }
 
+    public function createOrder(\App\Services\SalesOrderManagementService $service): void
+    {
+        Gate::authorize('sales.create');
+        $order = $service->createFromAcceptedQuote(Quote::query()->findOrFail($this->quoteId));
+        $this->redirectRoute('sales.orders.show', ['salesOrder' => $order], navigate: true);
+    }
+
     public function with(): array
     {
         Gate::authorize('sales.view');
 
-        return ['quote' => Quote::query()->with(['customer', 'creator', 'items'])->findOrFail($this->quoteId)];
+        return ['quote' => Quote::query()->with(['customer', 'creator', 'items', 'salesOrder'])->findOrFail($this->quoteId)];
     }
 }; ?>
 
@@ -41,6 +48,11 @@ new class extends \Livewire\Volt\Component
         <a href="{{ route('sales.quotes.index') }}" wire:navigate class="text-sm font-medium text-indigo-700 hover:text-indigo-900">{{ __('Retour aux devis') }}</a>
         <div class="flex flex-wrap gap-2">
             <a href="{{ route('sales.quotes.pdf', $quote) }}" target="_blank" rel="noopener" class="inline-flex min-h-10 items-center border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50">{{ __('Télécharger le PDF') }}</a>
+            @if ($quote->salesOrder)
+                <a href="{{ route('sales.orders.show', $quote->salesOrder) }}" wire:navigate class="inline-flex min-h-10 items-center border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50">{{ __('Voir la commande') }} {{ $quote->salesOrder->number }}</a>
+            @elseif ($quote->status === 'accepted' && $quote->archived_at === null)
+                @can('sales.create')<x-primary-button type="button" wire:click="createOrder">{{ __('Créer la commande') }}</x-primary-button>@endcan
+            @endif
             @if ($quote->isEditable())
                 @can('sales.update')<a href="{{ route('sales.quotes.edit', $quote) }}" wire:navigate class="inline-flex min-h-10 items-center border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50">{{ __('Modifier') }}</a>@endcan
                 @can('sales.delete')<x-danger-button type="button" wire:click="archive" wire:confirm="{{ __('Archiver ce brouillon ?') }}">{{ __('Archiver') }}</x-danger-button>@endcan

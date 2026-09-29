@@ -78,6 +78,9 @@ new class extends Component
                         <x-nav-link :href="route('sales.quotes.index')" :active="request()->routeIs('sales.quotes.*')" wire:navigate>
                             {{ __('Devis') }}
                         </x-nav-link>
+                        <x-nav-link :href="route('sales.orders.index')" :active="request()->routeIs('sales.orders.*')" wire:navigate>
+                            {{ __('Commandes clients') }}
+                        </x-nav-link>
                     @endcan
 
                     @can('stock.access')
@@ -184,6 +187,9 @@ new class extends Component
             @can('sales.view')
                 <x-responsive-nav-link :href="route('sales.quotes.index')" :active="request()->routeIs('sales.quotes.*')" wire:navigate>
                     {{ __('Devis') }}
+                </x-responsive-nav-link>
+                <x-responsive-nav-link :href="route('sales.orders.index')" :active="request()->routeIs('sales.orders.*')" wire:navigate>
+                    {{ __('Commandes clients') }}
                 </x-responsive-nav-link>
             @endcan
 

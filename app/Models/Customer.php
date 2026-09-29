@@ -45,6 +45,11 @@ class Customer extends Model
         return $this->hasMany(Quote::class);
     }
 
+    public function salesOrders(): HasMany
+    {
+        return $this->hasMany(SalesOrder::class);
+    }
+
     public function isArchived(): bool
     {
         return $this->status === 'archived';
