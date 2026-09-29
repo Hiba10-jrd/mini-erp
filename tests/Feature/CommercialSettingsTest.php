@@ -255,6 +255,32 @@ class CommercialSettingsTest extends TestCase
         ]);
     }
 
+    public function test_delivery_note_new_sequence_defaults_to_bl_prefix_and_never_dev(): void
+    {
+        $this->actingAs($this->createSuperAdministrator());
+
+        Volt::test('admin.document-sequences-manager')
+            ->set('documentType', 'delivery_note')
+            ->assertSet('prefix', 'BL')
+            ->set('year', '2026')
+            ->set('counter', '0')
+            ->set('numberFormat', '{prefix}-{year}-{counter:05d}')
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $this->assertDatabaseHas('document_sequences', [
+            'document_type' => 'delivery_note',
+            'prefix' => 'BL',
+            'year' => 2026,
+            'counter' => 0,
+        ]);
+
+        $this->assertDatabaseMissing('document_sequences', [
+            'document_type' => 'delivery_note',
+            'prefix' => 'DEV',
+        ]);
+    }
+
     public function test_duplicate_type_and_year_is_rejected_without_modifying_existing_sequences(): void
     {
         $this->actingAs($this->createSuperAdministrator());

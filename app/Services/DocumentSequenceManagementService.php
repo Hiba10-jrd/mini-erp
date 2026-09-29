@@ -14,6 +14,7 @@ class DocumentSequenceManagementService
         Gate::authorize('sales.create');
 
         return DB::transaction(function () use ($documentType, $year): string {
+            $documentType = $this->normalizeDocumentType($documentType);
             $sequence = DocumentSequence::query()
                 ->where('document_type', $documentType)
                 ->where('year', $year)
@@ -24,16 +25,27 @@ class DocumentSequenceManagementService
                 $document = match ($documentType) {
                     'quote' => __('des devis'),
                     'order' => __('des commandes clients'),
+                    'delivery_note' => __('des bons de livraison'),
                     default => __('demandée'),
                 };
                 $field = match ($documentType) {
                     'quote' => 'quoteDate',
                     'order' => 'orderDate',
+                    'delivery_note' => 'deliveryNoteDate',
                     default => 'document',
                 };
 
                 throw ValidationException::withMessages([
                     $field => __('La séquence documentaire :document n’est pas configurée pour :year.', ['document' => $document, 'year' => $year]),
+                ]);
+            }
+
+            if (! $this->prefixMatchesDocumentType($documentType, $sequence->prefix)) {
+                throw ValidationException::withMessages([
+                    'document_type' => __('La séquence :document doit utiliser le préfixe :expected pour rester cohérente avec le type documentaire.', [
+                        'document' => $documentType,
+                        'expected' => $this->expectedPrefix($documentType),
+                    ]),
                 ]);
             }
 
@@ -50,6 +62,12 @@ class DocumentSequenceManagementService
         Gate::authorize('company.administer');
 
         return DB::transaction(function () use ($sequenceId, $attributes): DocumentSequence {
+            $documentType = $this->normalizeDocumentType($attributes['document_type'] ?? 'quote');
+            $prefix = strtoupper((string) ($attributes['prefix'] ?? $this->expectedPrefix($documentType)));
+
+            $attributes['document_type'] = $documentType;
+            $attributes['prefix'] = $prefix;
+
             $sequence = $sequenceId === null
                 ? new DocumentSequence
                 : DocumentSequence::query()->lockForUpdate()->findOrFail($sequenceId);
@@ -67,7 +85,7 @@ class DocumentSequenceManagementService
 
         return $this->format(
             $attributes['number_format'],
-            $attributes['prefix'],
+            strtoupper((string) ($attributes['prefix'] ?? $this->expectedPrefix($this->normalizeDocumentType($attributes['document_type'] ?? 'quote')))),
             $attributes['year'],
             $attributes['counter'] + 1,
         );
@@ -87,5 +105,33 @@ class DocumentSequenceManagementService
             '{year}' => (string) $year,
             '{counter}' => $counter,
         ]);
+    }
+
+    private function normalizeDocumentType(string $documentType): string
+    {
+        return match ($documentType) {
+            'quote', 'order', 'delivery_note', 'invoice', 'credit_note' => $documentType,
+            default => 'quote',
+        };
+    }
+
+    private function expectedPrefix(string $documentType): string
+    {
+        return match ($documentType) {
+            'quote' => 'DEV',
+            'order' => 'CMD',
+            'delivery_note' => 'BL',
+            'invoice' => 'FAC',
+            'credit_note' => 'AV',
+            default => 'DEV',
+        };
+    }
+
+    private function prefixMatchesDocumentType(string $documentType, string $prefix): bool
+    {
+        $prefix = strtoupper((string) $prefix);
+        $expected = $this->expectedPrefix($documentType);
+
+        return $prefix === $expected || str_starts_with($prefix, $expected.'-');
     }
 }

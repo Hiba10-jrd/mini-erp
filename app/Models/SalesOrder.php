@@ -106,6 +106,11 @@ class SalesOrder extends Model
         return $this->hasMany(SalesOrderHistory::class)->orderBy('created_at')->orderBy('id');
     }
 
+    public function deliveryNotes(): HasMany
+    {
+        return $this->hasMany(DeliveryNote::class)->orderBy('created_at');
+    }
+
     public function isEditable(): bool
     {
         return $this->status === self::STATUS_DRAFT && $this->archived_at === null;

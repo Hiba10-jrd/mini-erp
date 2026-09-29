@@ -28,6 +28,28 @@ new class extends \Livewire\Volt\Component
         $service->transition(SalesOrder::query()->findOrFail($this->orderId), SalesOrder::STATUS_CANCELLED);
     }
 
+    public function createDeliveryNote(): void
+    {
+        Gate::authorize('sales.create');
+        $order = SalesOrder::query()->with('items')->findOrFail($this->orderId);
+        $remaining = $order->items->sum(fn ($item): float => (float) ($item->ordered_quantity - $item->delivered_quantity));
+
+        abort_unless(in_array($order->status, [SalesOrder::STATUS_CONFIRMED, SalesOrder::STATUS_PARTIALLY_DELIVERED], true) && $remaining > 0, 403, __('Cette commande ne peut pas recevoir de bon de livraison.'));
+
+        $draft = \App\Models\DeliveryNote::query()
+            ->where('sales_order_id', $order->id)
+            ->where('status', 'draft')
+            ->latest('created_at')
+            ->first();
+
+        if ($draft !== null) {
+            $this->redirectRoute('sales.delivery-notes.edit', ['deliveryNote' => $draft], navigate: true);
+            return;
+        }
+
+        $this->redirectRoute('sales.orders.delivery-notes.create', ['salesOrder' => $order], navigate: true);
+    }
+
     public function with(): array
     {
         Gate::authorize('sales.view');
@@ -37,6 +59,8 @@ new class extends \Livewire\Volt\Component
             'order' => $order,
             'canCancel' => in_array($order->status, [SalesOrder::STATUS_DRAFT, SalesOrder::STATUS_CONFIRMED], true)
                 && $order->items->every(fn ($item): bool => $item->delivered_quantity === '0.000'),
+            'canCreateDeliveryNote' => in_array($order->status, [SalesOrder::STATUS_CONFIRMED, SalesOrder::STATUS_PARTIALLY_DELIVERED], true)
+                && $order->items->sum(fn ($item): float => (float) ($item->ordered_quantity - $item->delivered_quantity)) > 0,
         ];
     }
 }; ?>
@@ -47,6 +71,9 @@ new class extends \Livewire\Volt\Component
         <div class="flex flex-wrap gap-2">
             @if ($order->isEditable())
                 @can('sales.update')<a href="{{ route('sales.orders.edit', $order) }}" wire:navigate class="inline-flex min-h-10 items-center border border-gray-300 px-4 text-sm font-medium text-gray-700">{{ __('Modifier') }}</a><x-primary-button type="button" wire:click="confirmOrder">{{ __('Confirmer la commande') }}</x-primary-button>@endcan
+            @endif
+            @if ($canCreateDeliveryNote)
+                @can('sales.create')<x-primary-button type="button" wire:click="createDeliveryNote">{{ __('Créer un bon de livraison') }}</x-primary-button>@endcan
             @endif
             @if ($canCancel)
                 @can('sales.delete')<x-danger-button type="button" wire:click="cancelOrder" wire:confirm="{{ __('Annuler cette commande ?') }}">{{ __('Annuler la commande') }}</x-danger-button>@endcan

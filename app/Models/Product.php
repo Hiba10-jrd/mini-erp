@@ -75,6 +75,11 @@ class Product extends Model
         return $this->hasMany(SalesOrderItem::class);
     }
 
+    public function deliveryNoteItems(): HasMany
+    {
+        return $this->hasMany(DeliveryNoteItem::class);
+    }
+
     public function isService(): bool
     {
         return $this->type === 'service';

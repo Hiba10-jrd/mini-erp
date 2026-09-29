@@ -1,7 +1,9 @@
 <?php
 
+use App\Http\Controllers\DeliveryNotePdfController;
 use App\Http\Controllers\QuotePdfController;
 use App\Models\Customer;
+use App\Models\DeliveryNote;
 use App\Models\Product;
 use App\Models\Quote;
 use App\Models\SalesOrder;
@@ -122,5 +124,31 @@ Route::get('sales/orders/{salesOrder}', function (SalesOrder $salesOrder) {
 })
     ->middleware(['auth', 'auth.session', 'verified', 'can:sales.view'])
     ->name('sales.orders.show');
+
+Route::view('sales/delivery-notes', 'admin.delivery-notes.index')
+    ->middleware(['auth', 'auth.session', 'verified', 'can:sales.view'])
+    ->name('sales.delivery-notes.index');
+
+Route::get('sales/orders/{salesOrder}/delivery-notes/create', function (SalesOrder $salesOrder) {
+    return view('admin.delivery-notes.form', compact('salesOrder'));
+})
+    ->middleware(['auth', 'auth.session', 'verified', 'can:sales.create'])
+    ->name('sales.orders.delivery-notes.create');
+
+Route::get('sales/delivery-notes/{deliveryNote}/edit', function (DeliveryNote $deliveryNote) {
+    return view('admin.delivery-notes.form', compact('deliveryNote'));
+})
+    ->middleware(['auth', 'auth.session', 'verified', 'can:sales.update'])
+    ->name('sales.delivery-notes.edit');
+
+Route::get('sales/delivery-notes/{deliveryNote}/pdf', DeliveryNotePdfController::class)
+    ->middleware(['auth', 'auth.session', 'verified', 'can:sales.view'])
+    ->name('sales.delivery-notes.pdf');
+
+Route::get('sales/delivery-notes/{deliveryNote}', function (DeliveryNote $deliveryNote) {
+    return view('admin.delivery-notes.show', compact('deliveryNote'));
+})
+    ->middleware(['auth', 'auth.session', 'verified', 'can:sales.view'])
+    ->name('sales.delivery-notes.show');
 
 require __DIR__.'/auth.php';
