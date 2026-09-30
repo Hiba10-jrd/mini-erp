@@ -50,6 +50,16 @@ class Customer extends Model
         return $this->hasMany(SalesOrder::class);
     }
 
+    public function invoices(): HasMany
+    {
+        return $this->hasMany(Invoice::class)->orderBy('invoice_date')->orderBy('id');
+    }
+
+    public function creditNotes(): HasMany
+    {
+        return $this->hasMany(CreditNote::class)->orderBy('credit_date')->orderBy('id');
+    }
+
     public function isArchived(): bool
     {
         return $this->status === 'archived';

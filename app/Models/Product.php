@@ -80,6 +80,16 @@ class Product extends Model
         return $this->hasMany(DeliveryNoteItem::class);
     }
 
+    public function invoiceItems(): HasMany
+    {
+        return $this->hasMany(InvoiceItem::class);
+    }
+
+    public function creditNoteItems(): HasMany
+    {
+        return $this->hasMany(CreditNoteItem::class);
+    }
+
     public function isService(): bool
     {
         return $this->type === 'service';

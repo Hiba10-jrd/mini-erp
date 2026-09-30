@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TaxRate extends Model
 {
@@ -15,5 +16,15 @@ class TaxRate extends Model
             'is_active' => 'boolean',
             'is_default' => 'boolean',
         ];
+    }
+
+    public function invoiceItems(): HasMany
+    {
+        return $this->hasMany(InvoiceItem::class);
+    }
+
+    public function creditNoteItems(): HasMany
+    {
+        return $this->hasMany(CreditNoteItem::class);
     }
 }

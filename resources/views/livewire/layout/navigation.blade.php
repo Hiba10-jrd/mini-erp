@@ -86,6 +86,24 @@ new class extends Component
                         </x-nav-link>
                     @endcan
 
+                    @can('invoices.view')
+    <x-nav-link
+        :href="route('sales.invoices.index')"
+        :active="request()->routeIs('sales.invoices.*')"
+        wire:navigate
+    >
+        {{ __('Factures') }}
+    </x-nav-link>
+@endcan
+@can('invoices.view')
+    <x-nav-link
+        :href="route('sales.credit-notes.index')"
+        :active="request()->routeIs('sales.credit-notes.*')"
+        wire:navigate
+    >
+        {{ __('Avoirs') }}
+    </x-nav-link>
+@endcan
                     @can('stock.access')
                         <x-nav-link :href="route('admin.stock.index')" :active="request()->routeIs('admin.stock.*')" wire:navigate>
                             {{ __('Stocks et dépôts') }}
@@ -198,6 +216,24 @@ new class extends Component
                     {{ __('Bons de livraison') }}
                 </x-responsive-nav-link>
             @endcan
+            @can('invoices.view')
+    <x-responsive-nav-link
+        :href="route('sales.invoices.index')"
+        :active="request()->routeIs('sales.invoices.*')"
+        wire:navigate
+    >
+        {{ __('Factures') }}
+    </x-responsive-nav-link>
+@endcan
+@can('invoices.view')
+    <x-responsive-nav-link
+        :href="route('sales.credit-notes.index')"
+        :active="request()->routeIs('sales.credit-notes.*')"
+        wire:navigate
+    >
+        {{ __('Avoirs') }}
+    </x-responsive-nav-link>
+@endcan
 
             @can('stock.access')
                 <x-responsive-nav-link :href="route('admin.stock.index')" :active="request()->routeIs('admin.stock.*')" wire:navigate>

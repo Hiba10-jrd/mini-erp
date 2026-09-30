@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\SalesOrder;
+use App\Services\InvoiceManagementService;
 use App\Services\SalesOrderManagementService;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Locked;
@@ -44,23 +45,73 @@ new class extends \Livewire\Volt\Component
 
         if ($draft !== null) {
             $this->redirectRoute('sales.delivery-notes.edit', ['deliveryNote' => $draft], navigate: true);
+
             return;
         }
 
         $this->redirectRoute('sales.orders.delivery-notes.create', ['salesOrder' => $order], navigate: true);
     }
 
-    public function with(): array
-    {
+    public function with(
+        InvoiceManagementService $invoiceService
+    ): array {
         Gate::authorize('sales.view');
-        $order = SalesOrder::query()->with(['customer', 'sourceQuote', 'creator', 'items', 'histories.user'])->findOrFail($this->orderId);
+
+        $order = SalesOrder::query()
+            ->with([
+                'customer',
+                'sourceQuote',
+                'creator',
+                'items',
+                'histories.user',
+            ])
+            ->findOrFail($this->orderId);
+
+        $canCreateInvoice = false;
+
+        $invoiceableStatuses = [
+            SalesOrder::STATUS_CONFIRMED,
+            SalesOrder::STATUS_PARTIALLY_DELIVERED,
+            SalesOrder::STATUS_DELIVERED,
+        ];
+
+        if (
+            Gate::allows('invoices.create')
+            && in_array($order->status, $invoiceableStatuses, true)
+        ) {
+            $canCreateInvoice = $invoiceService
+                ->availableItemsForOrder($order) !== [];
+        }
 
         return [
             'order' => $order,
-            'canCancel' => in_array($order->status, [SalesOrder::STATUS_DRAFT, SalesOrder::STATUS_CONFIRMED], true)
-                && $order->items->every(fn ($item): bool => $item->delivered_quantity === '0.000'),
-            'canCreateDeliveryNote' => in_array($order->status, [SalesOrder::STATUS_CONFIRMED, SalesOrder::STATUS_PARTIALLY_DELIVERED], true)
-                && $order->items->sum(fn ($item): float => (float) ($item->ordered_quantity - $item->delivered_quantity)) > 0,
+
+            'canCancel' => in_array(
+                $order->status,
+                [
+                    SalesOrder::STATUS_DRAFT,
+                    SalesOrder::STATUS_CONFIRMED,
+                ],
+                true
+            ) && $order->items->every(
+                fn ($item): bool => $item->delivered_quantity === '0.000'
+            ),
+
+            'canCreateDeliveryNote' => in_array(
+                $order->status,
+                [
+                    SalesOrder::STATUS_CONFIRMED,
+                    SalesOrder::STATUS_PARTIALLY_DELIVERED,
+                ],
+                true
+            ) && $order->items->sum(
+                fn ($item): float => (float) (
+                    $item->ordered_quantity
+                    - $item->delivered_quantity
+                )
+            ) > 0,
+
+            'canCreateInvoice' => $canCreateInvoice,
         ];
     }
 }; ?>
@@ -75,6 +126,20 @@ new class extends \Livewire\Volt\Component
             @if ($canCreateDeliveryNote)
                 @can('sales.create')<x-primary-button type="button" wire:click="createDeliveryNote">{{ __('Créer un bon de livraison') }}</x-primary-button>@endcan
             @endif
+            @if ($canCreateInvoice)
+    @can('invoices.create')
+        <a
+            href="{{ route(
+                'sales.orders.invoices.create',
+                $order
+            ) }}"
+            wire:navigate
+            class="inline-flex min-h-10 items-center bg-gray-800 px-4 text-sm font-semibold uppercase tracking-widest text-white transition hover:bg-gray-700"
+        >
+            {{ __('Créer une facture') }}
+        </a>
+    @endcan
+@endif
             @if ($canCancel)
                 @can('sales.delete')<x-danger-button type="button" wire:click="cancelOrder" wire:confirm="{{ __('Annuler cette commande ?') }}">{{ __('Annuler la commande') }}</x-danger-button>@endcan
             @endif

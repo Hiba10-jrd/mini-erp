@@ -1,9 +1,13 @@
 <?php
 
+use App\Http\Controllers\CreditNotePdfController;
 use App\Http\Controllers\DeliveryNotePdfController;
+use App\Http\Controllers\InvoicePdfController;
 use App\Http\Controllers\QuotePdfController;
+use App\Models\CreditNote;
 use App\Models\Customer;
 use App\Models\DeliveryNote;
+use App\Models\Invoice;
 use App\Models\Product;
 use App\Models\Quote;
 use App\Models\SalesOrder;
@@ -151,4 +155,93 @@ Route::get('sales/delivery-notes/{deliveryNote}', function (DeliveryNote $delive
     ->middleware(['auth', 'auth.session', 'verified', 'can:sales.view'])
     ->name('sales.delivery-notes.show');
 
+Route::view('sales/invoices', 'admin.invoices.index')
+    ->middleware([
+        'auth',
+        'auth.session',
+        'verified',
+        'can:invoices.view',
+    ])
+    ->name('sales.invoices.index');
+Route::get(
+    'sales/orders/{salesOrder}/invoices/create',
+    function (SalesOrder $salesOrder) {
+        return view(
+            'admin.invoices.form',
+            compact('salesOrder')
+        );
+    }
+)
+    ->middleware([
+        'auth',
+        'auth.session',
+        'verified',
+        'can:invoices.create',
+    ])
+    ->name('sales.orders.invoices.create');
+Route::get(
+    'sales/invoices/{invoice}/pdf',
+    InvoicePdfController::class
+)
+    ->middleware([
+        'auth',
+        'auth.session',
+        'verified',
+        'can:invoices.view',
+    ])
+    ->name('sales.invoices.pdf');
+Route::get(
+    'sales/invoices/{invoice}',
+    function (Invoice $invoice) {
+        return view(
+            'admin.invoices.show',
+            compact('invoice')
+        );
+    }
+)
+    ->middleware([
+        'auth',
+        'auth.session',
+        'verified',
+        'can:invoices.view',
+    ])
+    ->name('sales.invoices.show');
+Route::get('sales/credit-notes', function () {
+    return view('admin.credit-notes.index');
+})
+    ->middleware(['auth', 'auth.session', 'verified', 'can:invoices.view'])
+    ->name('sales.credit-notes.index');
+
+Route::get('sales/invoices/{invoice}/credit-notes/create', function (Invoice $invoice) {
+    return view('admin.credit-notes.form', [
+        'invoice' => $invoice,
+        'creditNote' => null,
+    ]);
+})
+    ->middleware(['auth', 'auth.session', 'verified', 'can:invoices.create'])
+    ->name('sales.invoices.credit-notes.create');
+
+Route::get('sales/credit-notes/{creditNote}/edit', function (CreditNote $creditNote) {
+    abort_unless($creditNote->isEditable(), 404);
+
+    return view('admin.credit-notes.form', [
+        'invoice' => $creditNote->invoice,
+        'creditNote' => $creditNote,
+    ]);
+})
+    ->middleware(['auth', 'auth.session', 'verified', 'can:invoices.create'])
+    ->name('sales.credit-notes.edit');
+
+Route::get(
+    'sales/credit-notes/{creditNote}/pdf',
+    CreditNotePdfController::class
+)
+    ->middleware(['auth', 'auth.session', 'verified', 'can:invoices.view'])
+    ->name('sales.credit-notes.pdf');
+
+Route::get('sales/credit-notes/{creditNote}', function (CreditNote $creditNote) {
+    return view('admin.credit-notes.show', compact('creditNote'));
+})
+    ->middleware(['auth', 'auth.session', 'verified', 'can:invoices.view'])
+    ->name('sales.credit-notes.show');
 require __DIR__.'/auth.php';

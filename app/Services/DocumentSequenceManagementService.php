@@ -11,7 +11,10 @@ class DocumentSequenceManagementService
 {
     public function allocate(string $documentType, int $year): string
     {
-        Gate::authorize('sales.create');
+        Gate::authorize(match ($documentType) {
+            'invoice', 'credit_note' => 'invoices.validate',
+            default => 'sales.create',
+        });
 
         return DB::transaction(function () use ($documentType, $year): string {
             $documentType = $this->normalizeDocumentType($documentType);
