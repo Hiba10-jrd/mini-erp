@@ -244,4 +244,40 @@ Route::get('sales/credit-notes/{creditNote}', function (CreditNote $creditNote) 
 })
     ->middleware(['auth', 'auth.session', 'verified', 'can:invoices.view'])
     ->name('sales.credit-notes.show');
+Route::view('sales/payments', 'admin.payments.index')
+    ->middleware([
+        'auth',
+        'auth.session',
+        'verified',
+        'can:payments.view',
+    ])
+    ->name('sales.payments.index');
+
+Route::view('sales/payments/create', 'admin.payments.form')
+    ->middleware([
+        'auth',
+        'auth.session',
+        'verified',
+        'can:payments.create',
+    ])
+    ->name('sales.payments.create');
+
+Route::get(
+    'sales/invoices/{invoice}/payments/create',
+    function (Invoice $invoice) {
+        abort_unless($invoice->isIssued(), 404);
+
+        return view(
+            'admin.payments.form',
+            compact('invoice')
+        );
+    }
+)
+    ->middleware([
+        'auth',
+        'auth.session',
+        'verified',
+        'can:payments.create',
+    ])
+    ->name('sales.invoices.payments.create');
 require __DIR__.'/auth.php';

@@ -92,6 +92,11 @@ class Invoice extends Model
         return $this->belongsTo(User::class, 'issued_by');
     }
 
+    public function paymentAllocations(): HasMany
+    {
+        return $this->hasMany(PaymentAllocation::class);
+    }
+
     public function items(): HasMany
     {
         return $this->hasMany(InvoiceItem::class)->orderBy('position');

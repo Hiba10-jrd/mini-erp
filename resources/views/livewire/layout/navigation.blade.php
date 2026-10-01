@@ -234,6 +234,15 @@ new class extends Component
         {{ __('Avoirs') }}
     </x-responsive-nav-link>
 @endcan
+@can('payments.view')
+    <x-nav-link
+        :href="route('sales.payments.index')"
+        :active="request()->routeIs('sales.payments.*')"
+        wire:navigate
+    >
+        {{ __('Paiements') }}
+    </x-nav-link>
+@endcan
 
             @can('stock.access')
                 <x-responsive-nav-link :href="route('admin.stock.index')" :active="request()->routeIs('admin.stock.*')" wire:navigate>

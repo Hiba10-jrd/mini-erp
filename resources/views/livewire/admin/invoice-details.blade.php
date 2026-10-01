@@ -1,7 +1,7 @@
 <?php
-
 use App\Models\Invoice;
 use App\Services\InvoiceManagementService;
+use App\Services\PaymentManagementService;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Locked;
 
@@ -50,20 +50,32 @@ new class extends \Livewire\Volt\Component
     }
 
     public function with(): array
-    {
-        Gate::authorize('invoices.view');
+{
+    Gate::authorize('invoices.view');
 
-        return [
-            'invoice' => Invoice::query()
-                ->with([
-                    'salesOrder:id,number',
-                    'creator:id,name',
-                    'issuer:id,name',
-                    'items',
-                ])
-                ->findOrFail($this->invoiceId),
-        ];
-    }
+    $invoice = Invoice::query()
+        ->with([
+            'salesOrder:id,number',
+            'creator:id,name',
+            'issuer:id,name',
+            'items',
+        ])
+        ->findOrFail($this->invoiceId);
+
+    $paymentService = app(PaymentManagementService::class);
+
+    return [
+        'invoice' => $invoice,
+
+        'paymentRemaining' => $invoice->isIssued()
+            ? $paymentService->remainingAmount($invoice)
+            : '0.00',
+
+        'paymentState' => $invoice->isIssued()
+            ? $paymentService->paymentState($invoice)
+            : 'not_applicable',
+    ];
+}
 };
 ?>
 
@@ -87,7 +99,20 @@ new class extends \Livewire\Volt\Component
                 >
                     {{ __('Télécharger le PDF') }}
                 </a>
-
+@can('payments.create')
+    @if (bccomp($paymentRemaining, '0.00', 2) === 1)
+        <a
+            href="{{ route(
+                'sales.invoices.payments.create',
+                $invoice
+            ) }}"
+            wire:navigate
+            class="inline-flex min-h-10 items-center bg-gray-900 px-4 text-sm font-semibold uppercase tracking-widest text-white transition hover:bg-gray-700"
+        >
+            {{ __('Enregistrer un paiement') }}
+        </a>
+    @endif
+@endcan
                 @can('invoices.create')
                     <a
                         href="{{ route('sales.invoices.credit-notes.create', $invoice) }}"

@@ -35,6 +35,11 @@ class Customer extends Model
         return $this->belongsTo(PaymentTerm::class);
     }
 
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
+    }
+
     public function contacts(): HasMany
     {
         return $this->hasMany(CustomerContact::class);
