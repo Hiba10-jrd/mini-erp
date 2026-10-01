@@ -18,6 +18,13 @@ class StockManagementService
         return $this->applyMovement($productId, $warehouseId, 'entry', $quantity, true, $reference, $notes);
     }
 
+    public function receivePurchaseReceipt(int $productId, int $warehouseId, string|int|float $quantity, string $reference, ?string $notes = null): StockMovement
+    {
+        Gate::authorize('purchases.update');
+
+        return $this->applyMovement($productId, $warehouseId, 'entry', $quantity, true, $reference, $notes, false);
+    }
+
     public function issue(int $productId, int $warehouseId, string|int|float $quantity, ?string $reference = null, ?string $notes = null): StockMovement
     {
         return $this->applyMovement($productId, $warehouseId, 'exit', $quantity, false, $reference, $notes);
@@ -117,9 +124,11 @@ class StockManagementService
         }, 3);
     }
 
-    private function applyMovement(int $productId, int $warehouseId, string $type, string|int|float $quantity, bool $isIncrease, ?string $reference, ?string $notes): StockMovement
+    private function applyMovement(int $productId, int $warehouseId, string $type, string|int|float $quantity, bool $isIncrease, ?string $reference, ?string $notes, bool $authorizeStock = true): StockMovement
     {
-        Gate::authorize('stock.manage');
+        if ($authorizeStock) {
+            Gate::authorize('stock.manage');
+        }
         $quantityUnits = $this->toMilliunits($quantity);
         [$reference, $notes] = $this->validateMetadata($reference, $notes);
 

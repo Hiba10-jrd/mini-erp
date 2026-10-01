@@ -14,6 +14,7 @@ class DocumentSequenceManagementService
         Gate::authorize(match ($documentType) {
             'invoice', 'credit_note' => 'invoices.validate',
             'purchase_order' => 'purchases.create',
+            'goods_receipt' => 'purchases.create',
             default => 'sales.create',
         });
 
@@ -31,6 +32,7 @@ class DocumentSequenceManagementService
                     'order' => __('des commandes clients'),
                     'delivery_note' => __('des bons de livraison'),
                     'purchase_order' => __('des commandes fournisseurs'),
+                    'goods_receipt' => __('des réceptions fournisseurs'),
                     default => __('demandée'),
                 };
                 $field = match ($documentType) {
@@ -38,6 +40,7 @@ class DocumentSequenceManagementService
                     'order' => 'orderDate',
                     'delivery_note' => 'deliveryNoteDate',
                     'purchase_order' => 'order_date',
+                    'goods_receipt' => 'receipt_date',
                     default => 'document',
                 };
 
@@ -116,7 +119,7 @@ class DocumentSequenceManagementService
     private function normalizeDocumentType(string $documentType): string
     {
         return match ($documentType) {
-            'quote', 'order', 'delivery_note', 'invoice', 'credit_note', 'purchase_order' => $documentType,
+            'quote', 'order', 'delivery_note', 'invoice', 'credit_note', 'purchase_order', 'goods_receipt' => $documentType,
             default => 'quote',
         };
     }
@@ -130,6 +133,7 @@ class DocumentSequenceManagementService
             'invoice' => 'FAC',
             'credit_note' => 'AV',
             'purchase_order' => 'BCF',
+            'goods_receipt' => 'BRF',
             default => 'DEV',
         };
     }

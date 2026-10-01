@@ -107,6 +107,11 @@ class PurchaseOrder extends Model
         return $this->hasMany(PurchaseOrderHistory::class)->orderBy('created_at')->orderBy('id');
     }
 
+    public function goodsReceipts(): HasMany
+    {
+        return $this->hasMany(GoodsReceipt::class)->orderBy('receipt_date')->orderBy('id');
+    }
+
     public function isEditable(): bool
     {
         return $this->status === self::STATUS_DRAFT;

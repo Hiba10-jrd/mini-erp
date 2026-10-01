@@ -7,6 +7,7 @@ use App\Http\Controllers\QuotePdfController;
 use App\Models\CreditNote;
 use App\Models\Customer;
 use App\Models\DeliveryNote;
+use App\Models\GoodsReceipt;
 use App\Models\Invoice;
 use App\Models\Product;
 use App\Models\PurchaseOrder;
@@ -91,6 +92,32 @@ Route::get('purchases/orders/{purchaseOrder}', function (PurchaseOrder $purchase
 })
     ->middleware(['auth', 'auth.session', 'verified', 'can:purchases.view'])
     ->name('purchases.orders.show');
+
+Route::view('purchases/receipts', 'admin.goods-receipts.index')
+    ->middleware(['auth', 'auth.session', 'verified', 'can:purchases.view'])
+    ->name('purchases.receipts.index');
+
+Route::view('purchases/receipts/create', 'admin.goods-receipts.form')
+    ->middleware(['auth', 'auth.session', 'verified', 'can:purchases.create'])
+    ->name('purchases.receipts.create');
+
+Route::get('purchases/orders/{purchaseOrder}/receipts/create', function (PurchaseOrder $purchaseOrder) {
+    return view('admin.goods-receipts.form', compact('purchaseOrder'));
+})
+    ->middleware(['auth', 'auth.session', 'verified', 'can:purchases.create'])
+    ->name('purchases.orders.receipts.create');
+
+Route::get('purchases/receipts/{goodsReceipt}/edit', function (GoodsReceipt $goodsReceipt) {
+    return view('admin.goods-receipts.form', compact('goodsReceipt'));
+})
+    ->middleware(['auth', 'auth.session', 'verified', 'can:purchases.update'])
+    ->name('purchases.receipts.edit');
+
+Route::get('purchases/receipts/{goodsReceipt}', function (GoodsReceipt $goodsReceipt) {
+    return view('admin.goods-receipts.show', compact('goodsReceipt'));
+})
+    ->middleware(['auth', 'auth.session', 'verified', 'can:purchases.view'])
+    ->name('purchases.receipts.show');
 
 Route::view('administration/stock', 'admin.stock.index')
     ->middleware(['auth', 'auth.session', 'verified', 'can:stock.access'])

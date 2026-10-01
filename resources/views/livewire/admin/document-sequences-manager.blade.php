@@ -241,6 +241,7 @@ new class extends Component
             'invoice' => 'Facture',
             'credit_note' => 'Avoir',
             'purchase_order' => 'Commande fournisseur',
+            'goods_receipt' => 'Réception fournisseur',
         ];
     }
 
@@ -258,6 +259,7 @@ new class extends Component
             'invoice' => 'FAC',
             'credit_note' => 'AV',
             'purchase_order' => 'BCF',
+            'goods_receipt' => 'BRF',
         ];
     }
 
