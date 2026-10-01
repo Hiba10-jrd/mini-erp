@@ -90,6 +90,11 @@ class Product extends Model
         return $this->hasMany(CreditNoteItem::class);
     }
 
+    public function purchaseOrderItems(): HasMany
+    {
+        return $this->hasMany(PurchaseOrderItem::class);
+    }
+
     public function isService(): bool
     {
         return $this->type === 'service';

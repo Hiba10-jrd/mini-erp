@@ -96,6 +96,16 @@ new class extends Component
                         </x-nav-link>
                     @endcan
 
+                    @can('purchases.view')
+                        <x-nav-link
+                            :href="route('purchases.orders.index')"
+                            :active="request()->routeIs('purchases.orders.*')"
+                            wire:navigate
+                        >
+                            {{ __('Commandes fournisseurs') }}
+                        </x-nav-link>
+                    @endcan
+
                     @can('products.access')
                         <x-nav-link
                             :href="route('admin.products.index')"
@@ -330,6 +340,16 @@ new class extends Component
                     wire:navigate
                 >
                     {{ __('Fournisseurs') }}
+                </x-responsive-nav-link>
+            @endcan
+
+            @can('purchases.view')
+                <x-responsive-nav-link
+                    :href="route('purchases.orders.index')"
+                    :active="request()->routeIs('purchases.orders.*')"
+                    wire:navigate
+                >
+                    {{ __('Commandes fournisseurs') }}
                 </x-responsive-nav-link>
             @endcan
 

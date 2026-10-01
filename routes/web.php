@@ -9,6 +9,7 @@ use App\Models\Customer;
 use App\Models\DeliveryNote;
 use App\Models\Invoice;
 use App\Models\Product;
+use App\Models\PurchaseOrder;
 use App\Models\Quote;
 use App\Models\SalesOrder;
 use App\Models\StockInventory;
@@ -70,6 +71,26 @@ Route::get('administration/products/{product}', function (Product $product) {
 })
     ->middleware(['auth', 'auth.session', 'verified', 'can:products.access'])
     ->name('admin.products.show');
+
+Route::view('purchases/orders', 'admin.purchase-orders.index')
+    ->middleware(['auth', 'auth.session', 'verified', 'can:purchases.view'])
+    ->name('purchases.orders.index');
+
+Route::view('purchases/orders/create', 'admin.purchase-orders.form')
+    ->middleware(['auth', 'auth.session', 'verified', 'can:purchases.create'])
+    ->name('purchases.orders.create');
+
+Route::get('purchases/orders/{purchaseOrder}/edit', function (PurchaseOrder $purchaseOrder) {
+    return view('admin.purchase-orders.form', compact('purchaseOrder'));
+})
+    ->middleware(['auth', 'auth.session', 'verified', 'can:purchases.update'])
+    ->name('purchases.orders.edit');
+
+Route::get('purchases/orders/{purchaseOrder}', function (PurchaseOrder $purchaseOrder) {
+    return view('admin.purchase-orders.show', compact('purchaseOrder'));
+})
+    ->middleware(['auth', 'auth.session', 'verified', 'can:purchases.view'])
+    ->name('purchases.orders.show');
 
 Route::view('administration/stock', 'admin.stock.index')
     ->middleware(['auth', 'auth.session', 'verified', 'can:stock.access'])

@@ -38,6 +38,11 @@ class Supplier extends Model
         return $this->hasMany(SupplierContact::class);
     }
 
+    public function purchaseOrders(): HasMany
+    {
+        return $this->hasMany(PurchaseOrder::class);
+    }
+
     public function isArchived(): bool
     {
         return $this->status === 'archived';

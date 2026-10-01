@@ -240,6 +240,7 @@ new class extends Component
             'delivery_note' => 'Bon de livraison',
             'invoice' => 'Facture',
             'credit_note' => 'Avoir',
+            'purchase_order' => 'Commande fournisseur',
         ];
     }
 
@@ -256,6 +257,7 @@ new class extends Component
             'delivery_note' => 'BL',
             'invoice' => 'FAC',
             'credit_note' => 'AV',
+            'purchase_order' => 'BCF',
         ];
     }
 
