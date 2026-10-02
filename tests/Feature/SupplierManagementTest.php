@@ -238,7 +238,7 @@ class SupplierManagementTest extends TestCase
             ->assertSee('ICE-123')
             ->assertSee('Comptant')
             ->assertSee('Contacts')
-            ->assertSee('Aucun historique d’achats ni solde n’est calculé')
+            ->assertDontSee('Aucun historique d’achats ni solde n’est calculé')
             ->assertDontSee('Ajouter un contact');
     }
 

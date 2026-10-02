@@ -48,6 +48,11 @@ class Supplier extends Model
         return $this->hasMany(SupplierInvoice::class);
     }
 
+    public function supplierPayments(): HasMany
+    {
+        return $this->hasMany(SupplierPayment::class);
+    }
+
     public function isArchived(): bool
     {
         return $this->status === 'archived';

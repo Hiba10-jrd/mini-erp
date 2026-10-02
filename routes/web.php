@@ -16,6 +16,7 @@ use App\Models\SalesOrder;
 use App\Models\StockInventory;
 use App\Models\Supplier;
 use App\Models\SupplierInvoice;
+use App\Models\SupplierPayment;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome');
@@ -145,6 +146,69 @@ Route::get('purchases/invoices/{supplierInvoice}', function (SupplierInvoice $su
 })
     ->middleware(['auth', 'auth.session', 'verified', 'can:purchases.view'])
     ->name('purchases.invoices.show');
+
+Route::view(
+    'purchases/payments',
+    'admin.supplier-payments.index'
+)
+    ->middleware([
+        'auth',
+        'auth.session',
+        'verified',
+        'can:payments.view',
+    ])
+    ->name('purchases.payments.index');
+
+Route::view(
+    'purchases/payments/create',
+    'admin.supplier-payments.form'
+)
+    ->middleware([
+        'auth',
+        'auth.session',
+        'verified',
+        'can:payments.create',
+    ])
+    ->name('purchases.payments.create');
+
+Route::get(
+    'purchases/invoices/{supplierInvoice}/payments/create',
+    function (SupplierInvoice $supplierInvoice) {
+        abort_unless(
+            $supplierInvoice->status === SupplierInvoice::STATUS_VALIDATED,
+            404
+        );
+
+        return view(
+            'admin.supplier-payments.form',
+            compact('supplierInvoice')
+        );
+    }
+)
+    ->middleware([
+        'auth',
+        'auth.session',
+        'verified',
+        'can:payments.create',
+    ])
+    ->name('purchases.invoices.payments.create');
+
+Route::get(
+    'purchases/payments/{supplierPayment}',
+    function (SupplierPayment $supplierPayment) {
+        return view(
+            'admin.supplier-payments.show',
+            compact('supplierPayment')
+        );
+    }
+)
+    ->middleware([
+        'auth',
+        'auth.session',
+        'verified',
+        'can:payments.view',
+    ])
+    ->name('purchases.payments.show');
 
 Route::view('administration/stock', 'admin.stock.index')
     ->middleware(['auth', 'auth.session', 'verified', 'can:stock.access'])
