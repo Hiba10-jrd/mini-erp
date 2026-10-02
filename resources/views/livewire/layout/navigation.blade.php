@@ -121,7 +121,15 @@ new class extends Component
                             {{ __('Factures fournisseurs') }}
                         </x-nav-link>
                     @endcan
-
+@can('payments.view')
+    <x-nav-link
+        :href="route('purchases.payments.index')"
+        :active="request()->routeIs('purchases.payments.*')"
+        wire:navigate
+    >
+        {{ __('Paiements fournisseurs') }}
+    </x-nav-link>
+@endcan
                     @can('products.access')
                         <x-nav-link
                             :href="route('admin.products.index')"
@@ -182,7 +190,7 @@ new class extends Component
                             :active="request()->routeIs('sales.payments.*')"
                             wire:navigate
                         >
-                            {{ __('Paiements') }}
+                            {{ __('Paiements clients') }}
                         </x-nav-link>
                     @endcan
 
@@ -375,7 +383,15 @@ new class extends Component
                 >
                     {{ __('Réceptions fournisseurs') }}
                 </x-responsive-nav-link>
-
+                @can('payments.view')
+                    <x-responsive-nav-link
+                        :href="route('purchases.payments.index')"
+                        :active="request()->routeIs('purchases.payments.*')"
+                        wire:navigate
+                    >
+                        {{ __('Paiements fournisseurs') }}
+                    </x-responsive-nav-link>
+                @endcan
                 <x-responsive-nav-link
                     :href="route('purchases.invoices.index')"
                     :active="request()->routeIs('purchases.invoices.*')"
@@ -445,7 +461,7 @@ new class extends Component
                     :active="request()->routeIs('sales.payments.*')"
                     wire:navigate
                 >
-                    {{ __('Paiements') }}
+                    {{ __('Paiements clients') }}
                 </x-responsive-nav-link>
             @endcan
 
