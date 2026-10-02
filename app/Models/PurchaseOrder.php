@@ -112,6 +112,11 @@ class PurchaseOrder extends Model
         return $this->hasMany(GoodsReceipt::class)->orderBy('receipt_date')->orderBy('id');
     }
 
+    public function supplierInvoices(): HasMany
+    {
+        return $this->hasMany(SupplierInvoice::class)->orderBy('invoice_date')->orderBy('id');
+    }
+
     public function isEditable(): bool
     {
         return $this->status === self::STATUS_DRAFT;

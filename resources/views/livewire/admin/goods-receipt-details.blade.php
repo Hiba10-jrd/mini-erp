@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\GoodsReceipt;
+use App\Models\SupplierInvoice;
 use App\Services\GoodsReceiptManagementService;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Locked;
@@ -62,17 +63,24 @@ new class extends \Livewire\Volt\Component
     {
         Gate::authorize('purchases.view');
 
+        $receipt = GoodsReceipt::query()
+            ->with([
+                'purchaseOrder',
+                'warehouse',
+                'creator',
+                'validator',
+                'items',
+                'histories.user',
+            ])
+            ->findOrFail($this->receiptId);
+
         return [
-            'receipt' => GoodsReceipt::query()
-                ->with([
-                    'purchaseOrder',
-                    'warehouse',
-                    'creator',
-                    'validator',
-                    'items',
-                    'histories.user',
-                ])
-                ->findOrFail($this->receiptId),
+            'receipt' => $receipt,
+            'supplierInvoices' => SupplierInvoice::query()
+                ->whereHas('items.goodsReceiptItem', fn ($query) => $query->where('goods_receipt_id', $receipt->id))
+                ->latest('invoice_date')
+                ->latest('id')
+                ->get(),
         ];
     }
 }; ?>
@@ -338,6 +346,22 @@ new class extends \Livewire\Volt\Component
                     @endforeach
                 </tbody>
             </table>
+        </div>
+    </section>
+
+    <section class="border-y border-gray-200 bg-white">
+        <div class="border-b border-gray-200 px-5 py-4">
+            <h3 class="font-semibold text-gray-900">{{ __('Factures fournisseurs liées') }}</h3>
+        </div>
+        <div class="divide-y divide-gray-100">
+            @forelse($supplierInvoices as $invoice)
+                <a href="{{ route('purchases.invoices.show', $invoice) }}" wire:navigate class="flex items-center justify-between gap-4 px-5 py-4 hover:bg-gray-50">
+                    <div><p class="font-medium text-indigo-700">{{ $invoice->number ?? __('Brouillon #:id', ['id' => $invoice->id]) }}</p><p class="text-sm text-gray-500">{{ $invoice->supplier_invoice_number }}</p></div>
+                    <span class="text-sm text-gray-600">{{ ['draft' => __('Brouillon'), 'validated' => __('Validée'), 'cancelled' => __('Annulée')][$invoice->status] ?? $invoice->status }}</span>
+                </a>
+            @empty
+                <p class="px-5 py-4 text-sm text-gray-500">{{ __('Aucune facture fournisseur liée à cette réception.') }}</p>
+            @endforelse
         </div>
     </section>
 

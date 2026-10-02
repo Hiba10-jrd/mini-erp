@@ -21,7 +21,16 @@ new class extends Component
     {
         Gate::authorize('suppliers.access');
 
-        return ['supplier' => Supplier::query()->with('paymentTerm')->findOrFail($this->supplierId)];
+        $query = Supplier::query()->with('paymentTerm');
+        if (Gate::allows('purchases.view')) {
+            $query->with(['supplierInvoices' => fn ($invoices) => $invoices
+                ->reorder()
+                ->with('purchaseOrder:id,number')
+                ->latest('invoice_date')
+                ->latest('id')]);
+        }
+
+        return ['supplier' => $query->findOrFail($this->supplierId)];
     }
 }; ?>
 
@@ -80,6 +89,28 @@ new class extends Component
             </dl>
         </div>
     @endif
+
+    @can('purchases.view')
+        <div class="bg-white p-6 shadow-sm sm:rounded-lg">
+            <div class="flex items-center justify-between gap-4">
+                <h4 class="font-medium text-gray-900">{{ __('Factures fournisseurs') }}</h4>
+                <a href="{{ route('purchases.invoices.index', ['supplier' => $supplier->id]) }}" wire:navigate class="text-sm font-medium text-indigo-700">{{ __('Voir toutes les factures') }}</a>
+            </div>
+            <div class="mt-4 divide-y divide-gray-100 border-y border-gray-200">
+                @forelse($supplier->supplierInvoices as $invoice)
+                    <a href="{{ route('purchases.invoices.show', $invoice) }}" wire:navigate class="flex items-center justify-between gap-4 py-4 hover:bg-gray-50">
+                        <div>
+                            <p class="font-medium text-indigo-700">{{ $invoice->number ?? __('Brouillon #:id', ['id' => $invoice->id]) }}</p>
+                            <p class="text-sm text-gray-500">{{ $invoice->supplier_invoice_number }} · {{ $invoice->purchaseOrder->number }}</p>
+                        </div>
+                        <div class="text-right text-sm"><p>{{ $invoice->invoice_date->format('d/m/Y') }}</p><p class="text-gray-500">{{ str_replace('.', ',', $invoice->total_ttc) }}</p></div>
+                    </a>
+                @empty
+                    <p class="py-4 text-sm text-gray-500">{{ __('Aucune facture fournisseur.') }}</p>
+                @endforelse
+            </div>
+        </div>
+    @endcan
 
     <livewire:admin.supplier-contacts-manager :supplier-id="$supplier->id" />
 </section>

@@ -27,4 +27,9 @@ class TaxRate extends Model
     {
         return $this->hasMany(CreditNoteItem::class);
     }
+
+    public function supplierInvoiceItems(): HasMany
+    {
+        return $this->hasMany(SupplierInvoiceItem::class);
+    }
 }

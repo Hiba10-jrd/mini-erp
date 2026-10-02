@@ -112,6 +112,14 @@ new class extends Component
                         >
                             {{ __('Réceptions fournisseurs') }}
                         </x-nav-link>
+
+                        <x-nav-link
+                            :href="route('purchases.invoices.index')"
+                            :active="request()->routeIs('purchases.invoices.*')"
+                            wire:navigate
+                        >
+                            {{ __('Factures fournisseurs') }}
+                        </x-nav-link>
                     @endcan
 
                     @can('products.access')
@@ -366,6 +374,14 @@ new class extends Component
                     wire:navigate
                 >
                     {{ __('Réceptions fournisseurs') }}
+                </x-responsive-nav-link>
+
+                <x-responsive-nav-link
+                    :href="route('purchases.invoices.index')"
+                    :active="request()->routeIs('purchases.invoices.*')"
+                    wire:navigate
+                >
+                    {{ __('Factures fournisseurs') }}
                 </x-responsive-nav-link>
             @endcan
 

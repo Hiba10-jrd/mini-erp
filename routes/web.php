@@ -15,6 +15,7 @@ use App\Models\Quote;
 use App\Models\SalesOrder;
 use App\Models\StockInventory;
 use App\Models\Supplier;
+use App\Models\SupplierInvoice;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome');
@@ -118,6 +119,32 @@ Route::get('purchases/receipts/{goodsReceipt}', function (GoodsReceipt $goodsRec
 })
     ->middleware(['auth', 'auth.session', 'verified', 'can:purchases.view'])
     ->name('purchases.receipts.show');
+
+Route::view('purchases/invoices', 'admin.supplier-invoices.index')
+    ->middleware(['auth', 'auth.session', 'verified', 'can:purchases.view'])
+    ->name('purchases.invoices.index');
+
+Route::view('purchases/invoices/create', 'admin.supplier-invoices.form')
+    ->middleware(['auth', 'auth.session', 'verified', 'can:purchases.create'])
+    ->name('purchases.invoices.create');
+
+Route::get('purchases/orders/{purchaseOrder}/invoices/create', function (PurchaseOrder $purchaseOrder) {
+    return view('admin.supplier-invoices.form', compact('purchaseOrder'));
+})
+    ->middleware(['auth', 'auth.session', 'verified', 'can:purchases.create'])
+    ->name('purchases.orders.invoices.create');
+
+Route::get('purchases/invoices/{supplierInvoice}/edit', function (SupplierInvoice $supplierInvoice) {
+    return view('admin.supplier-invoices.form', compact('supplierInvoice'));
+})
+    ->middleware(['auth', 'auth.session', 'verified', 'can:purchases.update'])
+    ->name('purchases.invoices.edit');
+
+Route::get('purchases/invoices/{supplierInvoice}', function (SupplierInvoice $supplierInvoice) {
+    return view('admin.supplier-invoices.show', compact('supplierInvoice'));
+})
+    ->middleware(['auth', 'auth.session', 'verified', 'can:purchases.view'])
+    ->name('purchases.invoices.show');
 
 Route::view('administration/stock', 'admin.stock.index')
     ->middleware(['auth', 'auth.session', 'verified', 'can:stock.access'])

@@ -15,6 +15,7 @@ class DocumentSequenceManagementService
             'invoice', 'credit_note' => 'invoices.validate',
             'purchase_order' => 'purchases.create',
             'goods_receipt' => 'purchases.create',
+            'supplier_invoice' => 'purchases.update',
             default => 'sales.create',
         });
 
@@ -33,6 +34,7 @@ class DocumentSequenceManagementService
                     'delivery_note' => __('des bons de livraison'),
                     'purchase_order' => __('des commandes fournisseurs'),
                     'goods_receipt' => __('des réceptions fournisseurs'),
+                    'supplier_invoice' => __('des factures fournisseurs'),
                     default => __('demandée'),
                 };
                 $field = match ($documentType) {
@@ -41,6 +43,7 @@ class DocumentSequenceManagementService
                     'delivery_note' => 'deliveryNoteDate',
                     'purchase_order' => 'order_date',
                     'goods_receipt' => 'receipt_date',
+                    'supplier_invoice' => 'invoice_date',
                     default => 'document',
                 };
 
@@ -119,7 +122,7 @@ class DocumentSequenceManagementService
     private function normalizeDocumentType(string $documentType): string
     {
         return match ($documentType) {
-            'quote', 'order', 'delivery_note', 'invoice', 'credit_note', 'purchase_order', 'goods_receipt' => $documentType,
+            'quote', 'order', 'delivery_note', 'invoice', 'credit_note', 'purchase_order', 'goods_receipt', 'supplier_invoice' => $documentType,
             default => 'quote',
         };
     }
@@ -134,6 +137,7 @@ class DocumentSequenceManagementService
             'credit_note' => 'AV',
             'purchase_order' => 'BCF',
             'goods_receipt' => 'BRF',
+            'supplier_invoice' => 'FAF',
             default => 'DEV',
         };
     }

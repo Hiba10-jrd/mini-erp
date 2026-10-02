@@ -70,6 +70,16 @@ class User extends Authenticatable
         return $this->hasMany(GoodsReceipt::class, 'validated_by');
     }
 
+    public function createdSupplierInvoices(): HasMany
+    {
+        return $this->hasMany(SupplierInvoice::class, 'created_by');
+    }
+
+    public function validatedSupplierInvoices(): HasMany
+    {
+        return $this->hasMany(SupplierInvoice::class, 'validated_by');
+    }
+
     /**
      * Get the attributes that should be cast.
      *

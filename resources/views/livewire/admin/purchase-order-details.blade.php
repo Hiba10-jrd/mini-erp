@@ -1,8 +1,9 @@
 <?php
 
 use App\Models\PurchaseOrder;
-use App\Services\PurchaseOrderManagementService;
 use App\Services\GoodsReceiptManagementService;
+use App\Services\PurchaseOrderManagementService;
+use App\Services\SupplierInvoiceManagementService;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Locked;
 
@@ -29,17 +30,22 @@ new class extends \Livewire\Volt\Component
         $service->cancelDraft(PurchaseOrder::query()->findOrFail($this->orderId));
     }
 
-    public function with(GoodsReceiptManagementService $receiptService): array
-    {
+    public function with(
+        GoodsReceiptManagementService $receiptService,
+        SupplierInvoiceManagementService $invoiceService,
+    ): array {
         Gate::authorize('purchases.view');
 
-        $order = PurchaseOrder::query()->with(['supplier', 'paymentTerm', 'creator', 'confirmedBy', 'items', 'histories.user', 'goodsReceipts.warehouse'])->findOrFail($this->orderId);
+        $order = PurchaseOrder::query()->with(['supplier', 'paymentTerm', 'creator', 'confirmedBy', 'items', 'histories.user', 'goodsReceipts.warehouse', 'supplierInvoices'])->findOrFail($this->orderId);
         $available = $receiptService->availableItemsForOrder($order);
+        $canCreateSupplierInvoice = $order->status === PurchaseOrder::STATUS_CONFIRMED
+            && $invoiceService->availableItemsForOrder($order) !== [];
 
         return [
             'order' => $order,
             'available' => $available,
             'canCreateReceipt' => $order->status === PurchaseOrder::STATUS_CONFIRMED && $receiptService->hasRemaining($order),
+            'canCreateSupplierInvoice' => $canCreateSupplierInvoice,
         ];
     }
 }; ?>
@@ -53,6 +59,7 @@ new class extends \Livewire\Volt\Component
                 @can('purchases.delete')<x-danger-button type="button" wire:click="cancelOrder" wire:confirm="{{ __('Annuler cette commande fournisseur ?') }}">{{ __('Annuler la commande') }}</x-danger-button>@endcan
             @endif
             @if($canCreateReceipt) @can('purchases.create')<a href="{{ route('purchases.orders.receipts.create', $order) }}" wire:navigate class="inline-flex min-h-10 items-center bg-gray-900 px-4 text-sm font-medium text-white">{{ __('Créer une réception') }}</a>@endcan @endif
+            @if($canCreateSupplierInvoice) @can('purchases.create')<a href="{{ route('purchases.orders.invoices.create', $order) }}" wire:navigate class="inline-flex min-h-10 items-center bg-indigo-700 px-4 text-sm font-medium text-white hover:bg-indigo-600">{{ __('Créer une facture fournisseur') }}</a>@endcan @endif
         </div>
     </div>
     <x-input-error :messages="$errors->get('status')" /><x-input-error :messages="$errors->get('order')" />
@@ -60,7 +67,7 @@ new class extends \Livewire\Volt\Component
     @php
         $statusLabels = ['draft' => __('Brouillon'), 'confirmed' => __('Confirmée'), 'cancelled' => __('Annulée')];
         $statusClasses = ['draft' => 'bg-gray-100 text-gray-700', 'confirmed' => 'bg-sky-100 text-sky-800', 'cancelled' => 'bg-rose-100 text-rose-800'];
-        $historyLabels = ['created' => __('Création'), 'draft_updated' => __('Modification du brouillon'), 'confirmed' => __('Confirmation'), 'cancelled' => __('Annulation'), 'goods_receipt_created' => __('Réception créée'), 'goods_receipt_validated' => __('Réception validée'), 'goods_receipt_cancelled' => __('Réception annulée')];
+        $historyLabels = ['created' => __('Création'), 'draft_updated' => __('Modification du brouillon'), 'confirmed' => __('Confirmation'), 'cancelled' => __('Annulation'), 'goods_receipt_created' => __('Réception créée'), 'goods_receipt_validated' => __('Réception validée'), 'goods_receipt_cancelled' => __('Réception annulée'), 'supplier_invoice_created' => __('Facture fournisseur créée'), 'supplier_invoice_validated' => __('Validation de la facture fournisseur'), 'supplier_invoice_cancelled' => __('Facture fournisseur annulée')];
     @endphp
     <section class="border-y border-gray-200 bg-white p-5 sm:p-6">
         <div class="flex flex-col gap-4 border-b border-gray-200 pb-5 sm:flex-row sm:items-start sm:justify-between">
@@ -83,6 +90,8 @@ new class extends \Livewire\Volt\Component
     </div>
 
     <section class="border-y border-gray-200 bg-white"><div class="border-b border-gray-200 px-5 py-4"><h3 class="text-base font-semibold text-gray-900">{{ __('Réceptions fournisseurs') }}</h3></div><div class="divide-y divide-gray-100">@forelse($order->goodsReceipts as $receipt)<a href="{{ route('purchases.receipts.show', $receipt) }}" wire:navigate class="flex items-center justify-between gap-4 px-5 py-4 hover:bg-gray-50"><div><p class="font-medium text-indigo-700">{{ $receipt->number }}</p><p class="text-sm text-gray-500">{{ $receipt->warehouse->code }} · {{ $receipt->receipt_date->format('d/m/Y') }}</p></div><span class="text-sm text-gray-600">{{ ['draft' => __('Brouillon'), 'validated' => __('Validée'), 'cancelled' => __('Annulée')][$receipt->status] ?? $receipt->status }}</span></a>@empty<p class="px-5 py-4 text-sm text-gray-500">{{ __('Aucune réception.') }}</p>@endforelse</div></section>
+
+    <section class="border-y border-gray-200 bg-white"><div class="border-b border-gray-200 px-5 py-4"><h3 class="text-base font-semibold text-gray-900">{{ __('Factures fournisseurs') }}</h3></div><div class="divide-y divide-gray-100">@forelse($order->supplierInvoices as $invoice)<a href="{{ route('purchases.invoices.show', $invoice) }}" wire:navigate class="flex items-center justify-between gap-4 px-5 py-4 hover:bg-gray-50"><div><p class="font-medium text-indigo-700">{{ $invoice->number ?? __('Brouillon #:id', ['id' => $invoice->id]) }}</p><p class="text-sm text-gray-500">{{ $invoice->supplier_invoice_number }} · {{ $invoice->invoice_date->format('d/m/Y') }}</p></div><span class="text-sm text-gray-600">{{ ['draft' => __('Brouillon'), 'validated' => __('Validée'), 'cancelled' => __('Annulée')][$invoice->status] ?? $invoice->status }}</span></a>@empty<p class="px-5 py-4 text-sm text-gray-500">{{ __('Aucune facture fournisseur.') }}</p>@endforelse</div></section>
 
     <section class="border-y border-gray-200 bg-white"><div class="border-b border-gray-200 px-5 py-4"><h3 class="text-base font-semibold text-gray-900">{{ __('Historique') }}</h3></div><ol class="divide-y divide-gray-100">@forelse ($order->histories as $history)<li class="flex flex-col gap-1 px-5 py-4 sm:flex-row sm:items-start sm:justify-between"><div><p class="font-medium text-gray-900">{{ $historyLabels[$history->event] ?? $history->event }}</p>@if ($history->description)<p class="text-sm text-gray-600">{{ $history->description }}</p>@endif<p class="text-xs text-gray-500">{{ $history->user?->name ?? '—' }}</p></div><time class="whitespace-nowrap text-sm text-gray-500">{{ $history->created_at?->format('d/m/Y H:i') }}</time></li>@empty<li class="px-5 py-4 text-sm text-gray-500">{{ __('Aucun événement.') }}</li>@endforelse</ol></section>
 </section>
