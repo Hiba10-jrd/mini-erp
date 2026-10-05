@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\CashRegister;
 use App\Models\CashTransaction;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -11,6 +12,14 @@ use Illuminate\Validation\ValidationException;
 
 class CashManagementService
 {
+    public function reportingQuery(): Builder
+    {
+        $totals = CashTransaction::query()->selectRaw("cash_register_id, SUM(CASE WHEN type = 'entry' THEN amount ELSE 0 END) AS entries, SUM(CASE WHEN type = 'exit' THEN amount ELSE 0 END) AS exits")->groupBy('cash_register_id');
+
+        return CashRegister::query()->leftJoinSub($totals, 'movements', 'movements.cash_register_id', '=', 'cash_registers.id')
+            ->select('cash_registers.*')->selectRaw('COALESCE(entries, 0) AS report_entries, COALESCE(exits, 0) AS report_exits, initial_balance + COALESCE(entries, 0) - COALESCE(exits, 0) AS report_balance');
+    }
+
     public function createRegister(array $attributes): CashRegister
     {
         Gate::authorize('payments.create');

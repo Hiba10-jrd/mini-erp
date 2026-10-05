@@ -38,6 +38,9 @@ new class extends Component
                         {{ __('Dashboard') }}
                     </x-nav-link>
 
+                    @can('reports.view')
+                        <x-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')" wire:navigate>Rapports</x-nav-link>
+                    @endcan
                     @can('users.administer')
                         <x-nav-link
                             :href="route('admin.users.index')"
@@ -334,6 +337,9 @@ new class extends Component
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
 
+            @can('reports.view')
+                <x-responsive-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')" wire:navigate>Rapports</x-responsive-nav-link>
+            @endcan
             @can('users.administer')
                 <x-responsive-nav-link
                     :href="route('admin.users.index')"
