@@ -5,7 +5,9 @@ namespace App\Services;
 use App\Models\CreditNote;
 use App\Models\Invoice;
 use App\Models\Payment;
+use App\Models\PaymentAllocation;
 use App\Models\PaymentMethod;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -13,6 +15,20 @@ use Illuminate\Validation\ValidationException;
 
 class PaymentManagementService
 {
+    /** SQL read model shared by reports; aggregate each relation before joining. */
+    public function reportingQuery(): Builder
+    {
+        $paid = PaymentAllocation::query()->selectRaw('invoice_id, SUM(amount) AS paid')->groupBy('invoice_id');
+        $credits = CreditNote::query()->where('status', CreditNote::STATUS_ISSUED)->selectRaw('invoice_id, SUM(total_ttc) AS credited')->groupBy('invoice_id');
+        $payable = 'CASE WHEN invoices.total_ttc - COALESCE(credits.credited, 0) > 0 THEN invoices.total_ttc - COALESCE(credits.credited, 0) ELSE 0 END';
+        $remaining = "CASE WHEN ($payable) - COALESCE(paid.paid, 0) > 0 THEN ($payable) - COALESCE(paid.paid, 0) ELSE 0 END";
+
+        return Invoice::query()->where('invoices.status', Invoice::STATUS_ISSUED)
+            ->leftJoinSub($paid, 'paid', 'paid.invoice_id', '=', 'invoices.id')
+            ->leftJoinSub($credits, 'credits', 'credits.invoice_id', '=', 'invoices.id')
+            ->select('invoices.*')->selectRaw("COALESCE(paid.paid, 0) AS report_paid, COALESCE(credits.credited, 0) AS report_credited, ($payable) AS report_payable, ($remaining) AS report_remaining");
+    }
+
     /**
      * @param  array{
      *     customer_id:int,

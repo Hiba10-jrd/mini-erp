@@ -21,6 +21,10 @@ use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome');
 
+Route::view('reports', 'admin.reports.index')
+    ->middleware(['auth', 'auth.session', 'verified', 'can:reports.view'])
+    ->name('reports.index');
+
 Route::view('dashboard', 'dashboard')
     ->middleware(['auth', 'auth.session', 'verified', 'can:erp.access'])
     ->name('dashboard');

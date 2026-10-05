@@ -6,6 +6,8 @@ use App\Models\PaymentMethod;
 use App\Models\Supplier;
 use App\Models\SupplierInvoice;
 use App\Models\SupplierPayment;
+use App\Models\SupplierPaymentAllocation;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
@@ -13,6 +15,15 @@ use Illuminate\Validation\ValidationException;
 
 class SupplierPaymentManagementService
 {
+    public function reportingQuery(): Builder
+    {
+        $paid = SupplierPaymentAllocation::query()->selectRaw('supplier_invoice_id, SUM(amount) AS paid')->groupBy('supplier_invoice_id');
+
+        return SupplierInvoice::query()->where('supplier_invoices.status', SupplierInvoice::STATUS_VALIDATED)
+            ->leftJoinSub($paid, 'paid', 'paid.supplier_invoice_id', '=', 'supplier_invoices.id')
+            ->select('supplier_invoices.*')->selectRaw('COALESCE(paid.paid, 0) AS report_paid, CASE WHEN total_ttc - COALESCE(paid.paid, 0) > 0 THEN total_ttc - COALESCE(paid.paid, 0) ELSE 0 END AS report_remaining');
+    }
+
     /**
      * @param  array{
      *     supplier_id:int,
