@@ -196,6 +196,14 @@ new class extends Component
   
                     @can('payments.view')
     <x-nav-link
+        :href="route('finance.receivables.index')"
+        :active="request()->routeIs('finance.receivables.*')"
+        wire:navigate
+    >
+        {{ __('Créances clients') }}
+    </x-nav-link>
+
+    <x-nav-link
         :href="route('finance.expenses.index')"
         :active="request()->routeIs('finance.expenses.*')"
         wire:navigate
@@ -461,6 +469,18 @@ new class extends Component
         </p>
 
         <div class="mt-2 space-y-1">
+            <a
+                href="{{ route('finance.receivables.index') }}"
+                wire:navigate
+                @class([
+                    'block rounded-md px-3 py-2 text-sm font-medium transition',
+                    'bg-gray-900 text-white' => request()->routeIs('finance.receivables.*'),
+                    'text-gray-600 hover:bg-gray-100 hover:text-gray-900' => ! request()->routeIs('finance.receivables.*'),
+                ])
+            >
+                {{ __('Créances clients') }}
+            </a>
+
             <a
                 href="{{ route('finance.expenses.index') }}"
                 wire:navigate

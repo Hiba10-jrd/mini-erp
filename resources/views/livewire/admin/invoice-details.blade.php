@@ -50,32 +50,33 @@ new class extends \Livewire\Volt\Component
     }
 
     public function with(): array
-{
-    Gate::authorize('invoices.view');
+    {
+        Gate::authorize('invoices.view');
 
-    $invoice = Invoice::query()
-        ->with([
-            'salesOrder:id,number',
-            'creator:id,name',
-            'issuer:id,name',
-            'items',
-        ])
-        ->findOrFail($this->invoiceId);
+        $invoice = Invoice::query()
+            ->with([
+                'salesOrder:id,number',
+                'creator:id,name',
+                'issuer:id,name',
+                'items',
+                'reminders.creator:id,name',
+            ])
+            ->findOrFail($this->invoiceId);
 
-    $paymentService = app(PaymentManagementService::class);
+        $paymentService = app(PaymentManagementService::class);
 
-    return [
-        'invoice' => $invoice,
+        return [
+            'invoice' => $invoice,
 
-        'paymentRemaining' => $invoice->isIssued()
-            ? $paymentService->remainingAmount($invoice)
-            : '0.00',
+            'paymentRemaining' => $invoice->isIssued()
+                ? $paymentService->remainingAmount($invoice)
+                : '0.00',
 
-        'paymentState' => $invoice->isIssued()
-            ? $paymentService->paymentState($invoice)
-            : 'not_applicable',
-    ];
-}
+            'paymentState' => $invoice->isIssued()
+                ? $paymentService->paymentState($invoice)
+                : 'not_applicable',
+        ];
+    }
 };
 ?>
 
@@ -357,6 +358,24 @@ new class extends \Livewire\Volt\Component
                     @endforeach
                 </tbody>
             </table>
+        </div>
+    </section>
+
+    <section class="border-y border-gray-200 bg-white p-5 sm:p-6">
+        <h3 class="text-sm font-semibold text-gray-900">{{ __('Historique des relances') }}</h3>
+        <div class="mt-4 divide-y divide-gray-100">
+            @forelse ($invoice->reminders as $reminder)
+                <article wire:key="reminder-{{ $reminder->id }}" class="py-3 text-sm">
+                    <div class="flex flex-wrap gap-3 text-gray-700">
+                        <time>{{ $reminder->reminder_date->format('d/m/Y') }}</time>
+                        <span>{{ ['email' => __('Email'), 'phone' => __('Téléphone'), 'whatsapp' => 'WhatsApp', 'manual' => __('Manuel')][$reminder->channel] ?? $reminder->channel }}</span>
+                        <span>{{ $reminder->creator?->name ?? __('Utilisateur supprimé') }}</span>
+                    </div>
+                    <p class="mt-2 whitespace-pre-line text-gray-600">{{ $reminder->note ?? '—' }}</p>
+                </article>
+            @empty
+                <p class="py-3 text-sm text-gray-500">{{ __('Aucune relance enregistrée.') }}</p>
+            @endforelse
         </div>
     </section>
 

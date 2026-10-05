@@ -419,6 +419,10 @@ Route::get(
         'can:payments.create',
     ])
     ->name('sales.invoices.payments.create');
+Route::view('finance/receivables', 'admin.receivables.index')
+    ->middleware(['auth', 'auth.session', 'verified', 'can:payments.view'])
+    ->name('finance.receivables.index');
+
 Route::view('finance/expenses', 'admin.expenses.index')
     ->middleware([
         'auth',
