@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use LogicException;
 
 class Invoice extends Model
@@ -105,6 +106,16 @@ class Invoice extends Model
     public function creditNotes(): HasMany
     {
         return $this->hasMany(CreditNote::class);
+    }
+
+    public function reminders(): HasMany
+    {
+        return $this->hasMany(CustomerReminder::class)->orderByDesc('reminder_date')->orderByDesc('id');
+    }
+
+    public function latestReminder(): HasOne
+    {
+        return $this->hasOne(CustomerReminder::class)->ofMany(['reminder_date' => 'max', 'id' => 'max']);
     }
 
     public function isEditable(): bool

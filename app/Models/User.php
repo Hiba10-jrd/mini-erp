@@ -90,6 +90,11 @@ class User extends Authenticatable
         return $this->hasMany(Expense::class, 'created_by');
     }
 
+    public function createdCustomerReminders(): HasMany
+    {
+        return $this->hasMany(CustomerReminder::class, 'created_by');
+    }
+
     public function createdCashRegisters(): HasMany
     {
         return $this->hasMany(CashRegister::class, 'created_by');
