@@ -159,7 +159,7 @@ new class extends \Livewire\Volt\Component
                             $invoice
                         ) }}"
                         wire:navigate
-                        class="inline-flex min-h-10 items-center bg-indigo-700 px-4 text-sm font-semibold text-white hover:bg-indigo-600"
+                        class="inline-flex min-h-10 items-center bg-indigo-700 px-4 text-sm font-semibold text-danger hover:bg-indigo-600"
                     >
                         {{ __('Enregistrer un paiement') }}
                     </a>
