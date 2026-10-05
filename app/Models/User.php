@@ -85,6 +85,21 @@ class User extends Authenticatable
         return $this->hasMany(SupplierPayment::class, 'created_by');
     }
 
+    public function createdExpenses(): HasMany
+    {
+        return $this->hasMany(Expense::class, 'created_by');
+    }
+
+    public function createdCashRegisters(): HasMany
+    {
+        return $this->hasMany(CashRegister::class, 'created_by');
+    }
+
+    public function createdCashTransactions(): HasMany
+    {
+        return $this->hasMany(CashTransaction::class, 'created_by');
+    }
+
     /**
      * Get the attributes that should be cast.
      *

@@ -193,7 +193,24 @@ new class extends Component
                             {{ __('Paiements clients') }}
                         </x-nav-link>
                     @endcan
+  
+                    @can('payments.view')
+    <x-nav-link
+        :href="route('finance.expenses.index')"
+        :active="request()->routeIs('finance.expenses.*')"
+        wire:navigate
+    >
+        {{ __('Dépenses') }}
+    </x-nav-link>
 
+    <x-nav-link
+        :href="route('finance.cash.index')"
+        :active="request()->routeIs('finance.cash.*')"
+        wire:navigate
+    >
+        {{ __('Caisse') }}
+    </x-nav-link>
+@endcan
                     @can('stock.access')
                         <x-nav-link
                             :href="route('admin.stock.index')"
@@ -436,6 +453,40 @@ new class extends Component
                     {{ __('Bons de livraison') }}
                 </x-responsive-nav-link>
             @endcan
+
+            @can('payments.view')
+    <div class="mt-6">
+        <p class="px-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
+            {{ __('Finance') }}
+        </p>
+
+        <div class="mt-2 space-y-1">
+            <a
+                href="{{ route('finance.expenses.index') }}"
+                wire:navigate
+                @class([
+                    'block rounded-md px-3 py-2 text-sm font-medium transition',
+                    'bg-gray-900 text-white' => request()->routeIs('finance.expenses.*'),
+                    'text-gray-600 hover:bg-gray-100 hover:text-gray-900' => ! request()->routeIs('finance.expenses.*'),
+                ])
+            >
+                {{ __('Dépenses') }}
+            </a>
+
+            <a
+                href="{{ route('finance.cash.index') }}"
+                wire:navigate
+                @class([
+                    'block rounded-md px-3 py-2 text-sm font-medium transition',
+                    'bg-gray-900 text-white' => request()->routeIs('finance.cash.*'),
+                    'text-gray-600 hover:bg-gray-100 hover:text-gray-900' => ! request()->routeIs('finance.cash.*'),
+                ])
+            >
+                {{ __('Caisse') }}
+            </a>
+        </div>
+    </div>
+@endcan
 
             @can('invoices.view')
                 <x-responsive-nav-link
