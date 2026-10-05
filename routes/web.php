@@ -419,4 +419,30 @@ Route::get(
         'can:payments.create',
     ])
     ->name('sales.invoices.payments.create');
+Route::view('finance/expenses', 'admin.expenses.index')
+    ->middleware([
+        'auth',
+        'auth.session',
+        'verified',
+        'can:payments.view',
+    ])
+    ->name('finance.expenses.index');
+
+Route::view('finance/expenses/create', 'admin.expenses.form')
+    ->middleware([
+        'auth',
+        'auth.session',
+        'verified',
+        'can:payments.create',
+    ])
+    ->name('finance.expenses.create');
+
+Route::view('finance/cash', 'admin.cash.index')
+    ->middleware([
+        'auth',
+        'auth.session',
+        'verified',
+        'can:payments.view',
+    ])
+    ->name('finance.cash.index');
 require __DIR__.'/auth.php';
