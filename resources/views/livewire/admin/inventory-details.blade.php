@@ -135,7 +135,7 @@ new class extends Component
 
     <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 text-sm">
+            <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200 text-sm">
                 <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500">
                     <tr><th class="px-4 py-3">{{ __('Produit') }}</th><th class="px-4 py-3">{{ __('Unité') }}</th><th class="px-4 py-3 text-right">{{ __('Théorique') }}</th><th class="px-4 py-3">{{ __('Stock réel') }}</th><th class="px-4 py-3">{{ __('Écart') }}</th><th class="px-4 py-3">{{ __('Note') }}</th>@can('stock.manage')<th class="px-4 py-3 text-right">{{ __('Action') }}</th>@endcan</tr>
                 </thead>
@@ -183,7 +183,7 @@ new class extends Component
                         </tr>
                     @endforeach
                 </tbody>
-            </table>
+            </table></div>
         </div>
     </div>
 

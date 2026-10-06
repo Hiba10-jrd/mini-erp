@@ -125,7 +125,7 @@ new class extends Component
             </dl>
 
             <div class="mt-5 overflow-x-auto rounded-lg border border-gray-200">
-                <table class="min-w-full divide-y divide-gray-200 text-sm">
+                <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200 text-sm">
                     <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500"><tr><th class="px-4 py-3">{{ __('Dépôt') }}</th><th class="px-4 py-3">{{ __('Statut') }}</th><th class="px-4 py-3 text-right">{{ __('Quantité disponible') }}</th></tr></thead>
                     <tbody class="divide-y divide-gray-200 bg-white">
                         @forelse ($stockRows as $stockRow)
@@ -134,7 +134,7 @@ new class extends Component
                             <tr><td colspan="3" class="px-4 py-6 text-center text-gray-500">{{ __('Aucun dépôt configuré.') }}</td></tr>
                         @endforelse
                     </tbody>
-                </table>
+                </table></div>
             </div>
         @endif
     </div>

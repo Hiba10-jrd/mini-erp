@@ -286,6 +286,7 @@ new class extends \Livewire\Volt\Component
                         </p>
                     </div>
                 @endif
+                <a class="mt-3 block text-indigo-600" href="{{ route('attachments.index', ['parentType' => 'payment', 'parentId' => $payment->id]) }}" wire:navigate>Documents</a>
             </article>
         @empty
             <div class="p-6 text-sm text-gray-500">

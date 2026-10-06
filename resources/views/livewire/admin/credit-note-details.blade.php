@@ -183,7 +183,7 @@ new class extends Component
     </section>
 
     <section class="overflow-x-auto border-y border-gray-200 bg-white">
-        <table class="min-w-full divide-y divide-gray-200">
+        <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
                     <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">{{ __('Article') }}</th>
@@ -208,7 +208,7 @@ new class extends Component
                     </tr>
                 @endforeach
             </tbody>
-        </table>
+        </table></div>
     </section>
 
     <div class="grid gap-6 lg:grid-cols-[1fr_20rem]">

@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div>
             <p class="text-sm font-medium text-indigo-600">{{ __('Stocks') }}</p>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800">{{ __('Inventaires physiques') }}</h2>
+            <h2 class="text-xl font-semibold leading-tight text-gray-800">{{ __('Inventaires physiques') }}</h2><p class="mt-2 text-sm text-slate-500">Préparez et suivez vos inventaires.</p>
         </div>
     </x-slot>
 

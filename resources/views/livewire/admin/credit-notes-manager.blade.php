@@ -94,7 +94,7 @@ new class extends Component
     </div>
 
     <div class="overflow-x-auto border-y border-gray-200 bg-white">
-        <table class="min-w-full divide-y divide-gray-200">
+        <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
                     <th class="px-5 py-3 text-left text-xs font-semibold uppercase text-gray-500">
@@ -172,7 +172,7 @@ new class extends Component
                     </tr>
                 @endforelse
             </tbody>
-        </table>
+        </table></div>
     </div>
 
     {{ $creditNotes->links() }}

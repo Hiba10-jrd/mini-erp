@@ -10,7 +10,9 @@ new class extends \Livewire\Volt\Component
     use WithPagination;
 
     public string $search = '';
+
     public string $statusFilter = 'all';
+
     public string $supplierFilter = 'all';
 
     public function mount(): void
@@ -67,7 +69,7 @@ new class extends \Livewire\Volt\Component
         $statusClasses = ['draft' => 'bg-gray-100 text-gray-700', 'confirmed' => 'bg-sky-100 text-sky-800', 'cancelled' => 'bg-rose-100 text-rose-800'];
     @endphp
     <div class="overflow-hidden border-y border-gray-200 bg-white">
-        <div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200 text-sm">
+        <div class="overflow-x-auto"><div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200 text-sm">
             <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500"><tr><th class="px-4 py-3">{{ __('Numéro') }}</th><th class="px-4 py-3">{{ __('Date') }}</th><th class="px-4 py-3">{{ __('Fournisseur') }}</th><th class="px-4 py-3">{{ __('Date prévue') }}</th><th class="px-4 py-3">{{ __('Statut') }}</th><th class="px-4 py-3 text-right">{{ __('TTC') }}</th><th class="px-4 py-3">{{ __('Créé par') }}</th><th class="px-4 py-3 text-right">{{ __('Actions') }}</th></tr></thead>
             <tbody class="divide-y divide-gray-100">
                 @forelse ($orders as $order)
@@ -78,7 +80,7 @@ new class extends \Livewire\Volt\Component
                     <tr><td colspan="8" class="px-6 py-10 text-center text-gray-500">{{ __('Aucune commande ne correspond aux filtres.') }}</td></tr>
                 @endforelse
             </tbody>
-        </table></div>
+        </table></div></div>
         @if ($orders->hasPages())<div class="border-t border-gray-200 px-4 py-4">{{ $orders->links() }}</div>@endif
     </div>
 </section>

@@ -11,15 +11,23 @@ new class extends \Livewire\Volt\Component
     use WithPagination;
 
     public string $search = '';
+
     public string $statusFilter = 'all';
+
     public string $supplierFilter = 'all';
+
     public string $warehouseFilter = 'all';
 
-    public function mount(): void { Gate::authorize('purchases.view'); }
+    public function mount(): void
+    {
+        Gate::authorize('purchases.view');
+    }
 
     public function updating(string $property): void
     {
-        if (in_array($property, ['search', 'statusFilter', 'supplierFilter', 'warehouseFilter'], true)) $this->resetPage();
+        if (in_array($property, ['search', 'statusFilter', 'supplierFilter', 'warehouseFilter'], true)) {
+            $this->resetPage();
+        }
     }
 
     public function with(): array
@@ -56,7 +64,7 @@ new class extends \Livewire\Volt\Component
     </div></div>
     @php($labels = ['draft' => __('Brouillon'), 'validated' => __('Validée'), 'cancelled' => __('Annulée')])
     @php($classes = ['draft' => 'bg-gray-100 text-gray-700', 'validated' => 'bg-emerald-100 text-emerald-800', 'cancelled' => 'bg-rose-100 text-rose-800'])
-    <div class="overflow-hidden border-y border-gray-200 bg-white"><div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200 text-sm"><thead class="bg-gray-50 text-left text-xs uppercase text-gray-500"><tr><th class="px-4 py-3">{{ __('Numéro') }}</th><th class="px-4 py-3">{{ __('Commande') }}</th><th class="px-4 py-3">{{ __('Fournisseur') }}</th><th class="px-4 py-3">{{ __('Dépôt') }}</th><th class="px-4 py-3">{{ __('Date') }}</th><th class="px-4 py-3">{{ __('Statut') }}</th><th class="px-4 py-3">{{ __('Créé par') }}</th><th class="px-4 py-3 text-right">{{ __('Actions') }}</th></tr></thead><tbody class="divide-y divide-gray-100">
+    <div class="overflow-hidden border-y border-gray-200 bg-white"><div class="overflow-x-auto"><div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200 text-sm"><thead class="bg-gray-50 text-left text-xs uppercase text-gray-500"><tr><th class="px-4 py-3">{{ __('Numéro') }}</th><th class="px-4 py-3">{{ __('Commande') }}</th><th class="px-4 py-3">{{ __('Fournisseur') }}</th><th class="px-4 py-3">{{ __('Dépôt') }}</th><th class="px-4 py-3">{{ __('Date') }}</th><th class="px-4 py-3">{{ __('Statut') }}</th><th class="px-4 py-3">{{ __('Créé par') }}</th><th class="px-4 py-3 text-right">{{ __('Actions') }}</th></tr></thead><tbody class="divide-y divide-gray-100">
         @forelse($receipts as $receipt)<tr wire:key="receipt-{{ $receipt->id }}"><td class="px-4 py-4 font-semibold">{{ $receipt->number }}</td><td class="px-4 py-4">{{ $receipt->purchaseOrder->number }}</td><td class="px-4 py-4">{{ $receipt->purchaseOrder->supplier_name }}</td><td class="px-4 py-4">{{ $receipt->warehouse->code }}</td><td class="px-4 py-4">{{ $receipt->receipt_date->format('d/m/Y') }}</td><td class="px-4 py-4"><span class="px-2 py-1 text-xs font-medium {{ $classes[$receipt->status] ?? 'bg-gray-100' }}">{{ $labels[$receipt->status] ?? $receipt->status }}</span></td><td class="px-4 py-4">{{ $receipt->creator?->name ?? '—' }}</td><td class="px-4 py-4 text-right"><a href="{{ route('purchases.receipts.show', $receipt) }}" wire:navigate class="font-medium text-indigo-700">{{ __('Consulter') }}</a>@if($receipt->isEditable()) @can('purchases.update')<a href="{{ route('purchases.receipts.edit', $receipt) }}" wire:navigate class="ms-3 text-gray-700">{{ __('Modifier') }}</a>@endcan @endif</td></tr>@empty<tr><td colspan="8" class="px-6 py-10 text-center text-gray-500">{{ __('Aucune réception ne correspond aux filtres.') }}</td></tr>@endforelse
-    </tbody></table></div>@if($receipts->hasPages())<div class="border-t border-gray-200 px-4 py-4">{{ $receipts->links() }}</div>@endif</div>
+    </tbody></table></div></div>@if($receipts->hasPages())<div class="border-t border-gray-200 px-4 py-4">{{ $receipts->links() }}</div>@endif</div>
 </section>

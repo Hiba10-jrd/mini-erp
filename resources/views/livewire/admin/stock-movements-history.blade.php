@@ -125,7 +125,7 @@ new class extends Component
         ];
     @endphp
     <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200 text-sm">
+        <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200 text-sm">
             <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500">
                 <tr><th class="px-4 py-3">{{ __('Date') }}</th><th class="px-4 py-3">{{ __('Produit') }}</th><th class="px-4 py-3">{{ __('Dépôt') }}</th><th class="px-4 py-3">{{ __('Type') }}</th><th class="px-4 py-3 text-right">{{ __('Quantité') }}</th><th class="px-4 py-3 text-right">{{ __('Avant') }}</th><th class="px-4 py-3 text-right">{{ __('Après') }}</th><th class="px-4 py-3">{{ __('Référence / note') }}</th><th class="px-4 py-3">{{ __('Utilisateur') }}</th></tr>
             </thead>
@@ -146,7 +146,7 @@ new class extends Component
                     <tr><td colspan="9" class="px-6 py-8 text-center text-gray-500">{{ __('Aucun mouvement ne correspond aux filtres.') }}</td></tr>
                 @endforelse
             </tbody>
-        </table>
+        </table></div>
     </div>
     @if ($movements->hasPages())
         <div class="border-t border-gray-200 px-6 py-4">{{ $movements->links() }}</div>

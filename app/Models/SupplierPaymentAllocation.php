@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RecordsOperations;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SupplierPaymentAllocation extends Model
 {
+    use RecordsOperations;
+
     protected $fillable = [
         'supplier_payment_id',
         'supplier_invoice_id',

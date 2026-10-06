@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RecordsOperations;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -9,6 +10,8 @@ use LogicException;
 
 class StockInventory extends Model
 {
+    use RecordsOperations;
+
     public const STATUS_DRAFT = 'draft';
 
     public const STATUS_IN_PROGRESS = 'in_progress';

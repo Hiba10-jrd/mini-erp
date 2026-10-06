@@ -443,7 +443,7 @@ new class extends \Livewire\Volt\Component
 
     <section class="overflow-hidden border-y border-gray-200 bg-white">
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 text-sm">
+            <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200 text-sm">
                 <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500">
                     <tr>
                         <th class="px-4 py-3">
@@ -585,7 +585,7 @@ new class extends \Livewire\Volt\Component
                         </tr>
                     @endforeach
                 </tbody>
-            </table>
+            </table></div>
         </div>
     </section>
 

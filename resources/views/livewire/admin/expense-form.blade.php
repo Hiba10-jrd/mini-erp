@@ -97,7 +97,7 @@ new class extends \Livewire\Volt\Component
             'receipt' => [
                 'nullable',
                 'file',
-                'mimes:pdf,jpg,jpeg,png',
+                'mimetypes:application/pdf,image/jpeg,image/png,image/webp',
                 'max:5120',
             ],
         ], [
@@ -118,38 +118,35 @@ new class extends \Livewire\Volt\Component
             'receipt.max' => __('Le justificatif ne peut pas dépasser 5 Mo.'),
         ]);
 
-        $receiptPath = null;
-
-        if ($this->receipt !== null) {
-            $receiptPath = $this->receipt->store(
-                'expenses/receipts',
-                'local'
-            );
-        }
-
+        $attachment = null;
         try {
-            $service->create([
-                'expense_category_id' => (int) $validated[
-                    'expenseCategoryId'
-                ],
-                'payment_method_id' => (int) $validated[
-                    'paymentMethodId'
-                ],
-                'cash_register_id' => $this->isCashPayment()
-                    ? (int) $validated['cashRegisterId']
-                    : null,
-                'expense_date' => $validated['expenseDate'],
-                'amount' => $validated['amount'],
-                'tax_amount' => $validated['taxAmount'],
-                'reference' => $validated['reference'] ?? null,
-                'description' => $validated['description'] ?? null,
-                'receipt_path' => $receiptPath,
-            ]);
-        } catch (\Throwable $exception) {
-            if ($receiptPath !== null) {
-                Storage::disk('local')->delete($receiptPath);
-            }
+            \Illuminate\Support\Facades\DB::transaction(function () use ($service, $validated, &$attachment): void {
+                $expense = $service->create([
+                    'expense_category_id' => (int) $validated[
+                        'expenseCategoryId'
+                    ],
+                    'payment_method_id' => (int) $validated[
+                        'paymentMethodId'
+                    ],
+                    'cash_register_id' => $this->isCashPayment()
+                        ? (int) $validated['cashRegisterId']
+                        : null,
+                    'expense_date' => $validated['expenseDate'],
+                    'amount' => $validated['amount'],
+                    'tax_amount' => $validated['taxAmount'],
+                    'reference' => $validated['reference'] ?? null,
+                    'description' => $validated['description'] ?? null,
 
+                ]);
+
+                if ($this->receipt !== null) {
+                    $attachment = app(\App\Services\AttachmentManagementService::class)->upload($expense, $this->receipt);
+                }
+            });
+        } catch (\Throwable $exception) {
+            if ($attachment !== null) {
+                Storage::disk('attachments')->delete($attachment->path);
+            }
             throw $exception;
         }
 

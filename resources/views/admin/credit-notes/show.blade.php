@@ -13,4 +13,5 @@
             <livewire:admin.credit-note-details :credit-note-id="$creditNote->id" />
         </div>
     </div>
+<div class="mx-auto max-w-7xl px-4 pb-8"><livewire:attachments-manager parent-type="credit-note" :parent-id="$creditNote->id" /></div>
 </x-app-layout>

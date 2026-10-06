@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RecordsOperations;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class TaxRate extends Model
 {
+    use RecordsOperations;
+
     protected $fillable = ['label', 'rate', 'is_active', 'is_default'];
 
     protected function casts(): array

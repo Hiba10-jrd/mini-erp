@@ -2,12 +2,21 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RecordsOperations;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Expense extends Model
 {
+    public function attachments(): MorphMany
+    {
+        return $this->morphMany(Attachment::class, 'attachable');
+    }
+
+    use RecordsOperations;
+
     protected $fillable = [
         'expense_category_id',
         'payment_method_id',

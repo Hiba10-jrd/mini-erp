@@ -95,7 +95,7 @@ new class extends \Livewire\Volt\Component
     @endphp
     <div class="overflow-hidden border-y border-gray-200 bg-white">
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 text-sm">
+            <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200 text-sm">
                 <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500"><tr><th class="px-4 py-3">{{ __('Numéro') }}</th><th class="px-4 py-3">{{ __('Date') }}</th><th class="px-4 py-3">{{ __('Client') }}</th><th class="px-4 py-3">{{ __('Validité') }}</th><th class="px-4 py-3 text-right">{{ __('TTC') }}</th><th class="px-4 py-3">{{ __('Statut') }}</th><th class="px-4 py-3">{{ __('Créé par') }}</th><th class="px-4 py-3 text-right">{{ __('Actions') }}</th></tr></thead>
                 <tbody class="divide-y divide-gray-100">
                     @forelse ($quotes as $quote)
@@ -119,7 +119,7 @@ new class extends \Livewire\Volt\Component
                         <tr><td colspan="8" class="px-6 py-10 text-center text-gray-500">{{ __('Aucun devis ne correspond aux filtres.') }}</td></tr>
                     @endforelse
                 </tbody>
-            </table>
+            </table></div>
         </div>
         @if ($quotes->hasPages())<div class="border-t border-gray-200 px-4 py-4">{{ $quotes->links() }}</div>@endif
     </div>

@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RecordsOperations;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LogicException;
 
 class QuoteItem extends Model
 {
+    use RecordsOperations;
+
     protected $fillable = [
         'product_id',
         'item_type',
