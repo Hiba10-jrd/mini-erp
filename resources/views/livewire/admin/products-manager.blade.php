@@ -333,7 +333,7 @@ new class extends Component
         </div>
 
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
+            <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-600">{{ __('Référence') }}</th>
@@ -373,7 +373,7 @@ new class extends Component
                         <tr><td colspan="8" class="px-6 py-10 text-center text-sm text-gray-500">{{ __('Aucun article trouvé.') }}</td></tr>
                     @endforelse
                 </tbody>
-            </table>
+            </table></div>
         </div>
 
         @if ($products->hasPages())

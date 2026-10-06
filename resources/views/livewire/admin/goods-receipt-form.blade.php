@@ -14,8 +14,11 @@ new class extends \Livewire\Volt\Component
     public ?int $receiptId = null;
 
     public string $purchaseOrderId = '';
+
     public string $warehouseId = '';
+
     public string $receiptDate = '';
+
     public string $notes = '';
 
     /** @var array<int, array{purchase_order_item_id: string, quantity: string}> */
@@ -34,7 +37,9 @@ new class extends \Livewire\Volt\Component
             $this->receiptDate = $receipt->receipt_date->toDateString();
             $this->notes = $receipt->notes ?? '';
             $this->initializeLines($receipt->purchaseOrder, app(GoodsReceiptManagementService::class));
-            foreach ($receipt->items as $item) $this->lines[$item->purchase_order_item_id]['quantity'] = $item->quantity;
+            foreach ($receipt->items as $item) {
+                $this->lines[$item->purchase_order_item_id]['quantity'] = $item->quantity;
+            }
 
             return;
         }
@@ -60,7 +65,11 @@ new class extends \Livewire\Volt\Component
     {
         $this->authorizeMutation();
         $items = collect($this->lines)->filter(function (array $line): bool {
-            try { return BigDecimal::of((string) ($line['quantity'] ?? '0'))->isGreaterThan(0); } catch (\Throwable) { return true; }
+            try {
+                return BigDecimal::of((string) ($line['quantity'] ?? '0'))->isGreaterThan(0);
+            } catch (\Throwable) {
+                return true;
+            }
         })->values()->all();
         $attributes = [
             'warehouse_id' => $this->warehouseId,
@@ -98,7 +107,9 @@ new class extends \Livewire\Volt\Component
     {
         abort_unless($order->status === PurchaseOrder::STATUS_CONFIRMED, 403);
         foreach ($service->availableItemsForOrder($order) as $line) {
-            if (! BigDecimal::of($line['remaining'])->isGreaterThan(0)) continue;
+            if (! BigDecimal::of($line['remaining'])->isGreaterThan(0)) {
+                continue;
+            }
             $this->lines[$line['item']->id] = [
                 'purchase_order_item_id' => (string) $line['item']->id,
                 'quantity' => $fillRemaining ? $line['remaining'] : '0.000',
@@ -109,13 +120,19 @@ new class extends \Livewire\Volt\Component
     private function authorizeMutation(): void
     {
         Gate::authorize($this->receiptId === null ? 'purchases.create' : 'purchases.update');
-        if ($this->receiptId !== null) abort_unless(GoodsReceipt::query()->findOrFail($this->receiptId)->isEditable(), 403);
+        if ($this->receiptId !== null) {
+            abort_unless(GoodsReceipt::query()->findOrFail($this->receiptId)->isEditable(), 403);
+        }
     }
 
     private function resolveOrder(): ?PurchaseOrder
     {
-        if ($this->receiptId !== null) return GoodsReceipt::query()->findOrFail($this->receiptId)->purchaseOrder;
-        if ($this->purchaseOrderId === '') return null;
+        if ($this->receiptId !== null) {
+            return GoodsReceipt::query()->findOrFail($this->receiptId)->purchaseOrder;
+        }
+        if ($this->purchaseOrderId === '') {
+            return null;
+        }
 
         return PurchaseOrder::query()->findOrFail($this->purchaseOrderId);
     }
@@ -132,9 +149,9 @@ new class extends \Livewire\Volt\Component
         </div></section>
 
         @if($order)
-            <section class="border-y border-gray-200 bg-white"><div class="border-b border-gray-200 px-5 py-4"><h3 class="font-semibold text-gray-900">{{ __('Quantités à recevoir') }}</h3><p class="mt-1 text-sm text-gray-500">{{ $order->supplier_name }}</p></div><x-input-error :messages="$errors->get('items')" class="mx-5 mt-3" /><div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200 text-sm"><thead class="bg-gray-50 text-left text-xs uppercase text-gray-500"><tr><th class="px-4 py-3">{{ __('Article') }}</th><th class="px-4 py-3 text-right">{{ __('Commandé') }}</th><th class="px-4 py-3 text-right">{{ __('Déjà reçu') }}</th><th class="px-4 py-3 text-right">{{ __('Restant') }}</th><th class="px-4 py-3">{{ __('À recevoir') }}</th></tr></thead><tbody class="divide-y divide-gray-100">
+            <section class="border-y border-gray-200 bg-white"><div class="border-b border-gray-200 px-5 py-4"><h3 class="font-semibold text-gray-900">{{ __('Quantités à recevoir') }}</h3><p class="mt-1 text-sm text-gray-500">{{ $order->supplier_name }}</p></div><x-input-error :messages="$errors->get('items')" class="mx-5 mt-3" /><div class="overflow-x-auto"><div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200 text-sm"><thead class="bg-gray-50 text-left text-xs uppercase text-gray-500"><tr><th class="px-4 py-3">{{ __('Article') }}</th><th class="px-4 py-3 text-right">{{ __('Commandé') }}</th><th class="px-4 py-3 text-right">{{ __('Déjà reçu') }}</th><th class="px-4 py-3 text-right">{{ __('Restant') }}</th><th class="px-4 py-3">{{ __('À recevoir') }}</th></tr></thead><tbody class="divide-y divide-gray-100">
                 @forelse($available as $itemId => $line) @if(isset($lines[$itemId]))<tr wire:key="receipt-line-{{ $itemId }}"><td class="px-4 py-4"><p class="font-medium">{{ $line['item']->description }}</p><p class="text-xs text-gray-500">{{ $line['item']->reference ?? '—' }} · {{ $line['item']->item_type === 'service' ? __('Service') : __('Produit') }}</p></td><td class="px-4 py-4 text-right">{{ $line['ordered'] }}</td><td class="px-4 py-4 text-right">{{ $line['received'] }}</td><td class="px-4 py-4 text-right font-medium">{{ $line['remaining'] }}</td><td class="w-44 px-4 py-4"><x-text-input type="number" min="0" max="{{ $line['remaining'] }}" step="0.001" wire:model="lines.{{ $itemId }}.quantity" class="block w-full" /><x-input-error :messages="$errors->get('items.'.$loop->index.'.quantity')" class="mt-1" /></td></tr>@endif @empty<tr><td colspan="5" class="px-6 py-8 text-center text-gray-500">{{ __('Aucune quantité ne reste à recevoir.') }}</td></tr>@endforelse
-            </tbody></table></div></section>
+            </tbody></table></div></div></section>
         @endif
         <div class="flex justify-end"><x-primary-button :disabled="$order === null">{{ $receiptId === null ? __('Enregistrer le brouillon') : __('Mettre à jour le brouillon') }}</x-primary-button></div>
     </form>

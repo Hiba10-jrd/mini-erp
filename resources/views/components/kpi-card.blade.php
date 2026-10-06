@@ -1,6 +1,10 @@
-@props(['title', 'value', 'subtitle' => null])
-<div class="border border-gray-200 bg-white p-5">
-    <p class="text-sm text-gray-500">{{ $title }}</p>
-    <p class="mt-2 text-xl font-semibold text-gray-900">{{ $value }}</p>
-    @if ($subtitle)<p class="mt-2 text-xs text-gray-500">{{ $subtitle }}</p>@endif
+@props(['title', 'value', 'subtitle' => null, 'accent' => null])
+@php
+    $accents = ['CA net HT'=>'#087FF5','Encaissements'=>'#18C978','Créances clients'=>'#FF8A00','Dépenses TTC'=>'#19BFEF','Alertes stock'=>'#DC3545','Solde caisse'=>'#0DB6AD'];
+    $color = $accent ?? $accents[$title] ?? '#087FF5';
+@endphp
+<div class="erp-kpi" style="--kpi-accent: {{ $color }}">
+    <p class="erp-kpi-label">{{ $title }}</p>
+    <p class="erp-kpi-value">{{ $value }}</p>
+    @if($subtitle)<p class="erp-kpi-subtitle">{{ $subtitle }}</p>@endif
 </div>

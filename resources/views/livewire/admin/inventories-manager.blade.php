@@ -137,7 +137,7 @@ new class extends Component
             $statusClasses = ['draft' => 'bg-gray-100 text-gray-700', 'in_progress' => 'bg-amber-50 text-amber-700', 'validated' => 'bg-emerald-50 text-emerald-700', 'cancelled' => 'bg-red-50 text-red-700'];
         @endphp
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 text-sm">
+            <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200 text-sm">
                 <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500">
                     <tr><th class="px-4 py-3">{{ __('Référence') }}</th><th class="px-4 py-3">{{ __('Dépôt') }}</th><th class="px-4 py-3">{{ __('Statut') }}</th><th class="px-4 py-3">{{ __('Création') }}</th><th class="px-4 py-3">{{ __('Créé par') }}</th><th class="px-4 py-3">{{ __('Date de validation') }}</th><th class="px-4 py-3">{{ __('Validé par') }}</th><th class="px-4 py-3 text-right">{{ __('Action') }}</th></tr>
                 </thead>
@@ -157,7 +157,7 @@ new class extends Component
                         <tr><td colspan="8" class="px-6 py-8 text-center text-gray-500">{{ __('Aucun inventaire ne correspond aux filtres.') }}</td></tr>
                     @endforelse
                 </tbody>
-            </table>
+            </table></div>
         </div>
         @if ($inventories->hasPages())
             <div class="border-t border-gray-200 px-6 py-4">{{ $inventories->links() }}</div>

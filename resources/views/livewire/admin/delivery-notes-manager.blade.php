@@ -10,7 +10,9 @@ new class extends \Livewire\Volt\Component
     use WithPagination;
 
     public string $search = '';
+
     public string $statusFilter = 'all';
+
     public string $warehouseFilter = 'all';
 
     public function mount(): void
@@ -88,7 +90,7 @@ new class extends \Livewire\Volt\Component
 
     <div class="overflow-hidden border-y border-gray-200 bg-white">
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 text-sm">
+            <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200 text-sm">
                 <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500">
                     <tr>
                         <th class="px-4 py-3">{{ __('Numéro') }}</th>
@@ -121,7 +123,7 @@ new class extends \Livewire\Volt\Component
                         </tr>
                     @endforelse
                 </tbody>
-            </table>
+            </table></div>
         </div>
         @if ($notes->hasPages())
             <div class="border-t border-gray-200 px-4 py-4">{{ $notes->links() }}</div>

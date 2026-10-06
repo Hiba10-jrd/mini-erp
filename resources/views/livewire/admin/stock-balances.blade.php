@@ -151,7 +151,7 @@ new class extends Component
     </div>
 
     <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200 text-sm">
+        <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200 text-sm">
             <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500">
                 <tr><th class="px-6 py-3">{{ __('Produit') }}</th><th class="px-6 py-3">{{ __('Dépôt') }}</th><th class="px-6 py-3 text-right">{{ __('Disponible') }}</th><th class="px-6 py-3 text-right">{{ __('Total global') }}</th><th class="px-6 py-3 text-right">{{ __('Minimum') }}</th><th class="px-6 py-3">{{ __('État') }}</th></tr>
             </thead>
@@ -182,7 +182,7 @@ new class extends Component
                     <tr><td colspan="6" class="px-6 py-8 text-center text-gray-500">{{ __('Aucun solde ne correspond aux filtres.') }}</td></tr>
                 @endforelse
             </tbody>
-        </table>
+        </table></div>
     </div>
     @if ($balances->hasPages())
         <div class="border-t border-gray-200 px-6 py-4">{{ $balances->links() }}</div>

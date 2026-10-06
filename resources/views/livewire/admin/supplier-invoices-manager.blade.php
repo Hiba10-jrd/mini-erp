@@ -115,7 +115,7 @@ new class extends \Livewire\Volt\Component
 
     <div class="overflow-hidden border-y border-gray-200 bg-white">
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 text-sm">
+            <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200 text-sm">
                 <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500">
                     <tr>
                         <th class="px-4 py-3">{{ __('FAF') }}</th>
@@ -151,7 +151,7 @@ new class extends \Livewire\Volt\Component
                         <tr><td colspan="8" class="px-6 py-10 text-center text-gray-500">{{ __('Aucune facture fournisseur ne correspond aux filtres.') }}</td></tr>
                     @endforelse
                 </tbody>
-            </table>
+            </table></div>
         </div>
         @if ($invoices->hasPages())
             <div class="border-t border-gray-200 px-4 py-4">{{ $invoices->links() }}</div>

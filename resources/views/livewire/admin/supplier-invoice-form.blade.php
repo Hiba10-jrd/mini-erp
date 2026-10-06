@@ -254,7 +254,7 @@ new class extends \Livewire\Volt\Component
                 </div>
                 <x-input-error :messages="$errors->get('items')" class="mx-5 mt-3" />
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200 text-sm">
+                    <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200 text-sm">
                         <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500">
                             <tr>
                                 <th class="px-4 py-3">{{ __('Inclure') }}</th>
@@ -293,7 +293,7 @@ new class extends \Livewire\Volt\Component
                                 <tr><td colspan="12" class="px-6 py-8 text-center text-gray-500">{{ __('Aucune quantité reçue ne reste à facturer.') }}</td></tr>
                             @endforelse
                         </tbody>
-                    </table>
+                    </table></div>
                 </div>
             </section>
 

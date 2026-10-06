@@ -151,7 +151,7 @@ new class extends Component
     </div>
 
     <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200 text-sm">
+        <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200 text-sm">
             <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500">
                 <tr><th class="px-6 py-3">{{ __('Code') }}</th><th class="px-6 py-3">{{ __('Dépôt') }}</th><th class="px-6 py-3">{{ __('Localisation') }}</th><th class="px-6 py-3">{{ __('Statut') }}</th><th class="px-6 py-3 text-right">{{ __('Actions') }}</th></tr>
             </thead>
@@ -173,6 +173,6 @@ new class extends Component
                     <tr><td colspan="5" class="px-6 py-8 text-center text-gray-500">{{ __('Aucun dépôt configuré.') }}</td></tr>
                 @endforelse
             </tbody>
-        </table>
+        </table></div>
     </div>
 </section>

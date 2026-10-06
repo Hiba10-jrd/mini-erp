@@ -2,7 +2,7 @@
     <x-slot name="header">
         <h2 class="text-xl font-semibold leading-tight text-gray-800">
             {{ __('Caisse') }}
-        </h2>
+        </h2><p class="mt-2 text-sm text-slate-500">Suivez les caisses et les mouvements enregistrés.</p>
     </x-slot>
 
     <div class="py-6">

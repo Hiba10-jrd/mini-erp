@@ -41,30 +41,17 @@ new class extends \Livewire\Volt\Component
         return ['notifications' => $notifications, 'links' => app(\App\Services\NotificationLinkResolver::class)->links($notifications->getCollection())];
     }
 }; ?>
-<section class="space-y-4">
-    <div class="flex flex-wrap items-center justify-between gap-3">
-        <h2 class="text-xl font-semibold">Notifications</h2>
-        <button type="button" wire:click="markAllRead" wire:loading.attr="disabled" class="rounded border border-gray-300 px-3 py-2 text-sm">Tout marquer comme lu</button>
+<section class="space-y-6">
+    <div class="flex flex-wrap items-center justify-between gap-4"><div><h2 class="text-xl font-semibold">Notifications</h2><p class="mt-2 text-sm text-slate-500">Retrouvez les alertes et les dernières activités qui vous concernent.</p></div><x-secondary-button wire:click="markAllRead" wire:loading.attr="disabled">Tout marquer comme lu</x-secondary-button></div>
+    <div class="flex flex-wrap gap-2" role="group" aria-label="Filtrer les notifications">
+        @foreach(['all'=>'Toutes','unread'=>'Non lues','read'=>'Lues'] as $value=>$label)<button type="button" wire:click="$set('filter', '{{ $value }}')" aria-pressed="{{ $filter === $value ? 'true' : 'false' }}" @class(['erp-button', 'erp-button-primary'=>$filter === $value, 'erp-button-secondary'=>$filter !== $value])>{{ $label }}</button>@endforeach
     </div>
-    <label class="block text-sm">Filtrer
-        <select wire:model.live="filter" class="ml-2 rounded border-gray-300">
-            <option value="all">Toutes</option>
-            <option value="unread">Non lues</option>
-            <option value="read">Lues</option>
-        </select>
-    </label>
-    <ul class="divide-y rounded border border-gray-200 bg-white px-4">
+    <div class="erp-card !p-0 overflow-hidden">
         @forelse($notifications as $notification)
-            <li wire:key="notification-{{ $notification->id }}" class="space-y-2 py-4 text-sm">
-                <h3 class="{{ $notification->read_at ? '' : 'font-semibold' }}">{{ $notification->data['title'] ?? 'Notification' }}</h3>
-                <p>{{ $notification->data['message'] ?? '' }}</p>
-                <p class="text-xs text-gray-500">{{ $notification->read_at ? 'Lue' : 'Non lue' }} · {{ $notification->created_at->format('d/m/Y H:i') }}</p>
-                @if($url = $links[$notification->id] ?? null)<a href="{{ $url }}" class="text-indigo-600 underline">Consulter</a>@endif
-                @if(!$notification->read_at)<button type="button" wire:click="markRead('{{ $notification->id }}')" class="text-indigo-600 underline">Marquer comme lue</button>@endif
-            </li>
-        @empty
-            <li class="py-4 text-sm text-gray-500">Aucune notification.</li>
-        @endforelse
-    </ul>
+            <article wire:key="notification-{{ $notification->id }}" @class(['erp-notification-row', 'is-unread'=>!$notification->read_at])>
+                <div class="flex items-start gap-4"><span class="erp-avatar" aria-hidden="true">{{ ($notification->data['severity'] ?? '') === 'warning' ? '!' : 'i' }}</span><div class="min-w-0 flex-1"><div class="flex flex-wrap items-center justify-between gap-2"><h3 class="text-sm font-semibold">{{ $notification->data['title'] ?? 'Notification' }}</h3><x-status-badge :status="$notification->read_at ? 'neutral' : 'info'" :label="$notification->read_at ? 'Lue' : 'Non lue'" /></div><p class="mt-2 text-sm leading-relaxed text-slate-600">{{ $notification->data['message'] ?? '' }}</p><time class="mt-2 block text-xs text-slate-400">{{ $notification->created_at->format('d/m/Y H:i') }}</time><div class="mt-3 flex flex-wrap gap-3">@if($url = $links[$notification->id] ?? null)<a href="{{ $url }}" class="text-xs font-semibold text-indigo-700">Consulter →</a>@endif @if(!$notification->read_at)<button type="button" wire:click="markRead('{{ $notification->id }}')" class="text-xs font-medium text-slate-600">Marquer comme lue</button>@endif</div></div></div>
+            </article>
+        @empty <x-empty-state title="Aucune notification" description="Vous êtes à jour. Vos prochaines alertes apparaîtront ici." /> @endforelse
+    </div>
     {{ $notifications->links() }}
 </section>

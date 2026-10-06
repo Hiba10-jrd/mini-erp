@@ -208,7 +208,7 @@ new class extends \Livewire\Volt\Component
     @endif
 
     <div class="overflow-x-auto border-y border-gray-200 bg-white">
-        <table class="min-w-full divide-y divide-gray-200 text-sm">
+        <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200 text-sm">
             <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500"><tr>@foreach (['Facture', 'Client', 'Date facture', 'Échéance', 'Retard', 'Total TTC', 'Payé', 'Restant', 'État paiement', 'État échéance', 'Dernière relance', 'Action'] as $heading)<th class="whitespace-nowrap px-4 py-3">{{ __($heading) }}</th>@endforeach</tr></thead>
             <tbody class="divide-y divide-gray-100">
                 @forelse ($receivables as $row)
@@ -229,7 +229,7 @@ new class extends \Livewire\Volt\Component
                     <tr><td colspan="12" class="px-6 py-12 text-center text-gray-500">{{ __('Aucune facture trouvée.') }}</td></tr>
                 @endforelse
             </tbody>
-        </table>
+        </table></div>
     </div>
     @if ($receivables->hasPages())<div>{{ $receivables->links() }}</div>@endif
 </section>

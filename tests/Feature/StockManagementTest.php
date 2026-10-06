@@ -46,7 +46,7 @@ class StockManagementTest extends TestCase
             ->assertSeeVolt('admin.warehouses-manager')
             ->assertDontSee('Valider l’opération');
 
-        Volt::test('layout.navigation')->assertSee('Stocks et dépôts');
+        $this->get(route('dashboard'))->assertOk()->assertSee('Stocks et dépôts');
     }
 
     public function test_viewer_cannot_call_livewire_or_service_mutations_directly(): void

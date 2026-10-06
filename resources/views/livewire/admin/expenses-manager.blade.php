@@ -310,7 +310,7 @@ new class extends \Livewire\Volt\Component
 
     <section class="overflow-hidden border border-gray-200 bg-white">
         <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 text-sm">
+            <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200 text-sm">
                 <thead class="bg-gray-50">
                     <tr>
                         <th class="px-4 py-3 text-left font-semibold text-gray-600">
@@ -387,8 +387,8 @@ new class extends \Livewire\Volt\Component
 
                             <td class="px-4 py-4 text-gray-600">
                                 {{ $expense->creator?->name ?? '—' }}
-                                <a class="mt-1 block text-indigo-600" href="{{ route('attachments.index', ['parentType' => 'expense', 'parentId' => $expense->id]) }}" wire:navigate>Documents</a>
-                            </td>
+                            <a class="mt-1 block text-indigo-600" href="{{ route('attachments.index', ['parentType' => 'expense', 'parentId' => $expense->id]) }}" wire:navigate>Documents</a>
+</td>
                         </tr>
                     @empty
                         <tr>
@@ -401,7 +401,7 @@ new class extends \Livewire\Volt\Component
                         </tr>
                     @endforelse
                 </tbody>
-            </table>
+            </table></div>
         </div>
     </section>
 

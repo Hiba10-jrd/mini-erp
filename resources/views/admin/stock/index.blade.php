@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div>
             <p class="text-sm font-medium text-indigo-600">{{ __('Inventaire') }}</p>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800">{{ __('Stocks et dépôts') }}</h2>
+            <h2 class="text-xl font-semibold leading-tight text-gray-800">{{ __('Stocks et dépôts') }}</h2><p class="mt-2 text-sm text-slate-500">Consultez les quantités et les alertes par dépôt.</p>
         </div>
     </x-slot>
 
