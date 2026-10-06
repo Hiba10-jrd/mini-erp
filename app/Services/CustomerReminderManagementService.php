@@ -8,6 +8,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
@@ -44,12 +45,26 @@ class CustomerReminderManagementService
 
             $note = trim((string) ($validated['note'] ?? ''));
 
-            return $lockedInvoice->reminders()->create([
+            $reminder = $lockedInvoice->reminders()->create([
                 'reminder_date' => $validated['reminder_date'],
                 'channel' => $validated['channel'],
                 'note' => $note === '' ? null : $note,
                 'created_by' => Auth::id(),
             ]);
+            DB::afterCommit(function () use ($reminder, $lockedInvoice): void {
+                try {
+                    app(InternalNotificationDispatcher::class)->group('finance', [
+                        'type' => 'reminder.created', 'title' => 'Relance enregistrée',
+                        'message' => 'Une relance a été enregistrée pour '.$lockedInvoice->number.'.',
+                        'url' => route('finance.receivables.index', ['invoice' => $lockedInvoice->id], false),
+                        'entity_type' => 'invoice', 'entity_id' => $lockedInvoice->id, 'severity' => 'info',
+                    ], 'reminder:'.$reminder->id);
+                } catch (\Throwable $e) {
+                    Log::error('Reminder notification failed.', ['reminder_id' => $reminder->id, 'exception' => $e::class]);
+                }
+            });
+
+            return $reminder;
         }, 3);
     }
 

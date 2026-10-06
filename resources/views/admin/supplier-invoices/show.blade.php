@@ -11,4 +11,5 @@
             <livewire:admin.supplier-invoice-details :invoice-id="$supplierInvoice->id" />
         </div>
     </div>
+<div class="mx-auto max-w-7xl px-4 pb-8"><livewire:attachments-manager parent-type="supplier-invoice" :parent-id="$supplierInvoice->id" /></div>
 </x-app-layout>

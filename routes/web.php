@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AttachmentDownloadController;
 use App\Http\Controllers\CreditNotePdfController;
 use App\Http\Controllers\DeliveryNotePdfController;
 use App\Http\Controllers\InvoicePdfController;
@@ -17,6 +18,7 @@ use App\Models\StockInventory;
 use App\Models\Supplier;
 use App\Models\SupplierInvoice;
 use App\Models\SupplierPayment;
+use App\Services\AttachmentAuthorizationService;
 use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome');
@@ -453,4 +455,17 @@ Route::view('finance/cash', 'admin.cash.index')
         'can:payments.view',
     ])
     ->name('finance.cash.index');
+Route::middleware(['auth', 'auth.session', 'verified', 'can:erp.access'])->group(function (): void {
+    Route::get('attachments/{attachment}/download', AttachmentDownloadController::class)->name('attachments.download');
+    Route::get('finance/expenses/{expense}/receipt', [AttachmentDownloadController::class, 'legacy'])->name('attachments.expense-legacy');
+    Route::get('documents/{parentType}/{parentId}', function (string $parentType, int $parentId) {
+        $authorization = app(AttachmentAuthorizationService::class);
+        $authorization->authorize($authorization->resolve($parentType, $parentId));
+
+        return view('admin.attachments.show', compact('parentType', 'parentId'));
+    })->whereNumber('parentId')->name('attachments.index');
+    Route::view('notifications', 'admin.notifications.index')->name('notifications.index');
+    Route::view('admin/audit', 'admin.audit.index')->middleware('can:audit.access')->name('admin.audit.index');
+});
+
 require __DIR__.'/auth.php';

@@ -14,6 +14,7 @@ new class extends \Livewire\Volt\Component
 {
     use WithPagination;
 
+    #[\Livewire\Attributes\Url]
     public string $search = '';
 
     public string $customerFilter = 'all';

@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RecordsOperations;
 use Illuminate\Database\Eloquent\Model;
 
 class Company extends Model
 {
+    use RecordsOperations;
+
     protected $fillable = [
         'legal_name',
         'trade_name',

@@ -38,6 +38,9 @@ new class extends Component
                         {{ __('Dashboard') }}
                     </x-nav-link>
 
+                    @can('audit.access')
+                        <x-nav-link :href="route('admin.audit.index')" :active="request()->routeIs('admin.audit.*')" wire:navigate>Audit</x-nav-link>
+                    @endcan
                     @can('reports.view')
                         <x-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')" wire:navigate>Rapports</x-nav-link>
                     @endcan
@@ -242,6 +245,10 @@ new class extends Component
                 </div>
             </div>
 
+            @can('erp.access')
+                <div class="flex items-center"><livewire:notification-bell /></div>
+            @endcan
+
             <!-- Settings Dropdown -->
             <div class="hidden sm:flex sm:items-center sm:ms-6">
                 <x-dropdown align="right" width="48">
@@ -337,6 +344,12 @@ new class extends Component
                 {{ __('Dashboard') }}
             </x-responsive-nav-link>
 
+            @can('erp.access')
+                <x-responsive-nav-link :href="route('notifications.index')" :active="request()->routeIs('notifications.*')" wire:navigate>Notifications</x-responsive-nav-link>
+            @endcan
+            @can('audit.access')
+                <x-responsive-nav-link :href="route('admin.audit.index')" :active="request()->routeIs('admin.audit.*')" wire:navigate>Audit</x-responsive-nav-link>
+            @endcan
             @can('reports.view')
                 <x-responsive-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.*')" wire:navigate>Rapports</x-responsive-nav-link>
             @endcan

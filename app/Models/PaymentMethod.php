@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RecordsOperations;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class PaymentMethod extends Model
 {
+    use RecordsOperations;
+
     public const TYPE_CASH = 'cash';
 
     public const TYPE_CHEQUE = 'cheque';

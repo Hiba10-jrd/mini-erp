@@ -17,10 +17,12 @@ new class extends Component
 
     public string $search = '';
 
+    #[\Livewire\Attributes\Url(as: 'warehouse')]
     public string $warehouseFilter = 'all';
 
     public string $categoryFilter = 'all';
 
+    #[\Livewire\Attributes\Url(as: 'product')]
     public string $productFilter = 'all';
 
     public string $alertFilter = 'all';

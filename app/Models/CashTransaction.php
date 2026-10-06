@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RecordsOperations;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class CashTransaction extends Model
 {
+    use RecordsOperations;
+
     public const TYPE_ENTRY = 'entry';
 
     public const TYPE_EXIT = 'exit';

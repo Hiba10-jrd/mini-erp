@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RecordsOperations;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LogicException;
 
 class CreditNoteItem extends Model
 {
+    use RecordsOperations;
+
     protected $fillable = [
         'credit_note_id',
         'invoice_item_id',

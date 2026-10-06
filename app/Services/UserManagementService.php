@@ -35,7 +35,9 @@ class UserManagementService
                 'account_status' => UserAccountStatus::Active,
             ])->save();
 
+            $oldRoles = $user->roles()->pluck('roles.id')->all();
             $user->roles()->sync($roleIds);
+            app(AuditTrailService::class)->record($user, 'roles.changed', ['role_ids' => $oldRoles], ['role_ids' => $roleIds]);
 
             return $user->load('roles');
         });
@@ -78,7 +80,9 @@ class UserManagementService
             }
 
             $user->save();
+            $oldRoles = $user->roles()->pluck('roles.id')->all();
             $user->roles()->sync($roleIds);
+            app(AuditTrailService::class)->record($user, 'roles.changed', ['role_ids' => $oldRoles], ['role_ids' => $roleIds]);
 
             return $user->load('roles');
         });

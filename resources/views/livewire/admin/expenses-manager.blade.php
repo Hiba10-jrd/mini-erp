@@ -387,6 +387,7 @@ new class extends \Livewire\Volt\Component
 
                             <td class="px-4 py-4 text-gray-600">
                                 {{ $expense->creator?->name ?? '—' }}
+                                <a class="mt-1 block text-indigo-600" href="{{ route('attachments.index', ['parentType' => 'expense', 'parentId' => $expense->id]) }}" wire:navigate>Documents</a>
                             </td>
                         </tr>
                     @empty

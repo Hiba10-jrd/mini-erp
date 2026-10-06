@@ -11,4 +11,5 @@
             <livewire:admin.purchase-order-details :order-id="$purchaseOrder->id" />
         </div>
     </div>
+<div class="mx-auto max-w-7xl px-4 pb-8"><livewire:attachments-manager parent-type="purchase-order" :parent-id="$purchaseOrder->id" /></div>
 </x-app-layout>

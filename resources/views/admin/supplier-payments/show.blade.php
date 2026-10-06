@@ -12,4 +12,5 @@
             />
         </div>
     </div>
+<div class="mx-auto max-w-7xl px-4 pb-8"><livewire:attachments-manager parent-type="supplier-payment" :parent-id="$supplierPayment->id" /></div>
 </x-app-layout>

@@ -57,7 +57,9 @@ class RolePermissionManagementService
                 ]);
             }
 
+            $oldPermissions = $role->permissions()->pluck('name')->all();
             $role->permissions()->sync($permissions->modelKeys());
+            app(AuditTrailService::class)->record($role, 'permissions.changed', ['permissions' => $oldPermissions], ['permissions' => $permissionNames]);
 
             return $role->load('permissions');
         });

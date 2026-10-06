@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RecordsOperations;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LogicException;
 
 class InvoiceItem extends Model
 {
+    use RecordsOperations;
+
     protected $fillable = [
         'invoice_id',
         'sales_order_item_id',

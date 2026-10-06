@@ -5,6 +5,8 @@ namespace App\Providers;
 use App\Http\Middleware\EnsurePasswordHasBeenChanged;
 use App\Http\Middleware\EnsureUserAccountIsActive;
 use App\Models\User;
+use App\Services\AttachmentAuthorizationService;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
@@ -25,6 +27,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Relation::morphMap(AttachmentAuthorizationService::PARENTS);
+        Gate::define('audit.access', fn (User $user): bool => $user->isSuperAdministrator());
+
         Livewire::addPersistentMiddleware([
             AuthenticateSession::class,
             EnsureUserAccountIsActive::class,

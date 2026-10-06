@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\RecordsOperations;
 use Brick\Math\BigDecimal;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -11,6 +12,8 @@ use LogicException;
 
 class Quote extends Model
 {
+    use RecordsOperations;
+
     public const STATUS_DRAFT = 'draft';
 
     public const STATUS_SENT = 'sent';
