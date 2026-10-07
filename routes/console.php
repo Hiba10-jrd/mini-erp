@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Schedule;
 Schedule::job(new CheckCustomerInvoiceDeadlines)->daily()->withoutOverlapping();
 Schedule::job(new CheckStockAlerts)->hourly()->withoutOverlapping();
 
+Schedule::command('backup:create')->dailyAt(config('backup.schedule_time', '02:00'))->withoutOverlapping();
+
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 
