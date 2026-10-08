@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Http\Middleware\EnsurePasswordHasBeenChanged;
 use App\Http\Middleware\EnsureUserAccountIsActive;
+use App\Http\Middleware\SetLocale;
 use App\Models\User;
 use App\Services\AttachmentAuthorizationService;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -31,6 +32,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::define('audit.access', fn (User $user): bool => $user->isSuperAdministrator());
 
         Livewire::addPersistentMiddleware([
+            SetLocale::class,
             AuthenticateSession::class,
             EnsureUserAccountIsActive::class,
             EnsurePasswordHasBeenChanged::class,

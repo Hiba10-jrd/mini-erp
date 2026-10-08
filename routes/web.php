@@ -4,6 +4,7 @@ use App\Http\Controllers\AttachmentDownloadController;
 use App\Http\Controllers\CreditNotePdfController;
 use App\Http\Controllers\DeliveryNotePdfController;
 use App\Http\Controllers\InvoicePdfController;
+use App\Http\Controllers\LocaleController;
 use App\Http\Controllers\QuotePdfController;
 use App\Models\CreditNote;
 use App\Models\Customer;
@@ -21,7 +22,13 @@ use App\Models\SupplierPayment;
 use App\Services\AttachmentAuthorizationService;
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'welcome');
+Route::get('/', function () {
+    return auth()->check() ? redirect()->route('dashboard') : redirect()->route('login');
+});
+
+Route::post('locale', [LocaleController::class, 'update'])
+    ->middleware(['throttle:60,1'])
+    ->name('locale.update');
 
 Route::view('reports', 'admin.reports.index')
     ->middleware(['auth', 'auth.session', 'verified', 'can:reports.view'])

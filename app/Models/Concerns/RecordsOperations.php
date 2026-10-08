@@ -15,7 +15,7 @@ trait RecordsOperations
         });
         static::updated(function (Model $model): void {
             $changes = $model->getChanges();
-            unset($changes['updated_at'], $changes['remember_token']);
+            unset($changes['updated_at'], $changes['remember_token'], $changes['locale']);
             if ($changes === []) {
                 return;
             }
