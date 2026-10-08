@@ -232,7 +232,7 @@ new class extends \Livewire\Volt\Component
     <div class="overflow-hidden border-y border-gray-200 bg-white">
         <div class="overflow-x-auto">
             <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200 text-sm">
-                <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500">
+                <thead class="bg-gray-50 text-start text-xs uppercase text-gray-500">
                     <tr>
                         <th class="px-4 py-3">
                             {{ __('Numéro') }}
@@ -258,11 +258,11 @@ new class extends \Livewire\Volt\Component
                             {{ __('Statut') }}
                         </th>
 
-                        <th class="px-4 py-3 text-right">
+                        <th class="px-4 py-3 text-end">
                             {{ __('TVA') }}
                         </th>
 
-                        <th class="px-4 py-3 text-right">
+                        <th class="px-4 py-3 text-end">
                             {{ __('TTC') }}
                         </th>
                     </tr>
@@ -320,11 +320,11 @@ new class extends \Livewire\Volt\Component
                                 </span>
                             </td>
 
-                            <td class="whitespace-nowrap px-4 py-4 text-right text-gray-700">
+                            <td class="whitespace-nowrap px-4 py-4 text-end text-gray-700">
                                 {{ str_replace('.', ',', $invoice->tax_total) }}
                             </td>
 
-                            <td class="whitespace-nowrap px-4 py-4 text-right font-semibold text-gray-900">
+                            <td class="whitespace-nowrap px-4 py-4 text-end font-semibold text-gray-900">
                                 {{ str_replace('.', ',', $invoice->total_ttc) }}
                             </td>
                         </tr>

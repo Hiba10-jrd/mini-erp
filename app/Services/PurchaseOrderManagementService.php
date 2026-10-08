@@ -49,7 +49,7 @@ class PurchaseOrderManagementService
                 ...$this->paymentTermSnapshot($paymentTerm),
             ])->save();
             $order->items()->createMany($preparedLines);
-            $this->recordHistory($order, 'created', null, PurchaseOrder::STATUS_DRAFT, __('Commande fournisseur créée.'));
+            $this->recordHistory($order, 'created', null, PurchaseOrder::STATUS_DRAFT, __('Commande fournisseur créée.'), null, 'Commande fournisseur créée.');
 
             return $this->load($order);
         }, 3);
@@ -80,7 +80,7 @@ class PurchaseOrderManagementService
             ])->save();
             $locked->items()->get()->each->delete();
             $locked->items()->createMany($preparedLines);
-            $this->recordHistory($locked, 'draft_updated', PurchaseOrder::STATUS_DRAFT, PurchaseOrder::STATUS_DRAFT, __('Brouillon de commande fournisseur modifié.'));
+            $this->recordHistory($locked, 'draft_updated', PurchaseOrder::STATUS_DRAFT, PurchaseOrder::STATUS_DRAFT, __('Brouillon de commande fournisseur modifié.'), null, 'Brouillon de commande fournisseur modifié.');
 
             return $this->load($locked);
         }, 3);
@@ -104,7 +104,7 @@ class PurchaseOrderManagementService
                 'confirmed_by' => Auth::id(),
                 'confirmed_at' => now(),
             ])->save();
-            $this->recordHistory($locked, 'confirmed', PurchaseOrder::STATUS_DRAFT, PurchaseOrder::STATUS_CONFIRMED, __('Commande fournisseur confirmée.'));
+            $this->recordHistory($locked, 'confirmed', PurchaseOrder::STATUS_DRAFT, PurchaseOrder::STATUS_CONFIRMED, __('Commande fournisseur confirmée.'), null, 'Commande fournisseur confirmée.');
 
             return $this->load($locked);
         }, 3);
@@ -124,7 +124,7 @@ class PurchaseOrderManagementService
                 'status' => PurchaseOrder::STATUS_CANCELLED,
                 'cancelled_at' => now(),
             ])->save();
-            $this->recordHistory($locked, 'cancelled', PurchaseOrder::STATUS_DRAFT, PurchaseOrder::STATUS_CANCELLED, __('Commande fournisseur annulée.'));
+            $this->recordHistory($locked, 'cancelled', PurchaseOrder::STATUS_DRAFT, PurchaseOrder::STATUS_CANCELLED, __('Commande fournisseur annulée.'), null, 'Commande fournisseur annulée.');
 
             return $this->load($locked);
         }, 3);
@@ -261,14 +261,28 @@ class PurchaseOrderManagementService
         ];
     }
 
-    private function recordHistory(PurchaseOrder $order, string $event, ?string $from, ?string $to, string $description): void
-    {
+    /** @param array<string, mixed>|null $metadata */
+    private function recordHistory(
+        PurchaseOrder $order,
+        string $event,
+        ?string $from,
+        ?string $to,
+        string $description,
+        ?array $metadata = null,
+        ?string $descriptionKey = null,
+        array $descriptionParams = []
+    ): void {
+        $meta = $metadata ?? [];
+        $meta['description_key'] = $descriptionKey ?? $description;
+        $meta['description_params'] = $descriptionParams;
+
         $order->histories()->create([
             'event' => $event,
             'from_status' => $from,
             'to_status' => $to,
             'user_id' => Auth::id(),
             'description' => $description,
+            'metadata' => $meta,
             'created_at' => now(),
         ]);
     }
