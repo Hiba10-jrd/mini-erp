@@ -51,6 +51,13 @@ return [
     */
 
     'channels' => [
+        'backup_operations' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/backup-operations.log'),
+            'level' => 'info',
+            'days' => 90,
+            'permission' => 0600,
+        ],
 
         'stack' => [
             'driver' => 'stack',

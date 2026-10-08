@@ -29,6 +29,14 @@ return [
     */
 
     'disks' => [
+        'backups' => [
+            'driver' => 'local',
+            'root' => storage_path('backups'),
+            'visibility' => 'private',
+            'directory_visibility' => 'private',
+            'serve' => false,
+            'throw' => true,
+        ],
         'attachments' => [
             'driver' => 'local',
             'root' => storage_path('app/private/attachments'),

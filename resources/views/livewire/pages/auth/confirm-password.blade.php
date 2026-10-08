@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Validation\ValidationException;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
@@ -14,6 +15,10 @@ new #[Layout('layouts.guest')] class extends Component
      */
     public function confirmPassword(): void
     {
+        $key = 'password-confirm:'.Auth::id().':'.request()->ip();
+        if (RateLimiter::tooManyAttempts($key, 5)) {
+            throw ValidationException::withMessages(['password' => __('auth.throttle', ['seconds' => RateLimiter::availableIn($key), 'minutes' => 1])]);
+        }
         $this->validate([
             'password' => ['required', 'string'],
         ]);
@@ -22,12 +27,14 @@ new #[Layout('layouts.guest')] class extends Component
             'email' => Auth::user()->email,
             'password' => $this->password,
         ])) {
+            RateLimiter::hit($key, 60);
             throw ValidationException::withMessages([
                 'password' => __('auth.password'),
             ]);
         }
 
         session(['auth.password_confirmed_at' => time()]);
+        RateLimiter::clear($key);
 
         $this->redirectIntended(default: route('dashboard', absolute: false), navigate: true);
     }
