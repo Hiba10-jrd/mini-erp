@@ -398,11 +398,11 @@ new class extends \Livewire\Volt\Component
                             type="text"
                             inputmode="decimal"
                             wire:model="amount"
-                            class="block w-full pr-14"
+                            class="block w-full pe-14"
                             placeholder="0.00"
                         />
 
-                        <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-sm text-gray-500">
+                        <span class="pointer-events-none absolute inset-y-0 end-0 flex items-center pe-4 text-sm text-gray-500">
                             {{ __('DH') }}
                         </span>
                     </div>
@@ -425,11 +425,11 @@ new class extends \Livewire\Volt\Component
                             type="text"
                             inputmode="decimal"
                             wire:model="taxAmount"
-                            class="block w-full pr-14"
+                            class="block w-full pe-14"
                             placeholder="0.00"
                         />
 
-                        <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-sm text-gray-500">
+                        <span class="pointer-events-none absolute inset-y-0 end-0 flex items-center pe-4 text-sm text-gray-500">
                             {{ __('DH') }}
                         </span>
                     </div>
@@ -478,7 +478,7 @@ new class extends \Livewire\Volt\Component
                         type="file"
                         wire:model="receipt"
                         accept=".pdf,.jpg,.jpeg,.png"
-                        class="mt-1 block w-full text-sm text-gray-600 file:mr-4 file:border-0 file:bg-gray-100 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-gray-700 hover:file:bg-gray-200"
+                        class="mt-1 block w-full text-sm text-gray-600 file:me-4 file:border-0 file:bg-gray-100 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-gray-700 hover:file:bg-gray-200"
                     >
 
                     <p class="mt-1 text-xs text-gray-500">

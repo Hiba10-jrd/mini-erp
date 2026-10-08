@@ -136,7 +136,7 @@ new class extends Component
                         wire:key="role-{{ $role->id }}"
                         wire:click="selectRole({{ $role->id }})"
                         @class([
-                            'flex w-full items-center justify-between px-6 py-4 text-left text-sm transition',
+                            'flex w-full items-center justify-between px-6 py-4 text-start text-sm transition',
                             'bg-indigo-50 text-indigo-900' => $selectedRoleId === $role->id,
                             'text-gray-700 hover:bg-gray-50' => $selectedRoleId !== $role->id,
                         ])

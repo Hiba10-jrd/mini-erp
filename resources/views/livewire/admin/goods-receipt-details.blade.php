@@ -293,7 +293,7 @@ new class extends \Livewire\Volt\Component
         <div class="overflow-x-auto">
             <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200 text-sm">
                 <thead
-                    class="bg-gray-50 text-left text-xs uppercase text-gray-500"
+                    class="bg-gray-50 text-start text-xs uppercase text-gray-500"
                 >
                     <tr>
                         <th class="px-4 py-3">
@@ -308,7 +308,7 @@ new class extends \Livewire\Volt\Component
                             {{ __('Unité') }}
                         </th>
 
-                        <th class="px-4 py-3 text-right">
+                        <th class="px-4 py-3 text-end">
                             {{ __('Quantité reçue') }}
                         </th>
                     </tr>
@@ -339,7 +339,7 @@ new class extends \Livewire\Volt\Component
                                 {{ $item->unit_label }}
                             </td>
 
-                            <td class="px-4 py-4 text-right font-medium">
+                            <td class="px-4 py-4 text-end font-medium">
                                 {{ $item->quantity }}
                             </td>
                         </tr>

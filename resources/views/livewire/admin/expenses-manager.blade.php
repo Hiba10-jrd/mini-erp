@@ -313,27 +313,27 @@ new class extends \Livewire\Volt\Component
             <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200 text-sm">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-4 py-3 text-left font-semibold text-gray-600">
+                        <th class="px-4 py-3 text-start font-semibold text-gray-600">
                             {{ __('Date') }}
                         </th>
 
-                        <th class="px-4 py-3 text-left font-semibold text-gray-600">
+                        <th class="px-4 py-3 text-start font-semibold text-gray-600">
                             {{ __('Dépense') }}
                         </th>
 
-                        <th class="px-4 py-3 text-left font-semibold text-gray-600">
+                        <th class="px-4 py-3 text-start font-semibold text-gray-600">
                             {{ __('Paiement') }}
                         </th>
 
-                        <th class="px-4 py-3 text-right font-semibold text-gray-600">
+                        <th class="px-4 py-3 text-end font-semibold text-gray-600">
                             {{ __('TVA') }}
                         </th>
 
-                        <th class="px-4 py-3 text-right font-semibold text-gray-600">
+                        <th class="px-4 py-3 text-end font-semibold text-gray-600">
                             {{ __('Montant') }}
                         </th>
 
-                        <th class="px-4 py-3 text-left font-semibold text-gray-600">
+                        <th class="px-4 py-3 text-start font-semibold text-gray-600">
                             {{ __('Responsable') }}
                         </th>
                     </tr>
@@ -375,12 +375,12 @@ new class extends \Livewire\Volt\Component
                                 @endif
                             </td>
 
-                            <td class="whitespace-nowrap px-4 py-4 text-right text-gray-600">
+                            <td class="whitespace-nowrap px-4 py-4 text-end text-gray-600">
                                 {{ number_format((float) $expense->tax_amount, 2, ',', ' ') }}
                                 {{ __('DH') }}
                             </td>
 
-                            <td class="whitespace-nowrap px-4 py-4 text-right font-semibold text-gray-900">
+                            <td class="whitespace-nowrap px-4 py-4 text-end font-semibold text-gray-900">
                                 {{ number_format((float) $expense->amount, 2, ',', ' ') }}
                                 {{ __('DH') }}
                             </td>

@@ -209,7 +209,7 @@ new class extends \Livewire\Volt\Component
     <section class="overflow-hidden border-y border-gray-200 bg-white">
         <div class="overflow-x-auto">
             <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200 text-sm">
-                <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500">
+                <thead class="bg-gray-50 text-start text-xs uppercase text-gray-500">
                     <tr>
                         <th class="px-4 py-3">
                             {{ __('Date') }}
@@ -231,11 +231,11 @@ new class extends \Livewire\Volt\Component
                             {{ __('Factures') }}
                         </th>
 
-                        <th class="px-4 py-3 text-right">
+                        <th class="px-4 py-3 text-end">
                             {{ __('Montant') }}
                         </th>
 
-                        <th class="px-4 py-3 text-right">
+                        <th class="px-4 py-3 text-end">
                             {{ __('Action') }}
                         </th>
                     </tr>
@@ -289,7 +289,7 @@ new class extends \Livewire\Volt\Component
                                 </div>
                             </td>
 
-                            <td class="whitespace-nowrap px-4 py-4 text-right font-semibold text-gray-900">
+                            <td class="whitespace-nowrap px-4 py-4 text-end font-semibold text-gray-900">
                                 {{ number_format(
                                     (float) $payment->amount,
                                     2,
@@ -298,7 +298,7 @@ new class extends \Livewire\Volt\Component
                                 ) }}
                             </td>
 
-                            <td class="whitespace-nowrap px-4 py-4 text-right">
+                            <td class="whitespace-nowrap px-4 py-4 text-end">
                                 <a
                                     href="{{ route(
                                         'purchases.payments.show',

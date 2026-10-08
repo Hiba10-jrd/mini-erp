@@ -203,7 +203,7 @@ new class extends \Livewire\Volt\Component
 
     @if ($errors->any())
         <div class="border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
-            <ul class="list-disc space-y-1 pl-5">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
+            <ul class="list-disc space-y-1 ps-5">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
         </div>
     @endif
 
@@ -255,20 +255,20 @@ new class extends \Livewire\Volt\Component
                 <x-input-error :messages="$errors->get('items')" class="mx-5 mt-3" />
                 <div class="overflow-x-auto">
                     <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200 text-sm">
-                        <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500">
+                        <thead class="bg-gray-50 text-start text-xs uppercase text-gray-500">
                             <tr>
                                 <th class="px-4 py-3">{{ __('Inclure') }}</th>
                                 <th class="px-4 py-3">{{ __('Réception source') }}</th>
                                 <th class="px-4 py-3">{{ __('Article') }}</th>
-                                <th class="px-4 py-3 text-right">{{ __('Reçue') }}</th>
-                                <th class="px-4 py-3 text-right">{{ __('Réservée brouillons') }}</th>
-                                <th class="px-4 py-3 text-right">{{ __('Déjà facturée') }}</th>
-                                <th class="px-4 py-3 text-right">{{ __('Disponible') }}</th>
+                                <th class="px-4 py-3 text-end">{{ __('Reçue') }}</th>
+                                <th class="px-4 py-3 text-end">{{ __('Réservée brouillons') }}</th>
+                                <th class="px-4 py-3 text-end">{{ __('Déjà facturée') }}</th>
+                                <th class="px-4 py-3 text-end">{{ __('Disponible') }}</th>
                                 <th class="px-4 py-3">{{ __('À facturer') }}</th>
-                                <th class="px-4 py-3 text-right">{{ __('PU HT') }}</th>
-                                <th class="px-4 py-3 text-right">{{ __('Remise') }}</th>
-                                <th class="px-4 py-3 text-right">{{ __('TVA') }}</th>
-                                <th class="px-4 py-3 text-right">{{ __('TTC ligne') }}</th>
+                                <th class="px-4 py-3 text-end">{{ __('PU HT') }}</th>
+                                <th class="px-4 py-3 text-end">{{ __('Remise') }}</th>
+                                <th class="px-4 py-3 text-end">{{ __('TVA') }}</th>
+                                <th class="px-4 py-3 text-end">{{ __('TTC ligne') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
@@ -277,17 +277,17 @@ new class extends \Livewire\Volt\Component
                                     <td class="px-4 py-4"><input type="checkbox" wire:model.live="lines.{{ $sourceId }}.selected" class="border-gray-300"></td>
                                     <td class="whitespace-nowrap px-4 py-4"><p class="font-medium text-indigo-700">{{ $line['goods_receipt_number'] }}</p><p class="text-xs text-gray-500">{{ $line['goods_receipt_date']->format('d/m/Y') }}</p></td>
                                     <td class="min-w-52 px-4 py-4"><p class="font-medium">{{ $line['description'] }}</p><p class="text-xs text-gray-500">{{ $line['reference'] ?? '—' }} · {{ $line['unit_label'] ?? '—' }}</p></td>
-                                    <td class="px-4 py-4 text-right">{{ $line['received_quantity'] }}</td>
-                                    <td class="px-4 py-4 text-right">{{ $line['reserved_by_other_drafts'] }}</td>
-                                    <td class="px-4 py-4 text-right">{{ $line['validated_invoiced_quantity'] }}</td>
-                                    <td class="px-4 py-4 text-right font-medium">{{ $line['available_quantity'] }}</td>
+                                    <td class="px-4 py-4 text-end">{{ $line['received_quantity'] }}</td>
+                                    <td class="px-4 py-4 text-end">{{ $line['reserved_by_other_drafts'] }}</td>
+                                    <td class="px-4 py-4 text-end">{{ $line['validated_invoiced_quantity'] }}</td>
+                                    <td class="px-4 py-4 text-end font-medium">{{ $line['available_quantity'] }}</td>
                                     <td class="w-40 px-4 py-4">
                                         <x-text-input type="number" min="0.001" max="{{ $line['available_quantity'] }}" step="0.001" wire:model.live="lines.{{ $sourceId }}.quantity" :disabled="! $line['selected']" class="block w-full" />
                                     </td>
-                                    <td class="px-4 py-4 text-right">{{ str_replace('.', ',', $line['unit_price']) }}</td>
-                                    <td class="px-4 py-4 text-right">{{ str_replace('.', ',', $line['discount_percent']) }} %</td>
-                                    <td class="px-4 py-4 text-right">{{ str_replace('.', ',', $line['tax_rate_percent']) }} %</td>
-                                    <td class="px-4 py-4 text-right font-medium">{{ isset($calculatedLines[$sourceId]['total_ttc']) ? str_replace('.', ',', $calculatedLines[$sourceId]['total_ttc']) : '—' }}</td>
+                                    <td class="px-4 py-4 text-end">{{ str_replace('.', ',', $line['unit_price']) }}</td>
+                                    <td class="px-4 py-4 text-end">{{ str_replace('.', ',', $line['discount_percent']) }} %</td>
+                                    <td class="px-4 py-4 text-end">{{ str_replace('.', ',', $line['tax_rate_percent']) }} %</td>
+                                    <td class="px-4 py-4 text-end font-medium">{{ isset($calculatedLines[$sourceId]['total_ttc']) ? str_replace('.', ',', $calculatedLines[$sourceId]['total_ttc']) : '—' }}</td>
                                 </tr>
                             @empty
                                 <tr><td colspan="12" class="px-6 py-8 text-center text-gray-500">{{ __('Aucune quantité reçue ne reste à facturer.') }}</td></tr>

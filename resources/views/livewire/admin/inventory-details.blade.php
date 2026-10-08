@@ -136,8 +136,8 @@ new class extends Component
     <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
         <div class="overflow-x-auto">
             <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200 text-sm">
-                <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500">
-                    <tr><th class="px-4 py-3">{{ __('Produit') }}</th><th class="px-4 py-3">{{ __('Unité') }}</th><th class="px-4 py-3 text-right">{{ __('Théorique') }}</th><th class="px-4 py-3">{{ __('Stock réel') }}</th><th class="px-4 py-3">{{ __('Écart') }}</th><th class="px-4 py-3">{{ __('Note') }}</th>@can('stock.manage')<th class="px-4 py-3 text-right">{{ __('Action') }}</th>@endcan</tr>
+                <thead class="bg-gray-50 text-start text-xs uppercase text-gray-500">
+                    <tr><th class="px-4 py-3">{{ __('Produit') }}</th><th class="px-4 py-3">{{ __('Unité') }}</th><th class="px-4 py-3 text-end">{{ __('Théorique') }}</th><th class="px-4 py-3">{{ __('Stock réel') }}</th><th class="px-4 py-3">{{ __('Écart') }}</th><th class="px-4 py-3">{{ __('Note') }}</th>@can('stock.manage')<th class="px-4 py-3 text-end">{{ __('Action') }}</th>@endcan</tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 bg-white">
                     @foreach ($inventory->lines as $line)
@@ -145,7 +145,7 @@ new class extends Component
                         <tr wire:key="inventory-line-{{ $line->id }}">
                             <td class="px-4 py-4"><p class="font-medium text-gray-900">{{ $line->product->name }}</p><p class="text-xs text-gray-500">{{ $line->product->reference }}</p></td>
                             <td class="whitespace-nowrap px-4 py-4 text-gray-600">{{ $line->product->unit->symbol }}</td>
-                            <td class="whitespace-nowrap px-4 py-4 text-right font-medium text-gray-900">{{ number_format((float) $line->theoretical_quantity, 3, ',', ' ') }}</td>
+                            <td class="whitespace-nowrap px-4 py-4 text-end font-medium text-gray-900">{{ number_format((float) $line->theoretical_quantity, 3, ',', ' ') }}</td>
                             <td class="min-w-40 px-4 py-4">
                                 @if ($inventory->isEditable() && auth()->user()->can('stock.manage'))
                                     <x-text-input type="number" min="0" step="0.001" wire:model="actualQuantities.{{ $line->id }}" class="block w-full" />
@@ -174,7 +174,7 @@ new class extends Component
                                 @endif
                             </td>
                             @can('stock.manage')
-                                <td class="px-4 py-4 text-right">
+                                <td class="px-4 py-4 text-end">
                                     @if ($inventory->isEditable())
                                         <x-secondary-button type="button" wire:click="saveLine({{ $line->id }})">{{ __('Enregistrer') }}</x-secondary-button>
                                     @endif

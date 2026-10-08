@@ -271,7 +271,7 @@ new class extends Component
                             </p>
                         </div>
 
-                        <div class="text-right text-sm">
+                        <div class="text-end text-sm">
                             <p>
                                 {{ $invoice->invoice_date->format('d/m/Y') }}
                             </p>

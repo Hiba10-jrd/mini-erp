@@ -27,7 +27,7 @@ new class extends \Livewire\Volt\Component
     <details @click.outside="$el.removeAttribute('open')" @keydown.escape.window="$el.removeAttribute('open')">
         <summary class="erp-icon-button relative cursor-pointer list-none" aria-label="{{ trans_choice('Notifications : :count non lue|Notifications : :count non lues', $unread, ['count' => $unread]) }}">
             <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M15 17h5l-1.4-1.4A2 2 0 0 1 18 14.2V10a6 6 0 0 0-12 0v4.2c0 .5-.2 1-.6 1.4L4 17h5m6 0a3 3 0 0 1-6 0m6 0H9" /></svg>
-            @if($unread)<span class="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#087FF5] px-1 text-[10px] font-semibold text-white">{{ $unread > 99 ? '99+' : $unread }}</span>@endif
+            @if($unread)<span class="absolute -end-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#087FF5] px-1 text-[10px] font-semibold text-white">{{ $unread > 99 ? '99+' : $unread }}</span>@endif
         </summary>
         <div class="erp-notification-menu">
             <div class="flex items-center justify-between border-b px-4 py-4"><h3 class="text-sm font-semibold">{{ __('Notifications') }}</h3><span class="text-xs text-slate-500">{{ trans_choice(':count non lue|:count non lues', $unread, ['count' => $unread]) }}</span></div>

@@ -444,7 +444,7 @@ new class extends \Livewire\Volt\Component
     <section class="overflow-hidden border-y border-gray-200 bg-white">
         <div class="overflow-x-auto">
             <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200 text-sm">
-                <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500">
+                <thead class="bg-gray-50 text-start text-xs uppercase text-gray-500">
                     <tr>
                         <th class="px-4 py-3">
                             {{ __('BRF') }}
@@ -454,7 +454,7 @@ new class extends \Livewire\Volt\Component
                             {{ __('Désignation') }}
                         </th>
 
-                        <th class="px-4 py-3 text-right">
+                        <th class="px-4 py-3 text-end">
                             {{ __('Quantité') }}
                         </th>
 
@@ -462,23 +462,23 @@ new class extends \Livewire\Volt\Component
                             {{ __('Unité') }}
                         </th>
 
-                        <th class="px-4 py-3 text-right">
+                        <th class="px-4 py-3 text-end">
                             {{ __('PU HT') }}
                         </th>
 
-                        <th class="px-4 py-3 text-right">
+                        <th class="px-4 py-3 text-end">
                             {{ __('Remise') }}
                         </th>
 
-                        <th class="px-4 py-3 text-right">
+                        <th class="px-4 py-3 text-end">
                             {{ __('TVA') }}
                         </th>
 
-                        <th class="px-4 py-3 text-right">
+                        <th class="px-4 py-3 text-end">
                             {{ __('HT net') }}
                         </th>
 
-                        <th class="px-4 py-3 text-right">
+                        <th class="px-4 py-3 text-end">
                             {{ __('TTC') }}
                         </th>
                     </tr>
@@ -517,7 +517,7 @@ new class extends \Livewire\Volt\Component
                                 </p>
                             </td>
 
-                            <td class="px-4 py-4 text-right">
+                            <td class="px-4 py-4 text-end">
                                 {{ $item->quantity }}
                             </td>
 
@@ -525,7 +525,7 @@ new class extends \Livewire\Volt\Component
                                 {{ $item->unit_label ?? '—' }}
                             </td>
 
-                            <td class="px-4 py-4 text-right">
+                            <td class="px-4 py-4 text-end">
                                 {{ str_replace(
                                     '.',
                                     ',',
@@ -533,7 +533,7 @@ new class extends \Livewire\Volt\Component
                                 ) }}
                             </td>
 
-                            <td class="px-4 py-4 text-right">
+                            <td class="px-4 py-4 text-end">
                                 {{ str_replace(
                                     '.',
                                     ',',
@@ -550,7 +550,7 @@ new class extends \Livewire\Volt\Component
                                 </span>
                             </td>
 
-                            <td class="px-4 py-4 text-right">
+                            <td class="px-4 py-4 text-end">
                                 {{ str_replace(
                                     '.',
                                     ',',
@@ -567,7 +567,7 @@ new class extends \Livewire\Volt\Component
                                 </span>
                             </td>
 
-                            <td class="px-4 py-4 text-right">
+                            <td class="px-4 py-4 text-end">
                                 {{ str_replace(
                                     '.',
                                     ',',
@@ -575,7 +575,7 @@ new class extends \Livewire\Volt\Component
                                 ) }}
                             </td>
 
-                            <td class="px-4 py-4 text-right font-medium">
+                            <td class="px-4 py-4 text-end font-medium">
                                 {{ str_replace(
                                     '.',
                                     ',',

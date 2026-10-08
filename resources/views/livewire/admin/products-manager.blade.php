@@ -336,14 +336,14 @@ new class extends Component
             <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-600">{{ __('Référence') }}</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-600">{{ __('Désignation') }}</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-600">{{ __('Type') }}</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-600">{{ __('Catégorie') }}</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-600">{{ __('Prix vente') }}</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-600">{{ __('TVA') }}</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-600">{{ __('Statut') }}</th>
-                        <th class="px-6 py-3 text-right text-xs font-semibold uppercase text-gray-600">{{ __('Actions') }}</th>
+                        <th class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-600">{{ __('Référence') }}</th>
+                        <th class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-600">{{ __('Désignation') }}</th>
+                        <th class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-600">{{ __('Type') }}</th>
+                        <th class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-600">{{ __('Catégorie') }}</th>
+                        <th class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-600">{{ __('Prix vente') }}</th>
+                        <th class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-600">{{ __('TVA') }}</th>
+                        <th class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-600">{{ __('Statut') }}</th>
+                        <th class="px-6 py-3 text-end text-xs font-semibold uppercase text-gray-600">{{ __('Actions') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 bg-white">
@@ -359,7 +359,7 @@ new class extends Component
                             <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600">{{ number_format((float) $product->selling_price, 2, ',', ' ') }}</td>
                             <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600">{{ $product->taxRate ? number_format((float) $product->taxRate->rate, 2, ',', ' ').' %' : __('Aucune') }}</td>
                             <td class="px-6 py-4 text-sm text-gray-600">{{ $product->is_active ? __('Actif') : __('Inactif') }}</td>
-                            <td class="px-6 py-4 text-right text-sm">
+                            <td class="px-6 py-4 text-end text-sm">
                                 <div class="flex flex-wrap justify-end gap-3">
                                     <a href="{{ route('admin.products.show', $product) }}" wire:navigate class="text-indigo-600 hover:text-indigo-900">{{ __('Consulter') }}</a>
                                     @can('stock.manage')
@@ -473,7 +473,7 @@ new class extends Component
                     </div>
                     <div class="sm:col-span-2">
                         <x-input-label for="product-image" :value="__('Photo')" />
-                        <input id="product-image" type="file" wire:model="image" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" class="mt-1 block w-full rounded-md border border-gray-300 bg-white text-sm text-gray-700 shadow-sm file:mr-4 file:border-0 file:bg-gray-100 file:px-4 file:py-2" />
+                        <input id="product-image" type="file" wire:model="image" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" class="mt-1 block w-full rounded-md border border-gray-300 bg-white text-sm text-gray-700 shadow-sm file:me-4 file:border-0 file:bg-gray-100 file:px-4 file:py-2" />
                         <p class="mt-1 text-xs text-gray-500">{{ __('JPG, PNG ou WEBP, 4 Mo maximum.') }}</p>
                         <x-input-error :messages="$errors->get('image')" class="mt-2" />
                         <div wire:loading wire:target="image" class="mt-2 text-sm text-gray-500">{{ __('Téléversement en cours...') }}</div>
