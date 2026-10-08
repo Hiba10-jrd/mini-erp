@@ -4,7 +4,7 @@
     $color = $accent ?? $accents[$title] ?? '#087FF5';
 @endphp
 <div class="erp-kpi" style="--kpi-accent: {{ $color }}">
-    <p class="erp-kpi-label">{{ $title }}</p>
-    <p class="erp-kpi-value">{{ $value }}</p>
-    @if($subtitle)<p class="erp-kpi-subtitle">{{ $subtitle }}</p>@endif
+    <p class="erp-kpi-label">{{ __($title) }}</p>
+    <p class="erp-kpi-value"><bdi class="erp-ltr">{{ $value }}</bdi></p>
+    @if($subtitle)<p class="erp-kpi-subtitle">{{ __($subtitle) }}</p>@endif
 </div>

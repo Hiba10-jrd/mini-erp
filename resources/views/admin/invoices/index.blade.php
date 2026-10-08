@@ -7,7 +7,7 @@
 
             <h2 class="text-xl font-semibold leading-tight text-gray-800">
                 {{ __('Factures clients') }}
-            </h2><p class="mt-2 text-sm text-slate-500">Consultez et gérez les factures clients.</p>
+            </h2><p class="mt-2 text-sm text-slate-500">{{ __('Consultez et gérez les factures clients.') }}</p>
         </div>
     </x-slot>
 

@@ -4,7 +4,7 @@
             <p class="text-sm text-gray-500">{{ __('Facturation') }}</p>
             <h2 class="text-xl font-semibold text-gray-900">
                 {{ __('Avoirs clients') }}
-            </h2><p class="mt-2 text-sm text-slate-500">Retrouvez les avoirs et leurs justificatifs.</p>
+            </h2><p class="mt-2 text-sm text-slate-500">{{ __('Retrouvez les avoirs et leurs justificatifs.') }}</p>
         </div>
     </x-slot>
 
