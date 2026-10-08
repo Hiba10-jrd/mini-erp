@@ -88,7 +88,7 @@ new class extends Component
         </div>
     </div>
     <form wire:submit="save" class="grid gap-5 border-b border-gray-200 p-6 sm:grid-cols-2">
-        <div><x-input-label for="tax-label" :value="__('Libellé')" /><x-text-input id="tax-label" wire:model="label" class="mt-1 block w-full" placeholder="Taux standard" /><x-input-error :messages="$errors->get('label')" class="mt-2" /></div>
+        <div><x-input-label for="tax-label" :value="__('Libellé')" /><x-text-input id="tax-label" wire:model="label" class="mt-1 block w-full" :placeholder="__('Taux standard')" /><x-input-error :messages="$errors->get('label')" class="mt-2" /></div>
         <div><x-input-label for="tax-rate" :value="__('Taux (%)')" /><x-text-input id="tax-rate" type="number" step="0.01" min="0" max="100" wire:model="rate" class="mt-1 block w-full" placeholder="20.00" /><x-input-error :messages="$errors->get('rate')" class="mt-2" /></div>
         <label class="flex items-center gap-2 text-sm text-gray-700"><input type="checkbox" wire:model="isActive" class="rounded border-gray-300 text-indigo-600">{{ __('Actif') }}</label>
         <label class="flex items-center gap-2 text-sm text-gray-700"><input type="checkbox" wire:model="isDefault" class="rounded border-gray-300 text-indigo-600">{{ __('Taux par défaut') }}</label>

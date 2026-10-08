@@ -43,7 +43,7 @@ class ProductManagementService
                     $newImagePath = $image->store("products/{$product->id}/images", 'public');
 
                     if (! is_string($newImagePath)) {
-                        throw new RuntimeException('L’image du produit n’a pas pu être enregistrée.');
+                        throw new RuntimeException(__('L’image du produit n’a pas pu être enregistrée.'));
                     }
 
                     $product->image_path = $newImagePath;

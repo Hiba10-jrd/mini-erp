@@ -54,7 +54,7 @@ new class extends Component
         </div>
         <div>
             <x-input-label for="currency-name" :value="__('Nom de la devise')" />
-            <x-text-input id="currency-name" wire:model="currencyName" class="mt-1 block w-full" placeholder="Dirham marocain" required />
+            <x-text-input id="currency-name" wire:model="currencyName" class="mt-1 block w-full" :placeholder="__('Dirham marocain')" required />
             <x-input-error :messages="$errors->get('currencyName')" class="mt-2" />
         </div>
         <div class="flex items-center justify-between gap-4 sm:col-span-2">

@@ -852,7 +852,7 @@ new class extends \Livewire\Volt\Component
 
                         @if ($history->description)
                             <p class="text-sm text-gray-600">
-                                {{ $history->description }}
+                                {{ __($history->description) }}
                             </p>
                         @endif
 

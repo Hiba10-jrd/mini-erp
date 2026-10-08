@@ -190,7 +190,7 @@ new class extends \Livewire\Volt\Component
 
             <p class="mt-2 text-2xl font-semibold text-gray-900">
                 {{ number_format((float) $totalExpenses, 2, ',', ' ') }}
-                <span class="text-sm font-medium text-gray-500">DH</span>
+                <span class="text-sm font-medium text-gray-500">{{ __('DH') }}</span>
             </p>
         </div>
 
@@ -201,7 +201,7 @@ new class extends \Livewire\Volt\Component
 
             <p class="mt-2 text-2xl font-semibold text-gray-900">
                 {{ number_format((float) $totalTax, 2, ',', ' ') }}
-                <span class="text-sm font-medium text-gray-500">DH</span>
+                <span class="text-sm font-medium text-gray-500">{{ __('DH') }}</span>
             </p>
         </div>
 
@@ -212,7 +212,7 @@ new class extends \Livewire\Volt\Component
 
             <p class="mt-2 text-2xl font-semibold text-gray-900">
                 {{ number_format((float) $cashExpenses, 2, ',', ' ') }}
-                <span class="text-sm font-medium text-gray-500">DH</span>
+                <span class="text-sm font-medium text-gray-500">{{ __('DH') }}</span>
             </p>
         </div>
 
@@ -236,7 +236,7 @@ new class extends \Livewire\Volt\Component
                     id="expense-search"
                     wire:model.live.debounce.300ms="search"
                     class="mt-1 block w-full"
-                    placeholder="Référence, description..."
+                    :placeholder="__('Référence, description...')"
                 />
             </div>
 
@@ -377,17 +377,17 @@ new class extends \Livewire\Volt\Component
 
                             <td class="whitespace-nowrap px-4 py-4 text-right text-gray-600">
                                 {{ number_format((float) $expense->tax_amount, 2, ',', ' ') }}
-                                DH
+                                {{ __('DH') }}
                             </td>
 
                             <td class="whitespace-nowrap px-4 py-4 text-right font-semibold text-gray-900">
                                 {{ number_format((float) $expense->amount, 2, ',', ' ') }}
-                                DH
+                                {{ __('DH') }}
                             </td>
 
                             <td class="px-4 py-4 text-gray-600">
                                 {{ $expense->creator?->name ?? '—' }}
-                            <a class="mt-1 block text-indigo-600" href="{{ route('attachments.index', ['parentType' => 'expense', 'parentId' => $expense->id]) }}" wire:navigate>Documents</a>
+                            <a class="mt-1 block text-indigo-600" href="{{ route('attachments.index', ['parentType' => 'expense', 'parentId' => $expense->id]) }}" wire:navigate>{{ __('Documents') }}</a>
 </td>
                         </tr>
                     @empty

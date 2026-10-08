@@ -379,7 +379,7 @@ new class extends \Livewire\Volt\Component
                                         ' '
                                     ) }}
 
-                                    DH
+                                    {{ __('DH') }}
                                 </span>
                             </p>
                         @endif
@@ -403,7 +403,7 @@ new class extends \Livewire\Volt\Component
                         />
 
                         <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-sm text-gray-500">
-                            DH
+                            {{ __('DH') }}
                         </span>
                     </div>
 
@@ -430,7 +430,7 @@ new class extends \Livewire\Volt\Component
                         />
 
                         <span class="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-sm text-gray-500">
-                            DH
+                            {{ __('DH') }}
                         </span>
                     </div>
 
@@ -510,7 +510,7 @@ new class extends \Livewire\Volt\Component
                         wire:model="description"
                         rows="4"
                         class="mt-1 block w-full border-gray-300 shadow-sm"
-                        placeholder="Objet de la dépense..."
+                        :placeholder="__('Objet de la dépense...')"
                     ></textarea>
 
                     <x-input-error

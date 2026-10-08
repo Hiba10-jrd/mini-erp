@@ -38,7 +38,7 @@ class CompanyManagementService
                     $newLogoPath = $logo->store('companies/logos', 'public');
 
                     if (! is_string($newLogoPath)) {
-                        throw new RuntimeException('Le logo de l’entreprise n’a pas pu être enregistré.');
+                        throw new RuntimeException(__('Le logo de l’entreprise n’a pas pu être enregistré.'));
                     }
 
                     $company->logo_path = $newLogoPath;

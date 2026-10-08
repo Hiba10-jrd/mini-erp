@@ -26,9 +26,14 @@ class CheckStockAlerts implements ShouldBeUnique, ShouldQueue
                 foreach ($rows as $row) {
                     $out = $row->report_state === 'rupture';
                     $type = $out ? 'stock.out' : 'stock.low';
+                    $titleKey = $out ? 'Rupture de stock' : 'Stock faible';
                     $dispatcher->group('stock', [
-                        'type' => $type, 'title' => $out ? 'Rupture de stock' : 'Stock faible',
+                        'type' => $type,
+                        'title' => $out ? 'Rupture de stock' : 'Stock faible',
+                        'title_key' => $titleKey,
                         'message' => $row->name.' — '.$row->warehouse_name,
+                        'message_key' => ':product — :warehouse',
+                        'params' => ['product' => $row->name, 'warehouse' => $row->warehouse_name],
                         'url' => route('admin.stock.index', ['warehouse' => $row->warehouse_id, 'product' => $row->id], false),
                         'entity_type' => 'product', 'entity_id' => $row->id, 'severity' => 'warning',
                     ], $type.':'.$row->id.':'.$row->warehouse_id.':'.today()->toDateString());

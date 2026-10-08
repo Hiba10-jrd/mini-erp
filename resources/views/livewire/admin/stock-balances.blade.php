@@ -116,7 +116,7 @@ new class extends Component
         <div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             <div>
                 <x-input-label for="balance-search" :value="__('Recherche')" />
-                <x-text-input id="balance-search" wire:model.live.debounce.300ms="search" class="mt-1 block w-full" placeholder="Référence, nom, code-barres" />
+                <x-text-input id="balance-search" wire:model.live.debounce.300ms="search" class="mt-1 block w-full" :placeholder="__('Référence, nom, code-barres')" />
             </div>
             <div>
                 <x-input-label for="balance-warehouse" :value="__('Dépôt')" />

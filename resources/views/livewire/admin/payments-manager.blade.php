@@ -160,7 +160,7 @@ new class extends \Livewire\Volt\Component
                     id="payment-search"
                     wire:model.live.debounce.300ms="search"
                     class="mt-1 block w-full"
-                    placeholder="Référence, client ou facture"
+                    :placeholder="__('Référence, client ou facture')"
                 />
             </div>
 

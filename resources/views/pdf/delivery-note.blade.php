@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="{{ $pdfLocale ?? 'fr' }}">
 <head>
     <meta charset="utf-8">
     <title>{{ __('Bon de livraison') }} {{ $deliveryNote->number }}</title>

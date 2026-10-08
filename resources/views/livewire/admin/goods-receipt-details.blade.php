@@ -394,7 +394,7 @@ new class extends \Livewire\Volt\Component
                             </p>
 
                             <p class="text-sm text-gray-600">
-                                {{ $history->description }}
+                                {{ __($history->description) }}
                             </p>
 
                             <p class="text-xs text-gray-500">

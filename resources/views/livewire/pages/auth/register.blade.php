@@ -18,7 +18,7 @@ new #[Layout('layouts.guest')] class extends Component
      */
     public function register(): void
     {
-        abort(403, 'Public registration is disabled.');
+        abort(403, __('Public registration is disabled.'));
     }
 }; ?>
 

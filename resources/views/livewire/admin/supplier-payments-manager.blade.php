@@ -173,7 +173,7 @@ new class extends \Livewire\Volt\Component
                     id="supplier-payment-search"
                     wire:model.live.debounce.300ms="search"
                     class="mt-1 block w-full"
-                    placeholder="Référence, fournisseur, FAF..."
+                    :placeholder="__('Référence, fournisseur, FAF...')"
                 />
             </div>
 
