@@ -428,5 +428,29 @@ Conformément au mandat, les fichiers suivants contiennent des messages techniqu
 
 ---
 
-## 8. Statut
-- Phase 0 validée. Prêt pour exécution directe de la Phase 1.
+## 8. Statut d’Exécution & Clôture
+
+**L’internationalisation complète (FR / EN / AR + support RTL) de l’application Mini ERP est désormais finalisée et validée à 100 %.**
+
+Toutes les chaînes visibles utilisateur à travers l'ensemble des vues Blade, composants, contrôleurs, services, jobs et modèles disposent d'une parité stricte 1-pour-1 entre `lang/fr.json`, `lang/en.json` et `lang/ar.json`. Toutes les classes CSS physiques ont été converties en classes logiques Tailwind (`text-start`, `text-end`, `ms-`, `me-`, `ps-`, `pe-`, `start-`, `end-`, `border-s-`).
+
+### 8.1. Récapitulatif par module
+
+| Module | Fichiers inspectés | Clés relevées | Clés ajoutées | Classes physiques converties | Statut |
+| :--- | :---: | :---: | :---: | :---: | :---: |
+| **Module 1 : Ventes** | 34 | 19 (techniques) + catalogue | 19 | 16 (`text-right` → `text-end`) | **Validé** |
+| **Module 2 : Clients** | 11 | 89 | 61 | 15 (`text-right`, `mr-`/`ml-`) | **Validé** |
+| **Module 3 : Achats** | 48 | 222 | 146 | 94 (`text-right`, `mr-`/`ml-`, `pr-`/`pl-`, `left-`/`right-`) | **Validé** |
+| **Module 4 : Stock** | 19 | 200 | 155 | 39 (`text-right`, `mr-`/`ml-`, `pr-`/`pl-`) | **Validé** |
+| **Module 5 : Finance** | 13 | 110 | 82 | 15 (`text-right`, `mr-`/`ml-`) | **Validé** |
+| **Module 6 : Administration** | 23 | 197 | 197 | 30 (`text-right`, `mr-`/`ml-`, `pl-`/`pr-`, `border-l`) | **Validé** |
+| **Module 7 : Profil, connexion, divers** | 34 | 304 | 35 | 5 (2 `text-left`, 2 `border-l-4`, 1 `-right-1`) | **Validé** |
+
+### 8.2. Décompte final vérifié des fichiers de traduction
+
+Lecture directe sur le système de fichiers :
+- [`lang/fr.json`](../lang/fr.json) : **1 475 clés** (1 478 lignes au total, clés réparties de la ligne 2 à 1 476)
+- [`lang/en.json`](../lang/en.json) : **1 475 clés** (1 478 lignes au total, clés réparties de la ligne 2 à 1 476)
+- [`lang/ar.json`](../lang/ar.json) : **1 475 clés** (1 478 lignes au total, clés réparties de la ligne 2 à 1 476)
+
+La parité ligne par ligne et clé par clé est totale, sans doublon ni clé manquante.
