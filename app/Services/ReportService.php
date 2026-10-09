@@ -58,25 +58,117 @@ class ReportService
         return self::decimal($query->reorder()->selectRaw("COALESCE(SUM($expression), 0) AS report_sum")->value('report_sum'));
     }
 
+    /** Shared financial definitions for reports, dashboard totals and chart series. */
+    private function activitySources(): array
+    {
+        return [
+            'invoice' => [Invoice::query()->where('status', Invoice::STATUS_ISSUED), 'invoice_date', 'subtotal_ht - discount_total'],
+            'credit' => [CreditNote::query()->where('status', CreditNote::STATUS_ISSUED), 'credit_date', 'subtotal_ht - discount_total'],
+            'payment' => [Payment::query(), 'payment_date', 'amount'],
+            'purchase' => [SupplierInvoice::query()->where('status', SupplierInvoice::STATUS_VALIDATED), 'invoice_date', 'total_ttc'],
+            'expense' => [Expense::query(), 'expense_date', 'amount'],
+        ];
+    }
+
+    private function during(Builder $query, string $date, string $from, string $to): Builder
+    {
+        return $query->where($date, '>=', $from)->where($date, '<', Carbon::parse($to)->addDay()->toDateString());
+    }
+
+    private function supplierBalance(): string
+    {
+        return self::decimal(DB::query()->fromSub($this->supplierPayments->reportingQuery()->toBase(), 'balances')->sum('report_remaining'));
+    }
+
+    /** Executive totals: reuse report definitions without calculating unused report KPIs. */
+    public function dashboardSummary(string $from, string $to): array
+    {
+        $this->period($from, $to);
+        $totals = [];
+        foreach ($this->activitySources() as $key => [$query, $date, $expression]) {
+            $totals[$key] = $this->sum($this->during($query, $date, $from, $to), $expression);
+        }
+        $receivables = $this->receivablesSummary();
+        $cash = $this->cashSummary($from, $to);
+        $stock = DB::query()->fromSub($this->stockQuery()->toBase(), 'stocks')
+            ->selectRaw("COALESCE(SUM(report_quantity * purchase_price), 0) AS stock_value, COUNT(CASE WHEN report_state IN ('rupture', 'low') THEN 1 END) AS alerts")
+            ->first();
+
+        return [
+            'flows' => ['CA net HT' => bcsub($totals['invoice'], $totals['credit'], 2), 'Encaissements' => $totals['payment'], 'Achats facturés TTC' => $totals['purchase'], 'Dépenses TTC' => $totals['expense']],
+            'current' => ['Créances clients' => $receivables['Créances clients'], 'Fournisseurs à payer' => $this->supplierBalance(), 'Solde caisse' => $cash['Solde caisse actuel'], 'Alertes stock' => (int) $stock->alerts],
+            'receivables' => $receivables,
+            'stockValue' => self::decimal($stock->stock_value),
+            'cashFlows' => $cash,
+        ];
+    }
+
+    /** Five grouped SQL queries, at most 60 points, with zero-filled empty intervals. */
+    public function activitySeries(string $from, string $to): array
+    {
+        $this->period($from, $to);
+        $start = Carbon::parse($from);
+        $end = Carbon::parse($to);
+        $days = (int) $start->diffInDays($end) + 1;
+        $monthly = $days > 180;
+        $step = $monthly
+            ? max(1, (int) ceil(((int) $start->startOfMonth()->diffInMonths($end->copy()->startOfMonth()) + 1) / 60))
+            : ($days > 45 ? 7 : 1);
+        $anchor = $monthly ? $start->year * 12 + $start->month - 1 : 0;
+        $count = $monthly
+            ? (int) floor(($end->year * 12 + $end->month - 1 - $anchor) / $step) + 1
+            : (int) ceil($days / $step);
+        $sqlite = DB::connection()->getDriverName() === 'sqlite';
+        $groups = [];
+        foreach ($this->activitySources() as $key => [$query, $date, $expression]) {
+            if ($monthly) {
+                $month = $sqlite ? "CAST(strftime('%Y', {$date}) AS INTEGER) * 12 + CAST(strftime('%m', {$date}) AS INTEGER) - 1" : "YEAR({$date}) * 12 + MONTH({$date}) - 1";
+                $bucket = $sqlite ? "CAST(({$month} - {$anchor}) / {$step} AS INTEGER)" : "FLOOR(({$month} - {$anchor}) / {$step})";
+                $bindings = [];
+            } else {
+                $bucket = $sqlite ? "CAST((julianday({$date}) - julianday(?)) / {$step} AS INTEGER)" : "FLOOR(DATEDIFF({$date}, ?) / {$step})";
+                $bindings = [$from];
+            }
+            $groups[$key] = $this->during($query, $date, $from, $to)
+                ->selectRaw("{$bucket} AS bucket, SUM({$expression}) AS amount", $bindings)
+                ->groupBy('bucket')->pluck('amount', 'bucket');
+        }
+        $rows = [];
+        for ($index = 0; $index < $count; $index++) {
+            $date = $monthly ? $start->copy()->addMonthsNoOverflow($index * $step) : Carbon::parse($from)->addDays($index * $step);
+            $rows[] = [
+                'date' => $date->toDateString(),
+                'label' => $date->locale(app()->getLocale())->isoFormat($monthly ? 'MMM YYYY' : 'D MMM'),
+                'net_ht' => bcsub(self::decimal($groups['invoice'][$index] ?? 0), self::decimal($groups['credit'][$index] ?? 0), 2),
+                'purchases' => self::decimal($groups['purchase'][$index] ?? 0),
+                'payments' => self::decimal($groups['payment'][$index] ?? 0),
+                'expenses' => self::decimal($groups['expense'][$index] ?? 0),
+            ];
+        }
+
+        return ['rows' => $rows, 'interval' => $monthly ? 'month' : ($step === 1 ? 'day' : 'week'), 'step' => $step];
+    }
+
     public function salesSummary(string $from, string $to): array
     {
         $this->period($from, $to);
-        $invoices = Invoice::query()->where('status', Invoice::STATUS_ISSUED)->where('invoice_date', '>=', $from)->where('invoice_date', '<', Carbon::parse($to)->addDay()->toDateString());
-        $credits = CreditNote::query()->where('status', CreditNote::STATUS_ISSUED)->where('credit_date', '>=', $from)->where('credit_date', '<', Carbon::parse($to)->addDay()->toDateString());
+        $sources = $this->activitySources();
+        $invoices = $this->during($sources['invoice'][0], $sources['invoice'][1], $from, $to);
+        $credits = $this->during($sources['credit'][0], $sources['credit'][1], $from, $to);
         $gross = $this->sum(clone $invoices, 'total_ttc');
         $credited = $this->sum(clone $credits, 'total_ttc');
-        $ht = bcsub($this->sum(clone $invoices, 'subtotal_ht - discount_total'), $this->sum(clone $credits, 'subtotal_ht - discount_total'), 2);
+        $ht = bcsub($this->sum(clone $invoices, $sources['invoice'][2]), $this->sum(clone $credits, $sources['credit'][2]), 2);
         $net = bcsub($gross, $credited, 2);
 
-        return ['CA net HT' => $ht, 'Facturation brute TTC' => $gross, 'Avoirs émis TTC' => $credited, 'Facturation nette TTC' => $net, 'TVA nette' => bcsub($net, $ht, 2), 'Encaissements' => $this->sum(Payment::query()->where('payment_date', '>=', $from)->where('payment_date', '<', Carbon::parse($to)->addDay()->toDateString()), 'amount'), 'Factures émises' => $invoices->count()];
+        return ['CA net HT' => $ht, 'Facturation brute TTC' => $gross, 'Avoirs émis TTC' => $credited, 'Facturation nette TTC' => $net, 'TVA nette' => bcsub($net, $ht, 2), 'Encaissements' => $this->sum($this->during($sources['payment'][0], $sources['payment'][1], $from, $to), $sources['payment'][2]), 'Factures émises' => $invoices->count()];
     }
 
     public function purchaseSummary(string $from, string $to): array
     {
         $this->period($from, $to);
-        $query = SupplierInvoice::query()->where('status', SupplierInvoice::STATUS_VALIDATED)->where('invoice_date', '>=', $from)->where('invoice_date', '<', Carbon::parse($to)->addDay()->toDateString());
-        $balances = $this->supplierPayments->reportingQuery();
-        $remaining = DB::query()->fromSub($balances->toBase(), 'balances')->sum('report_remaining');
+        [$query, $date] = $this->activitySources()['purchase'];
+        $query = $this->during($query, $date, $from, $to);
+        $remaining = $this->supplierBalance();
 
         return ['Achats HT' => $this->sum(clone $query, 'subtotal_ht - discount_total'), 'TVA achats' => $this->sum(clone $query, 'tax_total'), 'Achats facturés TTC' => $this->sum(clone $query, 'total_ttc'), 'Paiements fournisseurs' => $this->sum(SupplierPayment::query()->where('payment_date', '>=', $from)->where('payment_date', '<', Carbon::parse($to)->addDay()->toDateString()), 'amount'), 'Fournisseurs à payer actuels' => self::decimal($remaining)];
     }
@@ -91,7 +183,8 @@ class ReportService
     public function expenseSummary(string $from, string $to): array
     {
         $this->period($from, $to);
-        $query = Expense::query()->where('expense_date', '>=', $from)->where('expense_date', '<', Carbon::parse($to)->addDay()->toDateString());
+        [$query, $date] = $this->activitySources()['expense'];
+        $query = $this->during($query, $date, $from, $to);
         $ttc = $this->sum(clone $query, 'amount');
         $tax = $this->sum(clone $query, 'tax_amount');
 
@@ -132,11 +225,11 @@ class ReportService
         return ['Produits actifs' => Product::query()->where('is_active', true)->count(), 'Produits physiques actifs' => Product::query()->where('is_active', true)->where('type', 'product')->count(), 'Alertes stock' => $ruptures + $low, 'Ruptures' => $ruptures, 'Stocks faibles' => $low];
     }
 
-    public function cashRegisters()
+    public function cashRegisters(?int $limit = null)
     {
         Gate::authorize('reports.view');
 
-        return $this->cash->reportingQuery()->orderByDesc('is_active')->orderBy('name')->get();
+        return $this->cash->reportingQuery()->orderByDesc('is_active')->orderBy('name')->when($limit !== null, fn ($query) => $query->limit($limit))->get();
     }
 
     public function operationsSummary(string $from, string $to): array
@@ -185,7 +278,7 @@ class ReportService
         // Fixed set of grouped queries, regardless of the number of invoices or months.
         $month = DB::connection()->getDriverName() === 'sqlite' ? "strftime('%%Y-%%m', %s)" : "DATE_FORMAT(%s, '%%Y-%%m')";
         $groups = [];
-        foreach ([['invoice', Invoice::query()->where('status', 'issued'), 'invoice_date', 'subtotal_ht - discount_total'], ['credit', CreditNote::query()->where('status', 'issued'), 'credit_date', 'subtotal_ht - discount_total'], ['payment', Payment::query(), 'payment_date', 'amount']] as [$key, $query, $date, $amount]) {
+        foreach (array_intersect_key($this->activitySources(), array_flip(['invoice', 'credit', 'payment'])) as $key => [$query, $date, $amount]) {
             $groups[$key] = $query->where($date, '>=', $from)->where($date, '<', Carbon::parse($to)->addDay()->toDateString())->selectRaw(sprintf($month, $date)." AS month, SUM($amount) AS amount")->groupBy('month')->pluck('amount', 'month');
         }
         $rows = [];

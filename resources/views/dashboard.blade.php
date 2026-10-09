@@ -1,9 +1,11 @@
 <x-app-layout>
+    @cannot('reports.view')
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-gray-800 leading-tight">
             {{ __('Vue d’ensemble') }}
         </h2><p class="mt-2 text-sm text-slate-500">{{ __('Synthèse de votre activité.') }}</p>
     </x-slot>
+    @endcannot
 
     <div class="py-6">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
