@@ -22,7 +22,7 @@ class OperationHistory extends Model
 
     protected static function booted(): void
     {
-        static::updating(fn () => throw new LogicException('Operation histories are immutable.'));
-        static::deleting(fn () => throw new LogicException('Operation histories are immutable.'));
+        static::updating(fn () => throw new LogicException(__('Operation histories are immutable.')));
+        static::deleting(fn () => throw new LogicException(__('Operation histories are immutable.')));
     }
 }

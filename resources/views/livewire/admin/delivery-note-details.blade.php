@@ -99,10 +99,10 @@ new class extends \Livewire\Volt\Component
     <section class="overflow-hidden border-y border-gray-200 bg-white">
         <div class="overflow-x-auto">
             <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200 text-sm">
-                <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500">
+                <thead class="bg-gray-50 text-start text-xs uppercase text-gray-500">
                     <tr>
                         <th class="px-4 py-3">{{ __('Désignation') }}</th>
-                        <th class="px-4 py-3 text-right">{{ __('Quantité') }}</th>
+                        <th class="px-4 py-3 text-end">{{ __('Quantité') }}</th>
                         <th class="px-4 py-3">{{ __('Unité') }}</th>
                         <th class="px-4 py-3">{{ __('Référence') }}</th>
                     </tr>
@@ -114,7 +114,7 @@ new class extends \Livewire\Volt\Component
                                 <p class="font-medium text-gray-900">{{ $item->description }}</p>
                                 <p class="text-xs text-gray-500">{{ $item->item_type === 'service' ? __('Service') : __('Produit') }}</p>
                             </td>
-                            <td class="whitespace-nowrap px-4 py-4 text-right font-medium text-gray-900">{{ $item->quantity }}</td>
+                            <td class="whitespace-nowrap px-4 py-4 text-end font-medium text-gray-900">{{ $item->quantity }}</td>
                             <td class="whitespace-nowrap px-4 py-4">{{ $item->unit_label ?? '—' }}</td>
                             <td class="whitespace-nowrap px-4 py-4 text-gray-600">{{ $item->reference ?? '—' }}</td>
                         </tr>

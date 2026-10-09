@@ -96,7 +96,7 @@ new class extends \Livewire\Volt\Component
     <div class="overflow-hidden border-y border-gray-200 bg-white">
         <div class="overflow-x-auto">
             <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200 text-sm">
-                <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500"><tr><th class="px-4 py-3">{{ __('Numéro') }}</th><th class="px-4 py-3">{{ __('Date') }}</th><th class="px-4 py-3">{{ __('Client') }}</th><th class="px-4 py-3">{{ __('Validité') }}</th><th class="px-4 py-3 text-right">{{ __('TTC') }}</th><th class="px-4 py-3">{{ __('Statut') }}</th><th class="px-4 py-3">{{ __('Créé par') }}</th><th class="px-4 py-3 text-right">{{ __('Actions') }}</th></tr></thead>
+                <thead class="bg-gray-50 text-start text-xs uppercase text-gray-500"><tr><th class="px-4 py-3">{{ __('Numéro') }}</th><th class="px-4 py-3">{{ __('Date') }}</th><th class="px-4 py-3">{{ __('Client') }}</th><th class="px-4 py-3">{{ __('Validité') }}</th><th class="px-4 py-3 text-end">{{ __('TTC') }}</th><th class="px-4 py-3">{{ __('Statut') }}</th><th class="px-4 py-3">{{ __('Créé par') }}</th><th class="px-4 py-3 text-end">{{ __('Actions') }}</th></tr></thead>
                 <tbody class="divide-y divide-gray-100">
                     @forelse ($quotes as $quote)
                         <tr wire:key="quote-{{ $quote->id }}" class="hover:bg-gray-50">
@@ -104,10 +104,10 @@ new class extends \Livewire\Volt\Component
                             <td class="whitespace-nowrap px-4 py-4 text-gray-600">{{ $quote->quote_date->format('d/m/Y') }}</td>
                             <td class="min-w-48 px-4 py-4"><span class="font-medium text-gray-900">{{ $quote->customer_name }}</span><span class="block text-xs text-gray-500">{{ $quote->customer->code }}</span></td>
                             <td class="whitespace-nowrap px-4 py-4 text-gray-600">{{ $quote->valid_until?->format('d/m/Y') ?? '—' }}</td>
-                            <td class="whitespace-nowrap px-4 py-4 text-right font-medium text-gray-900">{{ str_replace('.', ',', $quote->total_ttc) }}</td>
+                            <td class="whitespace-nowrap px-4 py-4 text-end font-medium text-gray-900">{{ str_replace('.', ',', $quote->total_ttc) }}</td>
                             <td class="whitespace-nowrap px-4 py-4"><span class="inline-block px-2 py-1 text-xs font-medium {{ $statusClasses[$quote->status] }}">{{ $statusLabels[$quote->status] }}</span></td>
                             <td class="whitespace-nowrap px-4 py-4 text-gray-600">{{ $quote->creator?->name ?? '—' }}</td>
-                            <td class="whitespace-nowrap px-4 py-4 text-right">
+                            <td class="whitespace-nowrap px-4 py-4 text-end">
                                 <a href="{{ route('sales.quotes.show', $quote) }}" wire:navigate class="font-medium text-indigo-700 hover:text-indigo-900">{{ __('Consulter') }}</a>
                                 @if ($quote->isEditable())
                                     @can('sales.update')<a href="{{ route('sales.quotes.edit', $quote) }}" wire:navigate class="ms-3 text-gray-700 hover:text-gray-950">{{ __('Modifier') }}</a>@endcan

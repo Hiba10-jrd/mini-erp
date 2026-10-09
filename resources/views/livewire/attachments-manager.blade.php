@@ -68,32 +68,32 @@ new class extends \Livewire\Volt\Component
 }; ?>
 
 <section class="mt-6 space-y-4 rounded-lg bg-white p-6 shadow-sm">
-    <h3 class="text-lg font-semibold">Documents et pièces jointes</h3>
+    <h3 class="text-lg font-semibold">{{ __('Documents et pièces jointes') }}</h3>
     @if ($legacyExpense)
-        <a class="block text-indigo-600 underline" href="{{ route('attachments.expense-legacy', $legacyExpense) }}">Télécharger le justificatif historique</a>
+        <a class="block text-indigo-600 underline" href="{{ route('attachments.expense-legacy', $legacyExpense) }}">{{ __('Télécharger le justificatif historique') }}</a>
     @endif
     @if ($canUpload)
         <form wire:submit="upload" class="space-y-3">
-            <label class="block">Document (PDF, JPEG, PNG, WebP — 5 Mo maximum)
+            <label class="block">{{ __('Document (PDF, JPEG, PNG, WebP — 5 Mo maximum)') }}
                 <input type="file" wire:model="file" accept=".pdf,.jpg,.jpeg,.png,.webp" class="block" />
             </label>
             <x-input-error :messages="$errors->get('file')" />
-            <label class="block">Catégorie <input wire:model="category" maxlength="100" class="rounded border-gray-300" /></label>
+            <label class="block">{{ __('Catégorie') }} <input wire:model="category" maxlength="100" class="rounded border-gray-300" /></label>
             <x-input-error :messages="$errors->get('category')" />
-            <label class="block">Description <input wire:model="description" maxlength="2000" class="rounded border-gray-300" /></label>
+            <label class="block">{{ __('Description') }} <input wire:model="description" maxlength="2000" class="rounded border-gray-300" /></label>
             <x-input-error :messages="$errors->get('description')" />
-            <x-primary-button wire:loading.attr="disabled">Ajouter</x-primary-button>
+            <x-primary-button wire:loading.attr="disabled">{{ __('Ajouter') }}</x-primary-button>
         </form>
     @endif
     <ul class="divide-y">
         @forelse ($documents as $document)
             <li wire:key="attachment-{{ $document->id }}" class="flex flex-wrap items-center gap-3 py-3">
                 <a href="{{ route('attachments.download', $document) }}" class="text-indigo-600 underline">{{ $document->original_name }}</a>
-                <span class="text-sm text-gray-500">{{ number_format($document->size / 1024, 1) }} Ko · {{ $document->uploader?->name }}</span>
+                <span class="text-sm text-gray-500"><span class="erp-ltr">{{ number_format($document->size / 1024, 1) }} {{ __('Ko') }}</span> · {{ $document->uploader?->name }}</span>
                 <span>{{ $document->category }} {{ $document->description }}</span>
-                @if ($canRemove)<button wire:click="remove({{ $document->id }})" wire:confirm="Retirer cette pièce ?" class="text-red-600">Retirer</button>@endif
+                @if ($canRemove)<button wire:click="remove({{ $document->id }})" wire:confirm="{{ __('Retirer cette pièce ?') }}" class="text-red-600">{{ __('Retirer') }}</button>@endif
             </li>
-        @empty <li class="py-3 text-gray-500">Aucune pièce jointe.</li> @endforelse
+        @empty <li class="py-3 text-gray-500">{{ __('Aucune pièce jointe.') }}</li> @endforelse
     </ul>
     {{ $documents->links() }}
 </section>

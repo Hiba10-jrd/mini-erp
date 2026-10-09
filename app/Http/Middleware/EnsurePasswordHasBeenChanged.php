@@ -16,7 +16,7 @@ class EnsurePasswordHasBeenChanged
         if (
             $user instanceof User
             && $user->must_change_password
-            && ! $request->routeIs('password.change.required', '*.livewire.update')
+            && ! $request->routeIs('password.change.required', '*.livewire.update', 'locale.update')
         ) {
             return redirect()->route('password.change.required');
         }

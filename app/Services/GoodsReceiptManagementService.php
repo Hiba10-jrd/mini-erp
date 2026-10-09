@@ -58,8 +58,8 @@ class GoodsReceiptManagementService
             ])->save();
             $items = $attributes['items'] ?? $this->defaultItems($lockedOrder);
             $this->replaceDraftItems($receipt, $lockedOrder, $items);
-            $this->recordHistory($receipt, 'created', null, GoodsReceipt::STATUS_DRAFT, __('Réception fournisseur créée.'));
-            $this->recordOrderHistory($lockedOrder, 'goods_receipt_created', __('Réception :number créée.', ['number' => $receipt->number]), $receipt);
+            $this->recordHistory($receipt, 'created', null, GoodsReceipt::STATUS_DRAFT, __('Réception fournisseur créée.'), null, 'Réception fournisseur créée.');
+            $this->recordOrderHistory($lockedOrder, 'goods_receipt_created', __('Réception :number créée.', ['number' => $receipt->number]), $receipt, 'Réception :number créée.', ['number' => $receipt->number]);
 
             return $this->load($receipt);
         }, 3);
@@ -87,7 +87,7 @@ class GoodsReceiptManagementService
             if (array_key_exists('items', $attributes)) {
                 $this->replaceDraftItems($locked, $order, $attributes['items']);
             }
-            $this->recordHistory($locked, 'draft_updated', GoodsReceipt::STATUS_DRAFT, GoodsReceipt::STATUS_DRAFT, __('Brouillon de réception modifié.'));
+            $this->recordHistory($locked, 'draft_updated', GoodsReceipt::STATUS_DRAFT, GoodsReceipt::STATUS_DRAFT, __('Brouillon de réception modifié.'), null, 'Brouillon de réception modifié.');
 
             return $this->load($locked);
         }, 3);
@@ -152,8 +152,8 @@ class GoodsReceiptManagementService
                 'validated_by' => Auth::id(),
                 'validated_at' => now(),
             ])->save();
-            $this->recordHistory($locked, 'validated', GoodsReceipt::STATUS_DRAFT, GoodsReceipt::STATUS_VALIDATED, __('Réception fournisseur validée.'));
-            $this->recordOrderHistory($order, 'goods_receipt_validated', __('Réception :number validée.', ['number' => $locked->number]), $locked);
+            $this->recordHistory($locked, 'validated', GoodsReceipt::STATUS_DRAFT, GoodsReceipt::STATUS_VALIDATED, __('Réception fournisseur validée.'), null, 'Réception fournisseur validée.');
+            $this->recordOrderHistory($order, 'goods_receipt_validated', __('Réception :number validée.', ['number' => $locked->number]), $locked, 'Réception :number validée.', ['number' => $locked->number]);
 
             return $this->load($locked);
         }, 3);
@@ -168,8 +168,8 @@ class GoodsReceiptManagementService
             $this->ensureEditable($locked);
             $order = PurchaseOrder::query()->lockForUpdate()->findOrFail($locked->purchase_order_id);
             $locked->forceFill(['status' => GoodsReceipt::STATUS_CANCELLED, 'cancelled_at' => now()])->save();
-            $this->recordHistory($locked, 'cancelled', GoodsReceipt::STATUS_DRAFT, GoodsReceipt::STATUS_CANCELLED, __('Réception fournisseur annulée.'));
-            $this->recordOrderHistory($order, 'goods_receipt_cancelled', __('Réception :number annulée.', ['number' => $locked->number]), $locked);
+            $this->recordHistory($locked, 'cancelled', GoodsReceipt::STATUS_DRAFT, GoodsReceipt::STATUS_CANCELLED, __('Réception fournisseur annulée.'), null, 'Réception fournisseur annulée.');
+            $this->recordOrderHistory($order, 'goods_receipt_cancelled', __('Réception :number annulée.', ['number' => $locked->number]), $locked, 'Réception :number annulée.', ['number' => $locked->number]);
 
             return $this->load($locked);
         }, 3);
@@ -245,10 +245,10 @@ class GoodsReceiptManagementService
             $itemId = filter_var($line['purchase_order_item_id'] ?? null, FILTER_VALIDATE_INT);
             $quantity = trim((string) ($line['quantity'] ?? ''));
             if ($itemId === false || ! preg_match('/^(?:0|[1-9][0-9]{0,11})(?:\.[0-9]{1,3})?$/D', $quantity)) {
-                throw ValidationException::withMessages(["items.{$index}.quantity" => __('La quantité doit être positive avec au plus trois décimales.')]);
+                throw ValidationException::withMessages(["items.{$index}.quantity" => __('La quantité doit être un nombre positif avec au plus trois décimales.')]);
             }
             if (isset($seen[$itemId])) {
-                throw ValidationException::withMessages(["items.{$index}.purchase_order_item_id" => __('Une ligne de commande ne peut apparaître qu’une fois.')]);
+                throw ValidationException::withMessages(["items.{$index}.purchase_order_item_id" => __('Une même ligne de commande ne peut apparaître qu’une fois.')]);
             }
             $seen[$itemId] = true;
             $orderItem = PurchaseOrderItem::query()->where('purchase_order_id', $order->id)->whereKey($itemId)->lockForUpdate()->first();
@@ -299,7 +299,7 @@ class GoodsReceiptManagementService
             throw ValidationException::withMessages(['purchase_order_id' => __('Seule une commande fournisseur confirmée peut être réceptionnée.')]);
         }
         if (! $this->hasRemaining($order)) {
-            throw ValidationException::withMessages(['purchase_order_id' => __('Aucune quantité ne reste à recevoir sur cette commande.')]);
+            throw ValidationException::withMessages(['purchase_order_id' => __('Aucune quantité ne reste à recevoir.')]);
         }
     }
 
@@ -317,27 +317,56 @@ class GoodsReceiptManagementService
         }
     }
 
-    private function recordHistory(GoodsReceipt $receipt, string $event, ?string $from, ?string $to, string $description): void
-    {
+    /** @param array<string, mixed>|null $metadata */
+    private function recordHistory(
+        GoodsReceipt $receipt,
+        string $event,
+        ?string $from,
+        ?string $to,
+        string $description,
+        ?array $metadata = null,
+        ?string $descriptionKey = null,
+        array $descriptionParams = []
+    ): void {
+        $meta = $metadata ?? [];
+        $meta['description_key'] = $descriptionKey ?? $description;
+        $meta['description_params'] = $descriptionParams;
+
         $receipt->histories()->create([
             'event' => $event,
             'from_status' => $from,
             'to_status' => $to,
             'user_id' => Auth::id(),
             'description' => $description,
+            'metadata' => $meta,
             'created_at' => now(),
         ]);
     }
 
-    private function recordOrderHistory(PurchaseOrder $order, string $event, string $description, GoodsReceipt $receipt): void
-    {
+    /** @param array<string, mixed>|null $metadata */
+    private function recordOrderHistory(
+        PurchaseOrder $order,
+        string $event,
+        string $description,
+        GoodsReceipt $receipt,
+        ?string $descriptionKey = null,
+        array $descriptionParams = [],
+        ?array $metadata = null
+    ): void {
+        $meta = array_merge([
+            'goods_receipt_id' => $receipt->id,
+            'goods_receipt_number' => $receipt->number,
+            'description_key' => $descriptionKey ?? $description,
+            'description_params' => $descriptionParams,
+        ], $metadata ?? []);
+
         $order->histories()->create([
             'event' => $event,
             'from_status' => $order->status,
             'to_status' => $order->status,
             'user_id' => Auth::id(),
             'description' => $description,
-            'metadata' => ['goods_receipt_id' => $receipt->id, 'goods_receipt_number' => $receipt->number],
+            'metadata' => $meta,
             'created_at' => now(),
         ]);
     }

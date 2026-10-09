@@ -65,10 +65,14 @@ class InvoicePdfController
             $invoice->number
         ).'.pdf';
 
+        $pdfLocale = app()->getLocale() === 'en' ? 'en' : 'fr';
+        app()->setLocale($pdfLocale);
+
         return app('dompdf.wrapper')
             ->loadView('pdf.invoice', [
                 'invoice' => $invoice,
                 'logoData' => $logoData,
+                'pdfLocale' => $pdfLocale,
             ])
             ->setPaper('a4')
             ->download($filename);

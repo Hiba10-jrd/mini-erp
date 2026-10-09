@@ -42,7 +42,7 @@ new #[Layout('layouts.guest')] class extends Component
 
     @if (session('status') == 'verification-link-sent')
         <div class="mb-4 font-medium text-sm text-green-600">
-            {{ __('A new verification link has been sent to the email address you provided during registration.') }}
+            {{ __('A new verification link has been sent to your email address.') }}
         </div>
     @endif
 

@@ -176,7 +176,7 @@ new class extends \Livewire\Volt\Component
         @foreach (['remaining' => __('Total à recevoir'), 'overdue' => __('Montant en retard'), 'overdueCount' => __('Factures en retard'), 'openCount' => __('Factures ouvertes')] as $key => $label)
             <div class="border border-gray-200 bg-white p-5">
                 <p class="text-sm text-gray-500">{{ $label }}</p>
-                <p class="mt-2 text-xl font-semibold text-gray-900">{{ in_array($key, ['remaining', 'overdue']) ? str_replace('.', ',', $summary[$key]).' DH' : $summary[$key] }}</p>
+                <p class="mt-2 text-xl font-semibold text-gray-900">{{ in_array($key, ['remaining', 'overdue']) ? str_replace('.', ',', $summary[$key]).' '.__('DH') : $summary[$key] }}</p>
             </div>
         @endforeach
     </div>
@@ -209,7 +209,7 @@ new class extends \Livewire\Volt\Component
 
     <div class="overflow-x-auto border-y border-gray-200 bg-white">
         <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200 text-sm">
-            <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500"><tr>@foreach (['Facture', 'Client', 'Date facture', 'Échéance', 'Retard', 'Total TTC', 'Payé', 'Restant', 'État paiement', 'État échéance', 'Dernière relance', 'Action'] as $heading)<th class="whitespace-nowrap px-4 py-3">{{ __($heading) }}</th>@endforeach</tr></thead>
+            <thead class="bg-gray-50 text-start text-xs uppercase text-gray-500"><tr>@foreach (['Facture', 'Client', 'Date facture', 'Échéance', 'Retard', 'Total TTC', 'Payé', 'Restant', 'État paiement', 'État échéance', 'Dernière relance', 'Action'] as $heading)<th class="whitespace-nowrap px-4 py-3">{{ __($heading) }}</th>@endforeach</tr></thead>
             <tbody class="divide-y divide-gray-100">
                 @forelse ($receivables as $row)
                     @php($invoice = $row['invoice'])
@@ -219,7 +219,7 @@ new class extends \Livewire\Volt\Component
                         <td class="whitespace-nowrap px-4 py-4">{{ $invoice->invoice_date->format('d/m/Y') }}</td>
                         <td class="whitespace-nowrap px-4 py-4">{{ $invoice->due_date?->format('d/m/Y') ?? __('Sans échéance') }}</td>
                         <td class="whitespace-nowrap px-4 py-4 {{ $row['days'] > 0 ? 'text-rose-700' : 'text-gray-500' }}">{{ $row['days'] > 0 ? __(':days jours', ['days' => $row['days']]) : '—' }}</td>
-                        @foreach ([$invoice->total_ttc, $row['paid'], $row['remaining']] as $amount)<td class="whitespace-nowrap px-4 py-4 text-right">{{ str_replace('.', ',', $amount) }} DH</td>@endforeach
+                        @foreach ([$invoice->total_ttc, $row['paid'], $row['remaining']] as $amount)<td class="whitespace-nowrap px-4 py-4 text-end">{{ str_replace('.', ',', $amount) }} {{ __('DH') }}</td>@endforeach
                         <td class="whitespace-nowrap px-4 py-4"><span @class(['px-2 py-1 text-xs font-medium', 'bg-emerald-100 text-emerald-800' => $row['payment'] === 'paid', 'bg-amber-100 text-amber-800' => $row['payment'] === 'partially_paid', 'bg-gray-100 text-gray-700' => $row['payment'] === 'unpaid'])>{{ ['paid' => __('Soldée'), 'partially_paid' => __('Partiellement payée'), 'unpaid' => __('Impayée')][$row['payment']] }}</span></td>
                         <td class="whitespace-nowrap px-4 py-4"><span @class(['px-2 py-1 text-xs font-medium', 'bg-rose-100 text-rose-800' => $row['due'] === 'overdue', 'bg-gray-100 text-gray-700' => $row['due'] !== 'overdue'])>{{ ['settled' => __('Soldée'), 'overdue' => __('En retard'), 'upcoming' => __('À échoir'), 'no_due_date' => __('Sans échéance')][$row['due']] }}</span></td>
                         <td class="whitespace-nowrap px-4 py-4">@if ($invoice->latestReminder){{ $invoice->latestReminder->reminder_date->format('d/m/Y') }}<span class="block text-xs text-gray-500">{{ $invoice->latestReminder->channel }}</span>@else{{ __('Aucune') }}@endif</td>

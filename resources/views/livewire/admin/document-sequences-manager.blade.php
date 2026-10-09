@@ -532,19 +532,19 @@ new class extends Component
 
                 <tr>
 
-                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-600">
+                    <th class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-600">
                         {{ __('Type') }}
                     </th>
 
-                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-600">
+                    <th class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-600">
                         {{ __('Préfixe / année') }}
                     </th>
 
-                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-600">
+                    <th class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-600">
                         {{ __('Compteur') }}
                     </th>
 
-                    <th class="px-6 py-3 text-right text-xs font-semibold uppercase text-gray-600">
+                    <th class="px-6 py-3 text-end text-xs font-semibold uppercase text-gray-600">
                         {{ __('Action') }}
                     </th>
 
@@ -576,7 +576,7 @@ new class extends Component
                             {{ $sequence->counter }}
                         </td>
 
-                        <td class="px-6 py-4 text-right">
+                        <td class="px-6 py-4 text-end">
 
                             <button
                                 type="button"

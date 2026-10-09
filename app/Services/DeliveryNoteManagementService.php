@@ -78,11 +78,20 @@ class DeliveryNoteManagementService
             }
             $this->replaceDraftItems($deliveryNote, $lockedOrder, $items);
 
-            $this->recordOrderHistory($lockedOrder, 'delivery_note_created', $lockedOrder->status, $lockedOrder->status, __('Bon de livraison :number créé.', ['number' => $deliveryNote->number]), [
-                'delivery_note_id' => $deliveryNote->id,
-                'delivery_note_number' => $deliveryNote->number,
-                'warehouse_id' => $warehouseId,
-            ]);
+            $this->recordOrderHistory(
+                $lockedOrder,
+                'delivery_note_created',
+                $lockedOrder->status,
+                $lockedOrder->status,
+                __('Bon de livraison :number créé.', ['number' => $deliveryNote->number]),
+                [
+                    'delivery_note_id' => $deliveryNote->id,
+                    'delivery_note_number' => $deliveryNote->number,
+                    'warehouse_id' => $warehouseId,
+                    'description_key' => 'Bon de livraison :number créé.',
+                    'description_params' => ['number' => $deliveryNote->number],
+                ]
+            );
 
             return $deliveryNote->fresh(['salesOrder', 'warehouse', 'items', 'creator']);
         }, 3);
@@ -247,6 +256,8 @@ class DeliveryNoteManagementService
                 'delivery_note_id' => $locked->id,
                 'delivery_note_number' => $locked->number,
                 'warehouse_id' => $warehouseId,
+                'description_key' => 'BL :number validé depuis :warehouse.',
+                'description_params' => ['number' => $locked->number, 'warehouse' => $warehouseId !== null ? $warehouse->code : '—'],
             ]);
 
             $locked->forceFill([

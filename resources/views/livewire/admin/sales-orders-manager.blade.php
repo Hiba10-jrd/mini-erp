@@ -78,7 +78,7 @@ new class extends \Livewire\Volt\Component
     @endphp
     <div class="overflow-hidden border-y border-gray-200 bg-white">
         <div class="overflow-x-auto"><div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200 text-sm">
-            <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500"><tr><th class="px-4 py-3">{{ __('Numéro') }}</th><th class="px-4 py-3">{{ __('Date') }}</th><th class="px-4 py-3">{{ __('Client') }}</th><th class="px-4 py-3">{{ __('Devis source') }}</th><th class="px-4 py-3">{{ __('Statut') }}</th><th class="px-4 py-3 text-right">{{ __('TTC') }}</th><th class="px-4 py-3">{{ __('Créé par') }}</th><th class="px-4 py-3 text-right">{{ __('Actions') }}</th></tr></thead>
+            <thead class="bg-gray-50 text-start text-xs uppercase text-gray-500"><tr><th class="px-4 py-3">{{ __('Numéro') }}</th><th class="px-4 py-3">{{ __('Date') }}</th><th class="px-4 py-3">{{ __('Client') }}</th><th class="px-4 py-3">{{ __('Devis source') }}</th><th class="px-4 py-3">{{ __('Statut') }}</th><th class="px-4 py-3 text-end">{{ __('TTC') }}</th><th class="px-4 py-3">{{ __('Créé par') }}</th><th class="px-4 py-3 text-end">{{ __('Actions') }}</th></tr></thead>
             <tbody class="divide-y divide-gray-100">
                 @forelse ($orders as $order)
                     <tr wire:key="sales-order-{{ $order->id }}" class="hover:bg-gray-50">
@@ -87,9 +87,9 @@ new class extends \Livewire\Volt\Component
                         <td class="min-w-48 px-4 py-4 font-medium text-gray-900">{{ $order->customer_name }}</td>
                         <td class="whitespace-nowrap px-4 py-4 text-gray-600">{{ $order->sourceQuote?->number ?? '—' }}</td>
                         <td class="whitespace-nowrap px-4 py-4"><span class="inline-block px-2 py-1 text-xs font-medium {{ $statusClasses[$order->status] ?? 'bg-gray-100 text-gray-700' }}">{{ $statusLabels[$order->status] ?? $order->status }}</span></td>
-                        <td class="whitespace-nowrap px-4 py-4 text-right font-medium text-gray-900">{{ str_replace('.', ',', $order->total_ttc) }}</td>
+                        <td class="whitespace-nowrap px-4 py-4 text-end font-medium text-gray-900">{{ str_replace('.', ',', $order->total_ttc) }}</td>
                         <td class="whitespace-nowrap px-4 py-4 text-gray-600">{{ $order->creator?->name ?? '—' }}</td>
-                        <td class="whitespace-nowrap px-4 py-4 text-right"><a href="{{ route('sales.orders.show', $order) }}" wire:navigate class="font-medium text-indigo-700 hover:text-indigo-900">{{ __('Consulter') }}</a>@if ($order->isEditable()) @can('sales.update')<a href="{{ route('sales.orders.edit', $order) }}" wire:navigate class="ms-3 text-gray-700 hover:text-gray-950">{{ __('Modifier') }}</a>@endcan @endif</td>
+                        <td class="whitespace-nowrap px-4 py-4 text-end"><a href="{{ route('sales.orders.show', $order) }}" wire:navigate class="font-medium text-indigo-700 hover:text-indigo-900">{{ __('Consulter') }}</a>@if ($order->isEditable()) @can('sales.update')<a href="{{ route('sales.orders.edit', $order) }}" wire:navigate class="ms-3 text-gray-700 hover:text-gray-950">{{ __('Modifier') }}</a>@endcan @endif</td>
                     </tr>
                 @empty
                     <tr><td colspan="8" class="px-6 py-10 text-center text-gray-500">{{ __('Aucune commande ne correspond aux filtres.') }}</td></tr>

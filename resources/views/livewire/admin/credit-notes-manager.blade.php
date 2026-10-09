@@ -97,22 +97,22 @@ new class extends Component
         <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
-                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase text-gray-500">
+                    <th class="px-5 py-3 text-start text-xs font-semibold uppercase text-gray-500">
                         {{ __('Avoir') }}
                     </th>
-                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase text-gray-500">
+                    <th class="px-5 py-3 text-start text-xs font-semibold uppercase text-gray-500">
                         {{ __('Date') }}
                     </th>
-                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase text-gray-500">
+                    <th class="px-5 py-3 text-start text-xs font-semibold uppercase text-gray-500">
                         {{ __('Client') }}
                     </th>
-                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase text-gray-500">
+                    <th class="px-5 py-3 text-start text-xs font-semibold uppercase text-gray-500">
                         {{ __('Facture') }}
                     </th>
-                    <th class="px-5 py-3 text-left text-xs font-semibold uppercase text-gray-500">
+                    <th class="px-5 py-3 text-start text-xs font-semibold uppercase text-gray-500">
                         {{ __('Statut') }}
                     </th>
-                    <th class="px-5 py-3 text-right text-xs font-semibold uppercase text-gray-500">
+                    <th class="px-5 py-3 text-end text-xs font-semibold uppercase text-gray-500">
                         {{ __('TTC') }}
                     </th>
                 </tr>
@@ -160,7 +160,7 @@ new class extends Component
                             }}
                         </td>
 
-                        <td class="px-5 py-4 text-right font-medium text-gray-900">
+                        <td class="px-5 py-4 text-end font-medium text-gray-900">
                             {{ number_format((float) $creditNote->total_ttc, 2, ',', ' ') }}
                         </td>
                     </tr>

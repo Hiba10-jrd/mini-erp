@@ -22,7 +22,7 @@ new class extends Component
         abort_if(
             $user->isSuperAdministrator(),
             403,
-            'The Super Administrator account cannot be deleted.'
+            __('The Super Administrator account cannot be deleted.')
         );
 
         $this->validate([

@@ -136,12 +136,12 @@ new class extends Component
                         wire:key="role-{{ $role->id }}"
                         wire:click="selectRole({{ $role->id }})"
                         @class([
-                            'flex w-full items-center justify-between px-6 py-4 text-left text-sm transition',
+                            'flex w-full items-center justify-between px-6 py-4 text-start text-sm transition',
                             'bg-indigo-50 text-indigo-900' => $selectedRoleId === $role->id,
                             'text-gray-700 hover:bg-gray-50' => $selectedRoleId !== $role->id,
                         ])
                     >
-                        <span class="font-medium">{{ $role->name }}</span>
+                        <span class="font-medium">{{ trans()->has('roles.'.$role->slug) ? __('roles.'.$role->slug) : __($role->name) }}</span>
                         @if ($role->slug === 'super-admin')
                             <span class="text-xs text-gray-500">{{ __('Protégé') }}</span>
                         @endif
@@ -153,7 +153,7 @@ new class extends Component
         <section class="bg-white p-6 shadow-sm sm:rounded-lg lg:col-span-2">
             <div class="flex flex-col gap-3 border-b border-gray-200 pb-5 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-900">{{ $selectedRole?->name ?? __('Aucun rôle') }}</h3>
+                    <h3 class="text-lg font-semibold text-gray-900">{{ $selectedRole ? (trans()->has('roles.'.$selectedRole->slug) ? __('roles.'.$selectedRole->slug) : __($selectedRole->name)) : __('Aucun rôle') }}</h3>
                     <p class="mt-1 text-sm text-gray-600">{{ __('Les associations sont enregistrées dans le catalogue existant.') }}</p>
                 </div>
                 @if ($selectedRole && $selectedRole->slug !== 'super-admin')
@@ -164,7 +164,7 @@ new class extends Component
             <div class="mt-6 space-y-6">
                 @foreach ($permissionGroups as $module => $modulePermissions)
                     <fieldset>
-                        <legend class="text-sm font-semibold uppercase tracking-wide text-gray-700">{{ $module }}</legend>
+                        <legend class="text-sm font-semibold uppercase tracking-wide text-gray-700">{{ trans()->has('permissions.modules.'.$module) ? __('permissions.modules.'.$module) : __($module) }}</legend>
                         <div class="mt-3 grid gap-3 sm:grid-cols-2">
                             @foreach ($modulePermissions as $permissionName)
                                 @php($isConsultationWritePermission = $this->isConsultationWritePermission($permissionName, $selectedRole?->slug))
@@ -189,11 +189,11 @@ new class extends Component
                                             <path fill-rule="evenodd" d="M10 1a4 4 0 00-4 4v2H5a2 2 0 00-2 2v7a2 2 0 002 2h10a2 2 0 002-2V9a2 2 0 00-2-2h-1V5a4 4 0 00-4-4zm2 6V5a2 2 0 10-4 0v2h4zm-5 4a1 1 0 011-1h4a1 1 0 110 2h-1v2a1 1 0 11-2 0v-2H8a1 1 0 01-1-1z" clip-rule="evenodd" />
                                         </svg>
                                         <span class="flex min-w-0 flex-1 flex-col">
-                                            <span>{{ $permissionName }}</span>
+                                            <span>{{ trans()->has('permissions.'.$permissionName) ? __('permissions.'.$permissionName) : $permissionName }}</span>
                                             <span class="text-xs text-gray-500">{{ __('Non autorisé — lecture seule') }}</span>
                                         </span>
                                     @else
-                                        <span>{{ $permissionName }}</span>
+                                        <span>{{ trans()->has('permissions.'.$permissionName) ? __('permissions.'.$permissionName) : $permissionName }}</span>
                                     @endif
                                 </label>
                             @endforeach

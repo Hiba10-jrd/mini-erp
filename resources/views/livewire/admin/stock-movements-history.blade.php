@@ -126,8 +126,8 @@ new class extends Component
     @endphp
     <div class="overflow-x-auto">
         <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200 text-sm">
-            <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500">
-                <tr><th class="px-4 py-3">{{ __('Date') }}</th><th class="px-4 py-3">{{ __('Produit') }}</th><th class="px-4 py-3">{{ __('Dépôt') }}</th><th class="px-4 py-3">{{ __('Type') }}</th><th class="px-4 py-3 text-right">{{ __('Quantité') }}</th><th class="px-4 py-3 text-right">{{ __('Avant') }}</th><th class="px-4 py-3 text-right">{{ __('Après') }}</th><th class="px-4 py-3">{{ __('Référence / note') }}</th><th class="px-4 py-3">{{ __('Utilisateur') }}</th></tr>
+            <thead class="bg-gray-50 text-start text-xs uppercase text-gray-500">
+                <tr><th class="px-4 py-3">{{ __('Date') }}</th><th class="px-4 py-3">{{ __('Produit') }}</th><th class="px-4 py-3">{{ __('Dépôt') }}</th><th class="px-4 py-3">{{ __('Type') }}</th><th class="px-4 py-3 text-end">{{ __('Quantité') }}</th><th class="px-4 py-3 text-end">{{ __('Avant') }}</th><th class="px-4 py-3 text-end">{{ __('Après') }}</th><th class="px-4 py-3">{{ __('Référence / note') }}</th><th class="px-4 py-3">{{ __('Utilisateur') }}</th></tr>
             </thead>
             <tbody class="divide-y divide-gray-200 bg-white">
                 @forelse ($movements as $movement)
@@ -136,9 +136,9 @@ new class extends Component
                         <td class="px-4 py-4"><p class="font-medium text-gray-900">{{ $movement->product->name }}</p><p class="text-xs text-gray-500">{{ $movement->product->reference }}</p></td>
                         <td class="px-4 py-4 text-gray-700">{{ $movement->warehouse->code }} — {{ $movement->warehouse->name }}</td>
                         <td class="whitespace-nowrap px-4 py-4 text-gray-700">{{ $movementLabels[$movement->type] ?? $movement->type }}</td>
-                        <td class="whitespace-nowrap px-4 py-4 text-right font-medium">{{ $movement->quantity }}</td>
-                        <td class="whitespace-nowrap px-4 py-4 text-right text-gray-600">{{ $movement->quantity_before }}</td>
-                        <td class="whitespace-nowrap px-4 py-4 text-right text-gray-600">{{ $movement->quantity_after }}</td>
+                        <td class="whitespace-nowrap px-4 py-4 text-end font-medium">{{ $movement->quantity }}</td>
+                        <td class="whitespace-nowrap px-4 py-4 text-end text-gray-600">{{ $movement->quantity_before }}</td>
+                        <td class="whitespace-nowrap px-4 py-4 text-end text-gray-600">{{ $movement->quantity_after }}</td>
                         <td class="max-w-xs px-4 py-4 text-gray-600"><p>{{ $movement->reference ?? '—' }}</p>@if ($movement->notes)<p class="mt-1 text-xs text-gray-500">{{ $movement->notes }}</p>@endif</td>
                         <td class="whitespace-nowrap px-4 py-4 text-gray-600">{{ $movement->performer?->name ?? __('Compte supprimé') }}</td>
                     </tr>

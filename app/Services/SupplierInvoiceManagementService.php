@@ -67,8 +67,8 @@ class SupplierInvoiceManagementService
                 ...$totals,
             ])->save();
             $this->persistItems($invoice, $prepared);
-            $this->recordHistory($invoice, 'created', null, SupplierInvoice::STATUS_DRAFT, __('Facture fournisseur créée.'));
-            $this->recordOrderHistory($lockedOrder, 'supplier_invoice_created', __('Facture fournisseur :reference créée.', ['reference' => $invoice->supplier_invoice_number]), $invoice);
+            $this->recordHistory($invoice, 'created', null, SupplierInvoice::STATUS_DRAFT, __('Facture fournisseur créée.'), null, 'Facture fournisseur créée.');
+            $this->recordOrderHistory($lockedOrder, 'supplier_invoice_created', __('Facture fournisseur :reference créée.', ['reference' => $invoice->supplier_invoice_number]), $invoice, 'Facture fournisseur :reference créée.', ['reference' => $invoice->supplier_invoice_number]);
 
             return $this->load($invoice);
         }, 3);
@@ -111,7 +111,7 @@ class SupplierInvoiceManagementService
             ])->save();
             $locked->items()->get()->each->delete();
             $this->persistItems($locked, $prepared);
-            $this->recordHistory($locked, 'draft_updated', SupplierInvoice::STATUS_DRAFT, SupplierInvoice::STATUS_DRAFT, __('Brouillon de facture fournisseur modifié.'));
+            $this->recordHistory($locked, 'draft_updated', SupplierInvoice::STATUS_DRAFT, SupplierInvoice::STATUS_DRAFT, __('Brouillon de facture fournisseur modifié.'), null, 'Brouillon de facture fournisseur modifié.');
 
             return $this->load($locked);
         }, 3);
@@ -151,8 +151,8 @@ class SupplierInvoiceManagementService
                 'validated_at' => now(),
                 ...$totals,
             ])->save();
-            $this->recordHistory($locked, 'validated', SupplierInvoice::STATUS_DRAFT, SupplierInvoice::STATUS_VALIDATED, __('Validation de la facture fournisseur.'));
-            $this->recordOrderHistory($order, 'supplier_invoice_validated', __('Facture fournisseur :number validée.', ['number' => $number]), $locked);
+            $this->recordHistory($locked, 'validated', SupplierInvoice::STATUS_DRAFT, SupplierInvoice::STATUS_VALIDATED, __('Validation de la facture fournisseur.'), null, 'Validation de la facture fournisseur.');
+            $this->recordOrderHistory($order, 'supplier_invoice_validated', __('Facture fournisseur :number validée.', ['number' => $number]), $locked, 'Facture fournisseur :number validée.', ['number' => $number]);
 
             return $this->load($locked);
         }, 3);
@@ -172,8 +172,8 @@ class SupplierInvoiceManagementService
                 'status' => SupplierInvoice::STATUS_CANCELLED,
                 'cancelled_at' => now(),
             ])->save();
-            $this->recordHistory($locked, 'cancelled', SupplierInvoice::STATUS_DRAFT, SupplierInvoice::STATUS_CANCELLED, __('Facture fournisseur annulée.'));
-            $this->recordOrderHistory($order, 'supplier_invoice_cancelled', __('Facture fournisseur :reference annulée.', ['reference' => $locked->supplier_invoice_number]), $locked);
+            $this->recordHistory($locked, 'cancelled', SupplierInvoice::STATUS_DRAFT, SupplierInvoice::STATUS_CANCELLED, __('Facture fournisseur annulée.'), null, 'Facture fournisseur annulée.');
+            $this->recordOrderHistory($order, 'supplier_invoice_cancelled', __('Facture fournisseur :reference annulée.', ['reference' => $locked->supplier_invoice_number]), $locked, 'Facture fournisseur :reference annulée.', ['reference' => $locked->supplier_invoice_number]);
 
             return $this->load($locked);
         }, 3);
@@ -527,31 +527,57 @@ class SupplierInvoiceManagementService
         return (int) SupplierInvoice::query()->whereKey($invoice->id)->valueOrFail('purchase_order_id');
     }
 
-    private function recordHistory(SupplierInvoice $invoice, string $event, ?string $from, ?string $to, string $description): void
-    {
+    /** @param array<string, mixed>|null $metadata */
+    private function recordHistory(
+        SupplierInvoice $invoice,
+        string $event,
+        ?string $from,
+        ?string $to,
+        string $description,
+        ?array $metadata = null,
+        ?string $descriptionKey = null,
+        array $descriptionParams = []
+    ): void {
+        $meta = $metadata ?? [];
+        $meta['description_key'] = $descriptionKey ?? $description;
+        $meta['description_params'] = $descriptionParams;
+
         $invoice->histories()->create([
             'event' => $event,
             'from_status' => $from,
             'to_status' => $to,
             'user_id' => Auth::id(),
             'description' => $description,
+            'metadata' => $meta,
             'created_at' => now(),
         ]);
     }
 
-    private function recordOrderHistory(PurchaseOrder $order, string $event, string $description, SupplierInvoice $invoice): void
-    {
+    /** @param array<string, mixed>|null $metadata */
+    private function recordOrderHistory(
+        PurchaseOrder $order,
+        string $event,
+        string $description,
+        SupplierInvoice $invoice,
+        ?string $descriptionKey = null,
+        array $descriptionParams = [],
+        ?array $metadata = null
+    ): void {
+        $meta = array_merge([
+            'supplier_invoice_id' => $invoice->id,
+            'supplier_invoice_number' => $invoice->supplier_invoice_number,
+            'number' => $invoice->number,
+            'description_key' => $descriptionKey ?? $description,
+            'description_params' => $descriptionParams,
+        ], $metadata ?? []);
+
         $order->histories()->create([
             'event' => $event,
             'from_status' => $order->status,
             'to_status' => $order->status,
             'user_id' => Auth::id(),
             'description' => $description,
-            'metadata' => [
-                'supplier_invoice_id' => $invoice->id,
-                'supplier_invoice_number' => $invoice->supplier_invoice_number,
-                'number' => $invoice->number,
-            ],
+            'metadata' => $meta,
             'created_at' => now(),
         ]);
     }

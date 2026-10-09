@@ -30,11 +30,17 @@ class CheckCustomerInvoiceDeadlines implements ShouldBeUnique, ShouldQueue
                 foreach ($invoices as $invoice) {
                     $overdue = $invoice->due_date->lt(today());
                     $type = $overdue ? 'invoice.overdue' : 'invoice.due-soon';
+                    $titleKey = $overdue ? 'Facture en retard' : 'Échéance proche';
                     $dispatcher->group('finance', [
-                        'type' => $type, 'title' => $overdue ? 'Facture en retard' : 'Échéance proche',
+                        'type' => $type,
+                        'title' => $overdue ? 'Facture en retard' : 'Échéance proche',
+                        'title_key' => $titleKey,
                         'message' => 'Facture '.$invoice->number.' : '.$invoice->due_date->toDateString(),
+                        'message_key' => 'Facture :number : :date',
+                        'params' => ['number' => $invoice->number, 'date' => $invoice->due_date->toDateString()],
                         'url' => route('finance.receivables.index', ['invoice' => $invoice->id], false),
-                        'entity_type' => 'invoice', 'entity_id' => $invoice->id,
+                        'entity_type' => 'invoice',
+                        'entity_id' => $invoice->id,
                         'severity' => $overdue ? 'warning' : 'info',
                     ], $type.':'.$invoice->id.':'.$invoice->due_date->toDateString());
                 }

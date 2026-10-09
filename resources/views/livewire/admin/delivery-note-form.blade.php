@@ -182,7 +182,7 @@ new class extends \Livewire\Volt\Component
                             <x-text-input id="delivery-quantity-{{ $item->id }}" type="number" min="0.001" max="{{ $remaining }}" step="0.001" wire:model="lines.{{ $item->id }}.quantity" class="mt-1 block w-full" />
                             <x-input-error :messages="$errors->get('lines.'.$item->id.'.quantity')" class="mt-1" />
                         </div>
-                        <div class="text-right text-sm text-gray-600">
+                        <div class="text-end text-sm text-gray-600">
                             <p>{{ __('Restant') }}</p>
                             <p class="mt-1 font-semibold text-gray-900">{{ $remaining }}</p>
                         </div>

@@ -186,11 +186,11 @@ new class extends Component
         <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
-                    <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">{{ __('Article') }}</th>
-                    <th class="px-4 py-3 text-right text-xs font-semibold uppercase text-gray-500">{{ __('Qté') }}</th>
-                    <th class="px-4 py-3 text-right text-xs font-semibold uppercase text-gray-500">{{ __('PU HT') }}</th>
-                    <th class="px-4 py-3 text-right text-xs font-semibold uppercase text-gray-500">{{ __('TVA') }}</th>
-                    <th class="px-4 py-3 text-right text-xs font-semibold uppercase text-gray-500">{{ __('TTC') }}</th>
+                    <th class="px-4 py-3 text-start text-xs font-semibold uppercase text-gray-500">{{ __('Article') }}</th>
+                    <th class="px-4 py-3 text-end text-xs font-semibold uppercase text-gray-500">{{ __('Qté') }}</th>
+                    <th class="px-4 py-3 text-end text-xs font-semibold uppercase text-gray-500">{{ __('PU HT') }}</th>
+                    <th class="px-4 py-3 text-end text-xs font-semibold uppercase text-gray-500">{{ __('TVA') }}</th>
+                    <th class="px-4 py-3 text-end text-xs font-semibold uppercase text-gray-500">{{ __('TTC') }}</th>
                 </tr>
             </thead>
 
@@ -201,10 +201,10 @@ new class extends Component
                             <p class="font-medium">{{ $item->description }}</p>
                             <p class="text-xs text-gray-500">{{ $item->reference ?? '—' }}</p>
                         </td>
-                        <td class="px-4 py-4 text-right">{{ $item->quantity }}</td>
-                        <td class="px-4 py-4 text-right">{{ number_format((float) $item->unit_price, 2, ',', ' ') }}</td>
-                        <td class="px-4 py-4 text-right">{{ $item->tax_rate_percent }} %</td>
-                        <td class="px-4 py-4 text-right font-medium">{{ number_format((float) $item->total_ttc, 2, ',', ' ') }}</td>
+                        <td class="px-4 py-4 text-end">{{ $item->quantity }}</td>
+                        <td class="px-4 py-4 text-end">{{ number_format((float) $item->unit_price, 2, ',', ' ') }}</td>
+                        <td class="px-4 py-4 text-end">{{ $item->tax_rate_percent }} %</td>
+                        <td class="px-4 py-4 text-end font-medium">{{ number_format((float) $item->total_ttc, 2, ',', ' ') }}</td>
                     </tr>
                 @endforeach
             </tbody>

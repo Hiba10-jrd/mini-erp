@@ -114,7 +114,7 @@ new class extends Component
                     <h4 class="font-medium text-gray-900">{{ __('Stock par dépôt') }}</h4>
                     <p class="mt-1 text-sm text-gray-600">{{ __('Quantité calculée à partir des mouvements validés.') }}</p>
                 </div>
-                <div class="rounded-lg bg-indigo-50 px-4 py-2 text-right">
+                <div class="rounded-lg bg-indigo-50 px-4 py-2 text-end">
                     <p class="text-xs font-medium uppercase text-indigo-600">{{ __('Stock total') }}</p>
                     <p class="text-lg font-semibold text-indigo-900">{{ number_format((float) $totalStock, 3, ',', ' ') }}</p>
                 </div>
@@ -126,10 +126,10 @@ new class extends Component
 
             <div class="mt-5 overflow-x-auto rounded-lg border border-gray-200">
                 <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200 text-sm">
-                    <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500"><tr><th class="px-4 py-3">{{ __('Dépôt') }}</th><th class="px-4 py-3">{{ __('Statut') }}</th><th class="px-4 py-3 text-right">{{ __('Quantité disponible') }}</th></tr></thead>
+                    <thead class="bg-gray-50 text-start text-xs uppercase text-gray-500"><tr><th class="px-4 py-3">{{ __('Dépôt') }}</th><th class="px-4 py-3">{{ __('Statut') }}</th><th class="px-4 py-3 text-end">{{ __('Quantité disponible') }}</th></tr></thead>
                     <tbody class="divide-y divide-gray-200 bg-white">
                         @forelse ($stockRows as $stockRow)
-                            <tr><td class="px-4 py-3"><span class="font-medium text-gray-900">{{ $stockRow->code }}</span> — {{ $stockRow->name }}</td><td class="px-4 py-3 text-gray-600">{{ $stockRow->is_active ? __('Actif') : __('Inactif') }}</td><td class="px-4 py-3 text-right font-semibold text-gray-900">{{ number_format((float) $stockRow->stock_quantity, 3, ',', ' ') }}</td></tr>
+                            <tr><td class="px-4 py-3"><span class="font-medium text-gray-900">{{ $stockRow->code }}</span> — {{ $stockRow->name }}</td><td class="px-4 py-3 text-gray-600">{{ $stockRow->is_active ? __('Actif') : __('Inactif') }}</td><td class="px-4 py-3 text-end font-semibold text-gray-900">{{ number_format((float) $stockRow->stock_quantity, 3, ',', ' ') }}</td></tr>
                         @empty
                             <tr><td colspan="3" class="px-4 py-6 text-center text-gray-500">{{ __('Aucun dépôt configuré.') }}</td></tr>
                         @endforelse

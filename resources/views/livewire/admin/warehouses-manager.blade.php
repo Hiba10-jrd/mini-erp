@@ -152,8 +152,8 @@ new class extends Component
 
     <div class="overflow-x-auto">
         <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200 text-sm">
-            <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500">
-                <tr><th class="px-6 py-3">{{ __('Code') }}</th><th class="px-6 py-3">{{ __('Dépôt') }}</th><th class="px-6 py-3">{{ __('Localisation') }}</th><th class="px-6 py-3">{{ __('Statut') }}</th><th class="px-6 py-3 text-right">{{ __('Actions') }}</th></tr>
+            <thead class="bg-gray-50 text-start text-xs uppercase text-gray-500">
+                <tr><th class="px-6 py-3">{{ __('Code') }}</th><th class="px-6 py-3">{{ __('Dépôt') }}</th><th class="px-6 py-3">{{ __('Localisation') }}</th><th class="px-6 py-3">{{ __('Statut') }}</th><th class="px-6 py-3 text-end">{{ __('Actions') }}</th></tr>
             </thead>
             <tbody class="divide-y divide-gray-200 bg-white">
                 @forelse ($warehouses as $warehouse)
@@ -162,7 +162,7 @@ new class extends Component
                         <td class="px-6 py-4 text-gray-700"><p class="font-medium">{{ $warehouse->name }}</p><p class="text-xs text-gray-500">{{ $warehouse->notes }}</p></td>
                         <td class="px-6 py-4 text-gray-600">{{ collect([$warehouse->address, $warehouse->city])->filter()->join(', ') ?: __('Non renseignée') }}</td>
                         <td class="px-6 py-4"><span class="rounded-full px-2 py-1 text-xs {{ $warehouse->is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-600' }}">{{ $warehouse->is_active ? __('Actif') : __('Inactif') }}</span></td>
-                        <td class="whitespace-nowrap px-6 py-4 text-right">
+                        <td class="whitespace-nowrap px-6 py-4 text-end">
                             @can('stock.manage')
                                 <button type="button" wire:click="editWarehouse({{ $warehouse->id }})" class="text-indigo-600 hover:text-indigo-900">{{ __('Modifier') }}</button>
                                 <button type="button" wire:click="toggleWarehouse({{ $warehouse->id }})" class="ms-3 text-gray-600 hover:text-gray-900">{{ $warehouse->is_active ? __('Désactiver') : __('Activer') }}</button>

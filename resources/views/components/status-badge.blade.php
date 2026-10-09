@@ -8,4 +8,4 @@
         'issued','info','updated' => 'info', default => 'neutral',
     };
 @endphp
-<span {{ $attributes->class(['erp-badge', 'erp-badge-'.$tone]) }}>{{ $label ?? $labels[$status] ?? $status }}</span>
+<span {{ $attributes->class(['erp-badge', 'erp-badge-'.$tone]) }}>{{ __($label ?? $labels[$status] ?? $status) }}</span>

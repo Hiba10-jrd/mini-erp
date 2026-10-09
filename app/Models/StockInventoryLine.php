@@ -33,12 +33,12 @@ class StockInventoryLine extends Model
     {
         static::saving(function (StockInventoryLine $line): void {
             if (! $line->inventory()->firstOrFail()->isEditable()) {
-                throw new LogicException('Les lignes d’un inventaire clôturé sont immuables.');
+                throw new LogicException(__('Les lignes d’un inventaire clôturé sont immuables.'));
             }
         });
 
         static::deleting(function (): never {
-            throw new LogicException('Une ligne d’inventaire ne peut pas être supprimée physiquement.');
+            throw new LogicException(__('Une ligne d’inventaire ne peut pas être supprimée physiquement.'));
         });
     }
 
