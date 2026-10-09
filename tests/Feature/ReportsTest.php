@@ -207,7 +207,7 @@ class ReportsTest extends TestCase
         foreach ($tables as $table) {
             $before[$table] = DB::table($table)->orderBy('id')->get()->toJson();
         }
-        Volt::test('admin.reports-manager')->call('selectSection', 'receivables')->assertSee('03/10/2026')->assertSee('1 jours');
+        Volt::test('admin.reports-manager')->call('selectSection', 'receivables')->assertSee('03/10/2026')->assertSee('1 jour');
         Volt::test('admin.reports-manager')->call('selectSection', 'stock')->assertSee('Mouvements de la période')->assertViewHas('tables', fn ($tables) => $tables['movements']['paginator']->total() === 1);
         $this->assertSame(0, $this->reports()->table('movements', '2026-09-01', '2026-09-30')->total());
         Volt::test('dashboard-summary')->assertSee('Dernières relances')->assertSee('phone');

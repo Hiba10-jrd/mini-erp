@@ -116,7 +116,7 @@ new class extends Component
         <div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             <div>
                 <x-input-label for="balance-search" :value="__('Recherche')" />
-                <x-text-input id="balance-search" wire:model.live.debounce.300ms="search" class="mt-1 block w-full" placeholder="Référence, nom, code-barres" />
+                <x-text-input id="balance-search" wire:model.live.debounce.300ms="search" class="mt-1 block w-full" :placeholder="__('Référence, nom, code-barres')" />
             </div>
             <div>
                 <x-input-label for="balance-warehouse" :value="__('Dépôt')" />
@@ -152,8 +152,8 @@ new class extends Component
 
     <div class="overflow-x-auto">
         <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200 text-sm">
-            <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500">
-                <tr><th class="px-6 py-3">{{ __('Produit') }}</th><th class="px-6 py-3">{{ __('Dépôt') }}</th><th class="px-6 py-3 text-right">{{ __('Disponible') }}</th><th class="px-6 py-3 text-right">{{ __('Total global') }}</th><th class="px-6 py-3 text-right">{{ __('Minimum') }}</th><th class="px-6 py-3">{{ __('État') }}</th></tr>
+            <thead class="bg-gray-50 text-start text-xs uppercase text-gray-500">
+                <tr><th class="px-6 py-3">{{ __('Produit') }}</th><th class="px-6 py-3">{{ __('Dépôt') }}</th><th class="px-6 py-3 text-end">{{ __('Disponible') }}</th><th class="px-6 py-3 text-end">{{ __('Total global') }}</th><th class="px-6 py-3 text-end">{{ __('Minimum') }}</th><th class="px-6 py-3">{{ __('État') }}</th></tr>
             </thead>
             <tbody class="divide-y divide-gray-200 bg-white">
                 @forelse ($balances as $balance)
@@ -165,9 +165,9 @@ new class extends Component
                     <tr wire:key="balance-{{ $balance->id }}-{{ $balance->warehouse_id }}">
                         <td class="px-6 py-4"><p class="font-medium text-gray-900">{{ $balance->name }}</p><p class="text-xs text-gray-500">{{ $balance->reference }}@if ($balance->category) · {{ $balance->category->name }} @endif</p></td>
                         <td class="px-6 py-4 text-gray-700">{{ $balance->warehouse_code }} — {{ $balance->warehouse_name }}@if (! $balance->warehouse_is_active)<span class="ms-2 text-xs text-gray-500">{{ __('Inactif') }}</span>@endif</td>
-                        <td class="whitespace-nowrap px-6 py-4 text-right font-semibold text-gray-900">{{ number_format($quantity, 3, ',', ' ') }}</td>
-                        <td class="whitespace-nowrap px-6 py-4 text-right font-semibold text-indigo-700">{{ number_format((float) $balance->total_stock, 3, ',', ' ') }}</td>
-                        <td class="whitespace-nowrap px-6 py-4 text-right text-gray-600">{{ $balance->minimum_stock ?? '—' }}</td>
+                        <td class="whitespace-nowrap px-6 py-4 text-end font-semibold text-gray-900">{{ number_format($quantity, 3, ',', ' ') }}</td>
+                        <td class="whitespace-nowrap px-6 py-4 text-end font-semibold text-indigo-700">{{ number_format((float) $balance->total_stock, 3, ',', ' ') }}</td>
+                        <td class="whitespace-nowrap px-6 py-4 text-end text-gray-600">{{ $balance->minimum_stock ?? '—' }}</td>
                         <td class="px-6 py-4">
                             @if ($isRupture)
                                 <span class="rounded-full bg-red-50 px-2 py-1 text-xs text-red-700">{{ __('Rupture') }}</span>

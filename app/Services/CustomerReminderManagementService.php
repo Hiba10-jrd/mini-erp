@@ -54,10 +54,16 @@ class CustomerReminderManagementService
             DB::afterCommit(function () use ($reminder, $lockedInvoice): void {
                 try {
                     app(InternalNotificationDispatcher::class)->group('finance', [
-                        'type' => 'reminder.created', 'title' => 'Relance enregistrée',
+                        'type' => 'reminder.created',
+                        'title' => 'Relance enregistrée',
+                        'title_key' => 'Relance enregistrée',
                         'message' => 'Une relance a été enregistrée pour '.$lockedInvoice->number.'.',
+                        'message_key' => 'Une relance a été enregistrée pour :number.',
+                        'params' => ['number' => $lockedInvoice->number],
                         'url' => route('finance.receivables.index', ['invoice' => $lockedInvoice->id], false),
-                        'entity_type' => 'invoice', 'entity_id' => $lockedInvoice->id, 'severity' => 'info',
+                        'entity_type' => 'invoice',
+                        'entity_id' => $lockedInvoice->id,
+                        'severity' => 'info',
                     ], 'reminder:'.$reminder->id);
                 } catch (\Throwable $e) {
                     Log::error('Reminder notification failed.', ['reminder_id' => $reminder->id, 'exception' => $e::class]);

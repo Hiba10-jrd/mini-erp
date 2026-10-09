@@ -91,7 +91,7 @@ new class extends \Livewire\Volt\Component
     <div class="overflow-hidden border-y border-gray-200 bg-white">
         <div class="overflow-x-auto">
             <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200 text-sm">
-                <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500">
+                <thead class="bg-gray-50 text-start text-xs uppercase text-gray-500">
                     <tr>
                         <th class="px-4 py-3">{{ __('Numéro') }}</th>
                         <th class="px-4 py-3">{{ __('Date') }}</th>
@@ -99,7 +99,7 @@ new class extends \Livewire\Volt\Component
                         <th class="px-4 py-3">{{ __('Client') }}</th>
                         <th class="px-4 py-3">{{ __('Dépôt') }}</th>
                         <th class="px-4 py-3">{{ __('Statut') }}</th>
-                        <th class="px-4 py-3 text-right">{{ __('Actions') }}</th>
+                        <th class="px-4 py-3 text-end">{{ __('Actions') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
@@ -113,7 +113,7 @@ new class extends \Livewire\Volt\Component
                             <td class="whitespace-nowrap px-4 py-4">
                                 <span class="inline-block px-2 py-1 text-xs font-medium {{ $statusClasses[$note->status] ?? 'bg-gray-100 text-gray-700' }}">{{ $statusLabels[$note->status] ?? $note->status }}</span>
                             </td>
-                            <td class="whitespace-nowrap px-4 py-4 text-right">
+                            <td class="whitespace-nowrap px-4 py-4 text-end">
                                 <a href="{{ route('sales.delivery-notes.show', $note) }}" wire:navigate class="font-medium text-indigo-700 hover:text-indigo-900">{{ __('Consulter') }}</a>
                             </td>
                         </tr>

@@ -33,11 +33,11 @@ class StockMovement extends Model
     protected static function booted(): void
     {
         static::updating(function (): never {
-            throw new LogicException('Un mouvement de stock validé est immuable.');
+            throw new LogicException(__('Un mouvement de stock validé est immuable.'));
         });
 
         static::deleting(function (): never {
-            throw new LogicException('Un mouvement de stock validé ne peut pas être supprimé.');
+            throw new LogicException(__('Un mouvement de stock validé ne peut pas être supprimé.'));
         });
     }
 

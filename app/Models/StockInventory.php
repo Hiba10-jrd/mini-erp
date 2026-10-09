@@ -34,12 +34,12 @@ class StockInventory extends Model
     {
         static::updating(function (StockInventory $inventory): void {
             if (in_array($inventory->getOriginal('status'), [self::STATUS_VALIDATED, self::STATUS_CANCELLED], true)) {
-                throw new LogicException('Un inventaire clôturé est immuable.');
+                throw new LogicException(__('Un inventaire clôturé est immuable.'));
             }
         });
 
         static::deleting(function (): never {
-            throw new LogicException('Un inventaire ne peut pas être supprimé physiquement.');
+            throw new LogicException(__('Un inventaire ne peut pas être supprimé physiquement.'));
         });
     }
 

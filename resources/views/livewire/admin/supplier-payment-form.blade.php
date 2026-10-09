@@ -829,7 +829,7 @@ new class extends \Livewire\Volt\Component
 
                                 <div class="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm text-gray-500">
                                     <span>
-                                        {{ __('TTC : :amount', [
+                                        {{ __('Total TTC : :amount', [
                                             'amount' => str_replace(
                                                 '.',
                                                 ',',
@@ -839,7 +839,7 @@ new class extends \Livewire\Volt\Component
                                     </span>
 
                                     <span class="font-medium text-amber-700">
-                                        {{ __('Reste : :amount', [
+                                        {{ __('Reste à payer : :amount', [
                                             'amount' => str_replace(
                                                 '.',
                                                 ',',

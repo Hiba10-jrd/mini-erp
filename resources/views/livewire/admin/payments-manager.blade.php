@@ -160,7 +160,7 @@ new class extends \Livewire\Volt\Component
                     id="payment-search"
                     wire:model.live.debounce.300ms="search"
                     class="mt-1 block w-full"
-                    placeholder="Référence, client ou facture"
+                    :placeholder="__('Référence, client ou facture')"
                 />
             </div>
 
@@ -227,7 +227,7 @@ new class extends \Livewire\Volt\Component
                         </div>
                     </div>
 
-                    <div class="sm:text-right">
+                    <div class="sm:text-end">
                         <p class="text-lg font-semibold text-gray-900">
                             {{ number_format(
                                 (float) $payment->amount,
@@ -286,7 +286,7 @@ new class extends \Livewire\Volt\Component
                         </p>
                     </div>
                 @endif
-                <a class="mt-3 block text-indigo-600" href="{{ route('attachments.index', ['parentType' => 'payment', 'parentId' => $payment->id]) }}" wire:navigate>Documents</a>
+                <a class="mt-3 block text-indigo-600" href="{{ route('attachments.index', ['parentType' => 'payment', 'parentId' => $payment->id]) }}" wire:navigate>{{ __('Documents') }}</a>
             </article>
         @empty
             <div class="p-6 text-sm text-gray-500">

@@ -245,19 +245,19 @@ new class extends Component
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-4 py-3"></th>
-                            <th class="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">
+                            <th class="px-4 py-3 text-start text-xs font-semibold uppercase text-gray-500">
                                 {{ __('Article') }}
                             </th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold uppercase text-gray-500">
+                            <th class="px-4 py-3 text-end text-xs font-semibold uppercase text-gray-500">
                                 {{ __('Facturé') }}
                             </th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold uppercase text-gray-500">
+                            <th class="px-4 py-3 text-end text-xs font-semibold uppercase text-gray-500">
                                 {{ __('Déjà crédité') }}
                             </th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold uppercase text-gray-500">
+                            <th class="px-4 py-3 text-end text-xs font-semibold uppercase text-gray-500">
                                 {{ __('Disponible') }}
                             </th>
-                            <th class="px-4 py-3 text-right text-xs font-semibold uppercase text-gray-500">
+                            <th class="px-4 py-3 text-end text-xs font-semibold uppercase text-gray-500">
                                 {{ __('Qté avoir') }}
                             </th>
                         </tr>
@@ -285,26 +285,26 @@ new class extends Component
                                     </p>
                                 </td>
 
-                                <td class="px-4 py-4 text-right text-sm">
+                                <td class="px-4 py-4 text-end text-sm">
                                     {{ $line['invoiced_quantity'] }}
                                 </td>
 
-                                <td class="px-4 py-4 text-right text-sm">
+                                <td class="px-4 py-4 text-end text-sm">
                                     {{ $line['already_credited_quantity'] }}
                                 </td>
 
-                                <td class="px-4 py-4 text-right text-sm font-medium">
+                                <td class="px-4 py-4 text-end text-sm font-medium">
                                     {{ $line['remaining_quantity'] }}
                                 </td>
 
-                                <td class="px-4 py-4 text-right">
+                                <td class="px-4 py-4 text-end">
                                     <input
                                         type="number"
                                         step="0.001"
                                         min="0.001"
                                         max="{{ $line['remaining_quantity'] }}"
                                         wire:model.blur="lines.{{ $index }}.quantity"
-                                        class="w-28 rounded-md border-gray-300 text-right shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        class="w-28 rounded-md border-gray-300 text-end shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
                                     >
                                 </td>
                             </tr>

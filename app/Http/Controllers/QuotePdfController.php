@@ -22,11 +22,15 @@ class QuotePdfController
             $logoData = 'data:'.$mimeType.';base64,'.base64_encode(Storage::disk('public')->get($company->logo_path));
         }
 
+        $pdfLocale = app()->getLocale() === 'en' ? 'en' : 'fr';
+        app()->setLocale($pdfLocale);
+
         $viewData = [
             'quote' => $quote,
             'company' => $company,
             'logoData' => $logoData,
             'commercialSetting' => CommercialSetting::query()->where('singleton', true)->first(),
+            'pdfLocale' => $pdfLocale,
         ];
 
         if (! class_exists('Barryvdh\\DomPDF\\Facade\\Pdf')) {

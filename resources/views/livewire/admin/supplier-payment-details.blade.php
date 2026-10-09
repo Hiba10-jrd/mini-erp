@@ -228,7 +228,7 @@ new class extends \Livewire\Volt\Component
 
         <div class="overflow-x-auto">
             <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200 text-sm">
-                <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500">
+                <thead class="bg-gray-50 text-start text-xs uppercase text-gray-500">
                     <tr>
                         <th class="px-4 py-3">
                             {{ __('FAF') }}
@@ -238,11 +238,11 @@ new class extends \Livewire\Volt\Component
                             {{ __('Référence fournisseur') }}
                         </th>
 
-                        <th class="px-4 py-3 text-right">
+                        <th class="px-4 py-3 text-end">
                             {{ __('TTC facture') }}
                         </th>
 
-                        <th class="px-4 py-3 text-right">
+                        <th class="px-4 py-3 text-end">
                             {{ __('Affecté') }}
                         </th>
                     </tr>
@@ -274,7 +274,7 @@ new class extends \Livewire\Volt\Component
                                 {{ $allocation->supplierInvoice->supplier_invoice_number }}
                             </td>
 
-                            <td class="px-4 py-4 text-right">
+                            <td class="px-4 py-4 text-end">
                                 {{ str_replace(
                                     '.',
                                     ',',
@@ -282,7 +282,7 @@ new class extends \Livewire\Volt\Component
                                 ) }}
                             </td>
 
-                            <td class="px-4 py-4 text-right font-semibold">
+                            <td class="px-4 py-4 text-end font-semibold">
                                 {{ str_replace('.', ',', $allocation->amount) }}
                             </td>
                         </tr>
@@ -293,6 +293,6 @@ new class extends \Livewire\Volt\Component
     </section>
 
     <div class="border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-        {{ __('Un paiement enregistré constitue une opération financière historique. Il n’est ni modifiable ni supprimable depuis LOT 17.') }}
+        {{ __('Un paiement enregistré constitue une opération financière historique. Il n’est ni modifiable ni supprimable.') }}
     </div>
 </section>

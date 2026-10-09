@@ -138,8 +138,8 @@ new class extends Component
         @endphp
         <div class="overflow-x-auto">
             <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200 text-sm">
-                <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500">
-                    <tr><th class="px-4 py-3">{{ __('Référence') }}</th><th class="px-4 py-3">{{ __('Dépôt') }}</th><th class="px-4 py-3">{{ __('Statut') }}</th><th class="px-4 py-3">{{ __('Création') }}</th><th class="px-4 py-3">{{ __('Créé par') }}</th><th class="px-4 py-3">{{ __('Date de validation') }}</th><th class="px-4 py-3">{{ __('Validé par') }}</th><th class="px-4 py-3 text-right">{{ __('Action') }}</th></tr>
+                <thead class="bg-gray-50 text-start text-xs uppercase text-gray-500">
+                    <tr><th class="px-4 py-3">{{ __('Référence') }}</th><th class="px-4 py-3">{{ __('Dépôt') }}</th><th class="px-4 py-3">{{ __('Statut') }}</th><th class="px-4 py-3">{{ __('Création') }}</th><th class="px-4 py-3">{{ __('Créé par') }}</th><th class="px-4 py-3">{{ __('Date de validation') }}</th><th class="px-4 py-3">{{ __('Validé par') }}</th><th class="px-4 py-3 text-end">{{ __('Action') }}</th></tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 bg-white">
                     @forelse ($inventories as $inventory)
@@ -151,7 +151,7 @@ new class extends Component
                             <td class="px-4 py-4 text-gray-600">{{ $inventory->starter?->name ?? __('Compte supprimé') }}</td>
                             <td class="whitespace-nowrap px-4 py-4 text-gray-600">{{ $inventory->validated_at?->format('d/m/Y H:i') ?? '—' }}</td>
                             <td class="px-4 py-4 text-gray-600">{{ $inventory->validator?->name ?? '—' }}</td>
-                            <td class="px-4 py-4 text-right"><a href="{{ route('admin.inventories.show', $inventory) }}" wire:navigate class="text-indigo-600 hover:text-indigo-900">{{ __('Consulter') }}</a></td>
+                            <td class="px-4 py-4 text-end"><a href="{{ route('admin.inventories.show', $inventory) }}" wire:navigate class="text-indigo-600 hover:text-indigo-900">{{ __('Consulter') }}</a></td>
                         </tr>
                     @empty
                         <tr><td colspan="8" class="px-6 py-8 text-center text-gray-500">{{ __('Aucun inventaire ne correspond aux filtres.') }}</td></tr>

@@ -198,11 +198,11 @@ new class extends Component
         <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
                 <tr>
-                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-600">{{ __('Nom') }}</th>
-                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-600">{{ __('Fonction') }}</th>
-                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-600">{{ __('Coordonnées') }}</th>
-                    <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-600">{{ __('État') }}</th>
-                    <th class="px-6 py-3 text-right text-xs font-semibold uppercase text-gray-600">{{ __('Actions') }}</th>
+                    <th class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-600">{{ __('Nom') }}</th>
+                    <th class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-600">{{ __('Fonction') }}</th>
+                    <th class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-600">{{ __('Coordonnées') }}</th>
+                    <th class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-600">{{ __('État') }}</th>
+                    <th class="px-6 py-3 text-end text-xs font-semibold uppercase text-gray-600">{{ __('Actions') }}</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-200 bg-white">
@@ -211,16 +211,16 @@ new class extends Component
                         <td class="px-6 py-4 text-sm text-gray-900">
                             {{ $contact->first_name }} {{ $contact->last_name }}
                             @if ($contact->is_primary)
-                                <span class="ml-2 text-xs text-indigo-700">{{ __('Principal') }}</span>
+                                <span class="ms-2 text-xs text-indigo-700">{{ __('Principal') }}</span>
                             @endif
                         </td>
                         <td class="px-6 py-4 text-sm text-gray-600">{{ $contact->job_title }}</td>
                         <td class="px-6 py-4 text-sm text-gray-600">{{ $contact->email }}<br>{{ $contact->phone }}</td>
                         <td class="px-6 py-4 text-sm text-gray-600">{{ $contact->is_active ? __('Actif') : __('Désactivé') }}</td>
-                        <td class="px-6 py-4 text-right text-sm">
+                        <td class="px-6 py-4 text-end text-sm">
                             @can('suppliers.manage')
                                 @if ($contact->is_active && ! $supplier->isArchived())
-                                    <button type="button" wire:click="editContact({{ $contact->id }})" class="mr-3 text-indigo-600 hover:text-indigo-900">{{ __('Modifier') }}</button>
+                                    <button type="button" wire:click="editContact({{ $contact->id }})" class="me-3 text-indigo-600 hover:text-indigo-900">{{ __('Modifier') }}</button>
                                     <button type="button" wire:click="archiveContact({{ $contact->id }})" wire:confirm="{{ __('Désactiver ce contact ?') }}" class="text-red-600 hover:text-red-900">{{ __('Désactiver') }}</button>
                                 @endif
                             @endcan

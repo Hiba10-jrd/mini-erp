@@ -304,12 +304,12 @@ new class extends Component
             <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">{{ __('Nom') }}</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">{{ __('Email') }}</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">{{ __('Rôles') }}</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">{{ __('État') }}</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-600">{{ __('Créé le') }}</th>
-                        <th class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-600">{{ __('Actions') }}</th>
+                        <th class="px-6 py-3 text-start text-xs font-semibold uppercase tracking-wider text-gray-600">{{ __('Nom') }}</th>
+                        <th class="px-6 py-3 text-start text-xs font-semibold uppercase tracking-wider text-gray-600">{{ __('Email') }}</th>
+                        <th class="px-6 py-3 text-start text-xs font-semibold uppercase tracking-wider text-gray-600">{{ __('Rôles') }}</th>
+                        <th class="px-6 py-3 text-start text-xs font-semibold uppercase tracking-wider text-gray-600">{{ __('État') }}</th>
+                        <th class="px-6 py-3 text-start text-xs font-semibold uppercase tracking-wider text-gray-600">{{ __('Créé le') }}</th>
+                        <th class="px-6 py-3 text-end text-xs font-semibold uppercase tracking-wider text-gray-600">{{ __('Actions') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 bg-white">
@@ -321,7 +321,7 @@ new class extends Component
                             <td class="px-6 py-4 text-sm text-gray-600">
                                 <div class="flex flex-wrap gap-2">
                                     @foreach ($user->roles as $role)
-                                        <span class="rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-700">{{ $role->name }}</span>
+                                        <span class="rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-medium text-indigo-700">{{ trans()->has('roles.'.$role->slug) ? __('roles.'.$role->slug) : __($role->name) }}</span>
                                     @endforeach
                                 </div>
                             </td>
@@ -334,7 +334,7 @@ new class extends Component
                                 ])>{{ $user->account_status->label() }}</span>
                             </td>
                             <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600">{{ $user->created_at->format('d/m/Y') }}</td>
-                            <td class="px-6 py-4 text-right text-sm font-medium">
+                            <td class="px-6 py-4 text-end text-sm font-medium">
                                 <div class="flex flex-wrap justify-end gap-x-4 gap-y-2">
                                     @unless ($user->isArchived())
                                         <button type="button" wire:click="editUser({{ $user->id }})" class="text-indigo-600 hover:text-indigo-900">{{ __('Modifier') }}</button>
@@ -411,7 +411,7 @@ new class extends Component
                         @foreach ($roles as $role)
                             <label wire:key="managed-role-{{ $role->id }}" class="flex items-center gap-3 rounded-lg border border-gray-200 px-3 py-3 text-sm text-gray-700 hover:bg-gray-50">
                                 <input type="checkbox" wire:model="selectedRoleIds" value="{{ $role->id }}" class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
-                                <span>{{ $role->name }}</span>
+                                <span>{{ trans()->has('roles.'.$role->slug) ? __('roles.'.$role->slug) : __($role->name) }}</span>
                             </label>
                         @endforeach
                     </div>

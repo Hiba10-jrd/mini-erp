@@ -176,7 +176,7 @@ new class extends \Livewire\Volt\Component
 
     @if ($errors->any())
         <div class="border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
-            <ul class="list-disc space-y-1 pl-5">
+            <ul class="list-disc space-y-1 ps-5">
                 @foreach ($errors->all() as $error)
                     <li>{{ $error }}</li>
                 @endforeach

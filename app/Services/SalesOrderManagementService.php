@@ -48,7 +48,7 @@ class SalesOrderManagementService
                 ...$this->customerSnapshot($customer),
             ])->save();
             $order->items()->createMany($preparedLines);
-            $this->recordHistory($order, 'created', null, SalesOrder::STATUS_DRAFT, __('Commande créée directement.'));
+            $this->recordHistory($order, 'created', null, SalesOrder::STATUS_DRAFT, __('Commande créée directement.'), null, 'Commande créée directement.');
 
             return $order->load(['customer', 'sourceQuote', 'creator', 'items', 'histories']);
         }, 3);
@@ -114,8 +114,8 @@ class SalesOrderManagementService
                 ]);
             }
 
-            $this->recordHistory($order, 'created', null, SalesOrder::STATUS_DRAFT, __('Commande créée depuis le devis :number.', ['number' => $lockedQuote->number]));
-            $this->recordHistory($order, 'created_from_quote', null, SalesOrder::STATUS_DRAFT, __('Conversion du devis :number.', ['number' => $lockedQuote->number]), ['source_quote_id' => $lockedQuote->id]);
+            $this->recordHistory($order, 'created', null, SalesOrder::STATUS_DRAFT, __('Commande créée depuis le devis :number.', ['number' => $lockedQuote->number]), null, 'Commande créée depuis le devis :number.', ['number' => $lockedQuote->number]);
+            $this->recordHistory($order, 'created_from_quote', null, SalesOrder::STATUS_DRAFT, __('Conversion du devis :number.', ['number' => $lockedQuote->number]), ['source_quote_id' => $lockedQuote->id], 'Conversion du devis :number.', ['number' => $lockedQuote->number]);
 
             return $order->load(['customer', 'sourceQuote', 'creator', 'items', 'histories']);
         }, 3);
@@ -145,7 +145,7 @@ class SalesOrderManagementService
             ])->save();
             $locked->items()->get()->each->delete();
             $locked->items()->createMany($preparedLines);
-            $this->recordHistory($locked, 'draft_updated', SalesOrder::STATUS_DRAFT, SalesOrder::STATUS_DRAFT, __('Brouillon de commande modifié.'));
+            $this->recordHistory($locked, 'draft_updated', SalesOrder::STATUS_DRAFT, SalesOrder::STATUS_DRAFT, __('Brouillon de commande modifié.'), null, 'Brouillon de commande modifié.');
 
             return $locked->load(['customer', 'sourceQuote', 'creator', 'items', 'histories']);
         }, 3);
@@ -174,9 +174,8 @@ class SalesOrderManagementService
 
             $timestampField = $targetStatus === SalesOrder::STATUS_CONFIRMED ? 'confirmed_at' : 'cancelled_at';
             $locked->forceFill(['status' => $targetStatus, $timestampField => now()])->save();
-            $this->recordHistory($locked, $targetStatus, $fromStatus, $targetStatus, $targetStatus === SalesOrder::STATUS_CONFIRMED
-                ? __('Commande confirmée.')
-                : __('Commande annulée.'));
+            $transitionKey = $targetStatus === SalesOrder::STATUS_CONFIRMED ? 'Commande confirmée.' : 'Commande annulée.';
+            $this->recordHistory($locked, $targetStatus, $fromStatus, $targetStatus, __($transitionKey), null, $transitionKey);
 
             return $locked->fresh(['customer', 'sourceQuote', 'creator', 'items', 'histories']);
         }, 3);
@@ -323,15 +322,27 @@ class SalesOrderManagementService
     }
 
     /** @param array<string, mixed>|null $metadata */
-    private function recordHistory(SalesOrder $order, string $event, ?string $from, ?string $to, string $description, ?array $metadata = null): void
-    {
+    private function recordHistory(
+        SalesOrder $order,
+        string $event,
+        ?string $from,
+        ?string $to,
+        string $description,
+        ?array $metadata = null,
+        ?string $descriptionKey = null,
+        array $descriptionParams = []
+    ): void {
+        $meta = $metadata ?? [];
+        $meta['description_key'] = $descriptionKey ?? $description;
+        $meta['description_params'] = $descriptionParams;
+
         $order->histories()->create([
             'event' => $event,
             'from_status' => $from,
             'to_status' => $to,
             'user_id' => Auth::id(),
             'description' => $description,
-            'metadata' => $metadata,
+            'metadata' => $meta,
             'created_at' => now(),
         ]);
     }

@@ -220,7 +220,7 @@ new class extends Component
             <div class="grid gap-6 p-6 sm:grid-cols-[minmax(0,1fr)_12rem]">
                 <div>
                     <x-input-label for="company-logo" :value="__('Logo de l’entreprise')" />
-                    <input id="company-logo" type="file" wire:model="logo" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" class="mt-1 block w-full rounded-md border border-gray-300 bg-white text-sm text-gray-700 shadow-sm file:mr-4 file:border-0 file:bg-gray-100 file:px-4 file:py-2 file:text-sm file:font-medium file:text-gray-700" />
+                    <input id="company-logo" type="file" wire:model="logo" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp" class="mt-1 block w-full rounded-md border border-gray-300 bg-white text-sm text-gray-700 shadow-sm file:me-4 file:border-0 file:bg-gray-100 file:px-4 file:py-2 file:text-sm file:font-medium file:text-gray-700" />
                     <x-input-error :messages="$errors->get('logo')" class="mt-2" />
                     <div wire:loading wire:target="logo" class="mt-2 text-sm text-gray-500">{{ __('Téléversement en cours...') }}</div>
                 </div>

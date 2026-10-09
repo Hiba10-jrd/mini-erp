@@ -236,12 +236,12 @@ new class extends Component
             <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-600">{{ __('Code') }}</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-600">{{ __('Fournisseur') }}</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-600">{{ __('Email') }}</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-600">{{ __('Condition') }}</th>
-                        <th class="px-6 py-3 text-left text-xs font-semibold uppercase text-gray-600">{{ __('Statut') }}</th>
-                        <th class="px-6 py-3 text-right text-xs font-semibold uppercase text-gray-600">{{ __('Actions') }}</th>
+                        <th class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-600">{{ __('Code') }}</th>
+                        <th class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-600">{{ __('Fournisseur') }}</th>
+                        <th class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-600">{{ __('Email') }}</th>
+                        <th class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-600">{{ __('Condition') }}</th>
+                        <th class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-600">{{ __('Statut') }}</th>
+                        <th class="px-6 py-3 text-end text-xs font-semibold uppercase text-gray-600">{{ __('Actions') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200 bg-white">
@@ -255,7 +255,7 @@ new class extends Component
                             <td class="px-6 py-4 text-sm text-gray-600">{{ $supplier->email }}</td>
                             <td class="px-6 py-4 text-sm text-gray-600">{{ $supplier->paymentTerm?->label ?? __('Aucune') }}</td>
                             <td class="px-6 py-4 text-sm text-gray-600">{{ $supplier->isArchived() ? __('Archivé') : __('Actif') }}</td>
-                            <td class="px-6 py-4 text-right text-sm">
+                            <td class="px-6 py-4 text-end text-sm">
                                 <div class="flex flex-wrap justify-end gap-3">
                                     <a href="{{ route('admin.suppliers.show', $supplier) }}" wire:navigate class="text-indigo-600 hover:text-indigo-900">{{ __('Consulter') }}</a>
                                     @can('suppliers.manage')

@@ -34,9 +34,9 @@
     $subject = collect(request()->route()?->parameters() ?? [])->first(fn ($value) => $value instanceof \Illuminate\Database\Eloquent\Model);
     $identifier = $subject ? ($subject->number ?? $subject->name ?? $subject->code ?? '#'.$subject->getKey()) : null;
 @endphp
-<nav aria-label="Fil d’Ariane" class="erp-breadcrumb">
-    @if($context[1])<span>{{ $context[1] }}</span><span aria-hidden="true">/</span>@endif
-    @if($identifier && $context[2] && \Illuminate\Support\Facades\Gate::allows($context[3]))<a href="{{ route($context[2]) }}">{{ $context[0] }}</a><span aria-hidden="true">/</span><span aria-current="page">{{ $identifier }}</span>
-    @elseif($context[2] && \Illuminate\Support\Facades\Gate::allows($context[3]))<a href="{{ route($context[2]) }}" aria-current="page">{{ $context[0] }}</a>
-    @else<span aria-current="page">{{ $context[0] }}</span>@endif
+<nav aria-label="{{ __('Fil d’Ariane') }}" class="erp-breadcrumb">
+    @if($context[1])<span>{{ __($context[1]) }}</span><span aria-hidden="true">/</span>@endif
+    @if($identifier && $context[2] && \Illuminate\Support\Facades\Gate::allows($context[3]))<a href="{{ route($context[2]) }}">{{ __($context[0]) }}</a><span aria-hidden="true">/</span><span aria-current="page"><bdi class="erp-ltr">{{ $identifier }}</bdi></span>
+    @elseif($context[2] && \Illuminate\Support\Facades\Gate::allows($context[3]))<a href="{{ route($context[2]) }}" aria-current="page">{{ __($context[0]) }}</a>
+    @else<span aria-current="page">{{ __($context[0]) }}</span>@endif
 </nav>

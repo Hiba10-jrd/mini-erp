@@ -116,16 +116,16 @@ new class extends \Livewire\Volt\Component
     <div class="overflow-hidden border-y border-gray-200 bg-white">
         <div class="overflow-x-auto">
             <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200 text-sm">
-                <thead class="bg-gray-50 text-left text-xs uppercase text-gray-500">
+                <thead class="bg-gray-50 text-start text-xs uppercase text-gray-500">
                     <tr>
                         <th class="px-4 py-3">{{ __('FAF') }}</th>
                         <th class="px-4 py-3">{{ __('Référence fournisseur') }}</th>
                         <th class="px-4 py-3">{{ __('BCF') }}</th>
                         <th class="px-4 py-3">{{ __('Fournisseur') }}</th>
                         <th class="px-4 py-3">{{ __('Date') }}</th>
-                        <th class="px-4 py-3 text-right">{{ __('TTC') }}</th>
+                        <th class="px-4 py-3 text-end">{{ __('TTC') }}</th>
                         <th class="px-4 py-3">{{ __('Statut') }}</th>
-                        <th class="px-4 py-3 text-right">{{ __('Actions') }}</th>
+                        <th class="px-4 py-3 text-end">{{ __('Actions') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
@@ -136,9 +136,9 @@ new class extends \Livewire\Volt\Component
                             <td class="whitespace-nowrap px-4 py-4">{{ $invoice->purchaseOrder->number }}</td>
                             <td class="min-w-44 px-4 py-4">{{ $invoice->supplier_name }}</td>
                             <td class="whitespace-nowrap px-4 py-4">{{ $invoice->invoice_date->format('d/m/Y') }}</td>
-                            <td class="whitespace-nowrap px-4 py-4 text-right font-medium">{{ str_replace('.', ',', $invoice->total_ttc) }}</td>
+                            <td class="whitespace-nowrap px-4 py-4 text-end font-medium">{{ str_replace('.', ',', $invoice->total_ttc) }}</td>
                             <td class="px-4 py-4"><span class="px-2 py-1 text-xs font-medium {{ $statusClasses[$invoice->status] ?? 'bg-gray-100 text-gray-700' }}">{{ $statusLabels[$invoice->status] ?? $invoice->status }}</span></td>
-                            <td class="whitespace-nowrap px-4 py-4 text-right">
+                            <td class="whitespace-nowrap px-4 py-4 text-end">
                                 <a href="{{ route('purchases.invoices.show', $invoice) }}" wire:navigate class="font-medium text-indigo-700">{{ __('Consulter') }}</a>
                                 @if ($invoice->isEditable())
                                     @can('purchases.update')

@@ -461,7 +461,7 @@ new class extends \Livewire\Volt\Component
                         id="cash-name"
                         wire:model="newRegisterName"
                         class="mt-1 block w-full"
-                        placeholder="Caisse principale"
+                        :placeholder="__('Caisse principale')"
                     />
 
                     <x-input-error
@@ -623,7 +623,7 @@ new class extends \Livewire\Volt\Component
                         ) }}
 
                         <span class="text-sm font-medium text-gray-500">
-                            DH
+                            {{ __('DH') }}
                         </span>
                     </p>
                 </div>
@@ -947,7 +947,7 @@ new class extends \Livewire\Volt\Component
                             ' '
                         ) }}
 
-                        DH
+                        {{ __('DH') }}
                     </p>
                 </article>
             @empty

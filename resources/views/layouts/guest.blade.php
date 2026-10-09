@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" dir="{{ app()->getLocale() === 'ar' ? 'rtl' : 'ltr' }}">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -10,12 +10,19 @@
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
+        @if (app()->getLocale() === 'ar')
+            <link href="https://fonts.bunny.net/css?family=noto-sans-arabic:400,500,600,700&display=swap" rel="stylesheet" />
+        @endif
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
     <body class="font-sans text-gray-900 antialiased erp-guest">
-        <div class="min-h-screen flex flex-col justify-center items-center px-4 py-10">
+        <div class="min-h-screen flex flex-col justify-center items-center px-4 py-10 relative">
+            <div class="absolute top-4 end-4 z-50">
+                <x-language-switcher />
+            </div>
+
             <div>
                 <a href="/" wire:navigate>
                     <x-application-logo class="w-28 h-28 rounded-2xl" />
