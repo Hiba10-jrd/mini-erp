@@ -66,15 +66,12 @@ new class extends Component
                 'warehouses.code as warehouse_code',
                 'warehouses.name as warehouse_name',
                 'warehouses.is_active as warehouse_is_active',
-                DB::raw('COALESCE(warehouse_stocks.quantity, 0) as stock_quantity'),
+                'warehouse_stocks.quantity as stock_quantity',
                 DB::raw('COALESCE(stock_totals.total_stock, 0) as total_stock'),
             ])
             ->with('category')
-            ->crossJoin('warehouses')
-            ->leftJoin('warehouse_stocks', function (JoinClause $join): void {
-                $join->on('warehouse_stocks.product_id', '=', 'products.id')
-                    ->on('warehouse_stocks.warehouse_id', '=', 'warehouses.id');
-            })
+            ->join('warehouse_stocks', 'warehouse_stocks.product_id', '=', 'products.id')
+            ->join('warehouses', 'warehouses.id', '=', 'warehouse_stocks.warehouse_id')
             ->leftJoinSub($stockTotals, 'stock_totals', function (JoinClause $join): void {
                 $join->on('stock_totals.product_id', '=', 'products.id');
             })
@@ -90,11 +87,11 @@ new class extends Component
             ->when($this->warehouseFilter !== 'all', fn ($query) => $query->where('warehouses.id', (int) $this->warehouseFilter))
             ->when($this->categoryFilter !== 'all', fn ($query) => $query->where('products.category_id', (int) $this->categoryFilter))
             ->when($this->productFilter !== 'all', fn ($query) => $query->where('products.id', (int) $this->productFilter))
-            ->when($this->alertFilter === 'rupture', fn ($query) => $query->whereRaw('COALESCE(warehouse_stocks.quantity, 0) = 0'))
+            ->when($this->alertFilter === 'rupture', fn ($query) => $query->where('warehouse_stocks.quantity', 0))
             ->when($this->alertFilter === 'low', fn ($query) => $query
-                ->whereRaw('COALESCE(warehouse_stocks.quantity, 0) > 0')
+                ->where('warehouse_stocks.quantity', '>', 0)
                 ->whereNotNull('products.minimum_stock')
-                ->whereRaw('COALESCE(warehouse_stocks.quantity, 0) <= products.minimum_stock'))
+                ->whereColumn('warehouse_stocks.quantity', '<=', 'products.minimum_stock'))
             ->orderBy('products.name')
             ->orderBy('warehouses.name')
             ->paginate(10);

@@ -4,7 +4,6 @@ use App\Models\Product;
 use App\Models\Warehouse;
 use App\Models\WarehouseStock;
 use Illuminate\Database\Query\JoinClause;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Locked;
@@ -38,8 +37,8 @@ new class extends Component
 
         if (! $product->isService()) {
             $stockRows = Warehouse::query()
-                ->select(['warehouses.*', DB::raw('COALESCE(warehouse_stocks.quantity, 0) as stock_quantity')])
-                ->leftJoin('warehouse_stocks', function (JoinClause $join) use ($product): void {
+                ->select(['warehouses.*', 'warehouse_stocks.quantity as stock_quantity'])
+                ->join('warehouse_stocks', function (JoinClause $join) use ($product): void {
                     $join->on('warehouse_stocks.warehouse_id', '=', 'warehouses.id')
                         ->where('warehouse_stocks.product_id', '=', $product->id);
                 })

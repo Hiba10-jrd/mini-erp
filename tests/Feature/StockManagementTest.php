@@ -343,6 +343,8 @@ class StockManagementTest extends TestCase
         $service = app(StockManagementService::class);
         $service->receive($lowProduct->id, $warehouse->id, '3.000', 'REC-LOW');
         $service->receive($lowProduct->id, $secondWarehouse->id, '4.000', 'REC-ANNEXE');
+        $service->receive($emptyProduct->id, $warehouse->id, '1.000');
+        $service->issue($emptyProduct->id, $warehouse->id, '1.000');
         $secondWarehouse->forceFill(['is_active' => false])->save();
 
         Volt::test('admin.stock-balances')
