@@ -203,10 +203,11 @@ class InternalNotificationTest extends TestCase
         Warehouse::forceCreate(['code' => 'OFF', 'name' => 'Inactif', 'is_active' => false]);
         $unit = Unit::create(['symbol' => 'pce', 'name' => 'Pièce']);
         $low = Product::forceCreate(['unit_id' => $unit->id, 'type' => 'product', 'reference' => 'LOW', 'name' => 'Faible', 'is_active' => true, 'minimum_stock' => 5]);
-        Product::forceCreate(['unit_id' => $unit->id, 'type' => 'product', 'reference' => 'OUT', 'name' => 'Rupture', 'is_active' => true]);
+        $out = Product::forceCreate(['unit_id' => $unit->id, 'type' => 'product', 'reference' => 'OUT', 'name' => 'Rupture', 'is_active' => true]);
         Product::forceCreate(['unit_id' => $unit->id, 'type' => 'service', 'reference' => 'SVC', 'name' => 'Service', 'is_active' => true]);
         Product::forceCreate(['unit_id' => $unit->id, 'type' => 'product', 'reference' => 'OFF', 'name' => 'Inactif', 'is_active' => false]);
         WarehouseStock::create(['warehouse_id' => $warehouse->id, 'product_id' => $low->id, 'quantity' => 5]);
+        WarehouseStock::create(['warehouse_id' => $warehouse->id, 'product_id' => $out->id, 'quantity' => 0]);
         app()->call([new CheckStockAlerts, 'handle']);
         app()->call([new CheckStockAlerts, 'handle']);
         $this->assertSame(2, $user->notifications()->count());

@@ -8,6 +8,7 @@ use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
 use App\Models\Warehouse;
 use Brick\Math\BigDecimal;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -283,14 +284,32 @@ class GoodsReceiptManagementService
             return [];
         }
 
-        return GoodsReceiptItem::query()
-            ->selectRaw('purchase_order_item_id, SUM(quantity) as received_quantity')
+        return $this->validatedQuantityQuery()
             ->whereIn('purchase_order_item_id', $itemIds)
-            ->whereHas('goodsReceipt', fn ($query) => $query->where('status', GoodsReceipt::STATUS_VALIDATED))
-            ->groupBy('purchase_order_item_id')
             ->pluck('received_quantity', 'purchase_order_item_id')
             ->map(fn ($quantity): string => (string) BigDecimal::of($quantity)->toScale(3))
             ->all();
+    }
+
+    private function validatedQuantityQuery(): Builder
+    {
+        return GoodsReceiptItem::query()
+            ->selectRaw('purchase_order_item_id, SUM(quantity) as received_quantity')
+            ->whereHas('goodsReceipt', fn ($query) => $query->where('status', GoodsReceipt::STATUS_VALIDATED))
+            ->groupBy('purchase_order_item_id');
+    }
+
+    /** Count confirmed orders with actual quantities still to receive, without loading lines. */
+    public function ordersAwaitingReceipt(): int
+    {
+        Gate::authorize('purchases.view');
+
+        return DB::table('purchase_order_items')
+            ->join('purchase_orders', 'purchase_orders.id', '=', 'purchase_order_items.purchase_order_id')
+            ->leftJoinSub($this->validatedQuantityQuery()->toBase(), 'received', 'received.purchase_order_item_id', '=', 'purchase_order_items.id')
+            ->where('purchase_orders.status', PurchaseOrder::STATUS_CONFIRMED)
+            ->whereRaw('purchase_order_items.quantity > COALESCE(received.received_quantity, 0)')
+            ->distinct()->count('purchase_orders.id');
     }
 
     private function ensureOrderEligible(PurchaseOrder $order): void

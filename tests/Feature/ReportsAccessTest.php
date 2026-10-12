@@ -20,8 +20,8 @@ class ReportsAccessTest extends TestCase
         $this->actingAs($this->userWithPermissions(['sales.view']));
         $this->get(route('reports.index'))->assertForbidden();
         Volt::test('admin.reports-manager')->assertForbidden();
-        Volt::test('dashboard-summary')->assertForbidden();
-        $this->get(route('dashboard'))->assertOk()->assertSee('Bienvenue dans votre ERP')->assertDontSee('CA net HT')->assertDontSee('Situation actuelle')->assertDontSee('Factures récentes');
+        Volt::test('dashboard-summary')->assertSee('Devis en attente')->assertViewHas('reporting', false);
+        $this->get(route('dashboard'))->assertOk()->assertSee('Devis en attente')->assertDontSee('Bienvenue dans votre ERP')->assertDontSee('CA net HT')->assertDontSee('Factures récentes');
     }
 
     public function test_permission_alone_allows_reports_and_both_navigation_links(): void
@@ -60,6 +60,6 @@ class ReportsAccessTest extends TestCase
         $dashboard = Volt::test('dashboard-summary');
         $user->roles()->first()->permissions()->detach();
         $reports->call('$refresh')->assertForbidden();
-        $dashboard->call('$refresh')->assertForbidden();
+        $dashboard->call('$refresh')->assertSee('Bienvenue dans votre ERP')->assertDontSee('CA net HT')->assertViewHas('reporting', false);
     }
 }

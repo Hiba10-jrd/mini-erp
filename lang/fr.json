@@ -1514,5 +1514,16 @@
     "Données du :date": "Données du :date",
     "Les avoirs émis sont déduits du chiffre d’affaires HT.": "Les avoirs émis sont déduits du chiffre d’affaires HT.",
     "Aucune opération sur cette période.": "Aucune opération sur cette période.",
-    "Afficher les données du graphe": "Afficher les données du graphe"
+    "Afficher les données du graphe": "Afficher les données du graphe",
+    "Situation actuelle, toutes périodes": "Situation actuelle, toutes périodes",
+    "Clients actifs": "Clients actifs",
+    "Clients récents": "Clients récents",
+    "Fournisseurs actifs": "Fournisseurs actifs",
+    "Fournisseurs récents": "Fournisseurs récents",
+    "Commandes fournisseurs en cours": "Commandes fournisseurs en cours",
+    "Commandes à réceptionner": "Commandes à réceptionner",
+    "Ruptures de stock": "Ruptures de stock",
+    "Inventaires ouverts": "Inventaires ouverts",
+    "Mouvements récents": "Mouvements récents",
+    "Factures brouillon": "Factures brouillon"
 }

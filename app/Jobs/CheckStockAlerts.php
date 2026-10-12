@@ -21,7 +21,7 @@ class CheckStockAlerts implements ShouldBeUnique, ShouldQueue
     public function handle(StockReportingQuery $stocks, InternalNotificationDispatcher $dispatcher): void
     {
         $stocks->query()->where('products.is_active', true)->where('warehouses.is_active', true)
-            ->whereRaw('(COALESCE(warehouse_stocks.quantity, 0) = 0 OR (products.minimum_stock IS NOT NULL AND warehouse_stocks.quantity > 0 AND warehouse_stocks.quantity <= products.minimum_stock))')
+            ->whereRaw('(warehouse_stocks.quantity = 0 OR (products.minimum_stock IS NOT NULL AND warehouse_stocks.quantity > 0 AND warehouse_stocks.quantity <= products.minimum_stock))')
             ->orderBy('products.id')->orderBy('warehouses.id')->chunk(100, function ($rows) use ($dispatcher): void {
                 foreach ($rows as $row) {
                     $out = $row->report_state === 'rupture';

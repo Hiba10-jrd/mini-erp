@@ -6,7 +6,18 @@ use Illuminate\Support\Facades\Gate;
 
 new class extends \Livewire\Volt\Component
 {
-    use FiltersReportPeriod { preset as private existingPreset; }
+    use FiltersReportPeriod {
+        preset as private existingPreset;
+        mount as private reportingMount;
+    }
+
+    public function mount(): void
+    {
+        Gate::authorize('erp.access');
+        if (Gate::allows('reports.view')) {
+            $this->reportingMount();
+        }
+    }
 
     public function preset(string $preset): void
     {
@@ -23,11 +34,19 @@ new class extends \Livewire\Volt\Component
 
     public function with(): array
     {
-        Gate::authorize('reports.view');
+        Gate::authorize('erp.access');
+
+        if (Gate::allows('reports.view') && $this->appliedFrom === '') {
+            $this->reportingMount();
+        }
 
         return app(DashboardService::class)->read($this->appliedFrom, $this->appliedTo);
     }
 }; ?>
+<section @class(['dashboard-executive', 'dashboard-operational' => ! $reporting]) aria-label="{{ __('Vue d’ensemble') }}" wire:loading.class="dashboard-updating">
+@if (! $reporting)
+    @include('components.dashboard-operational')
+@else
 @php
     $money = fn ($amount) => \App\Services\ReportService::money($amount, $currency);
     $cards = [
@@ -45,7 +64,6 @@ new class extends \Livewire\Volt\Component
         ['reminders', 'Relances à traiter', 'Factures échues avec solde restant', 'finance.receivables.index', 'payments.view'],
     ];
 @endphp
-<section class="dashboard-executive" aria-label="{{ __('Vue d’ensemble') }}" wire:loading.class="dashboard-updating">
     <header class="dashboard-header">
         <div><span class="dashboard-eyebrow">{{ __('Tableau de bord') }}</span><h1>{{ __('Vue d’ensemble') }}</h1><p>{{ __('Suivez en temps réel la performance de votre activité.') }}</p></div>
         <a class="dashboard-report-link" href="{{ route('reports.index') }}" wire:navigate>{{ __('Consulter les rapports') }} <span aria-hidden="true">↗</span></a>
@@ -167,4 +185,5 @@ new class extends \Livewire\Volt\Component
         </details>
     </div>
     <div wire:loading class="dashboard-loading" role="status">{{ __('Actualisation en cours…') }}</div>
+@endif
 </section>

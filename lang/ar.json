@@ -1514,5 +1514,16 @@
     "Données du :date": "بيانات :date",
     "Les avoirs émis sont déduits du chiffre d’affaires HT.": "تُخصم الإشعارات الدائنة الصادرة من رقم المعاملات دون الضريبة.",
     "Aucune opération sur cette période.": "لا توجد عمليات خلال هذه الفترة.",
-    "Afficher les données du graphe": "عرض بيانات الرسم البياني"
+    "Afficher les données du graphe": "عرض بيانات الرسم البياني",
+    "Situation actuelle, toutes périodes": "الوضع الحالي، جميع الفترات",
+    "Clients actifs": "العملاء النشطون",
+    "Clients récents": "أحدث العملاء",
+    "Fournisseurs actifs": "الموردون النشطون",
+    "Fournisseurs récents": "أحدث الموردين",
+    "Commandes fournisseurs en cours": "طلبات الموردين الجارية",
+    "Commandes à réceptionner": "طلبات في انتظار الاستلام",
+    "Ruptures de stock": "نفاد المخزون",
+    "Inventaires ouverts": "عمليات الجرد المفتوحة",
+    "Mouvements récents": "أحدث حركات المخزون",
+    "Factures brouillon": "مسودات الفواتير"
 }

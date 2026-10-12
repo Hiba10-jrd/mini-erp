@@ -143,7 +143,7 @@ class ReportsTest extends TestCase
         Volt::test('dashboard-summary')->assertSee('Caisse rapport (inactive)')->assertSee('149,99 MAD');
     }
 
-    public function test_stock_alerts_include_missing_rows_and_equal_threshold_per_warehouse(): void
+    public function test_stock_alerts_exclude_missing_rows_and_include_equal_threshold_per_warehouse(): void
     {
         $invoice = $this->invoice();
         $product = Product::query()->first();
@@ -154,9 +154,9 @@ class ReportsTest extends TestCase
         $summary = $this->reports()->stockSummary();
         $this->assertSame(2, $summary['Produits actifs']);
         $this->assertSame(1, $summary['Produits physiques actifs']);
-        $this->assertSame(1, $summary['Ruptures']);
+        $this->assertSame(0, $summary['Ruptures']);
         $this->assertSame(1, $summary['Stocks faibles']);
-        $this->assertSame(2, $summary['Alertes stock']);
+        $this->assertSame(1, $summary['Alertes stock']);
     }
 
     public function test_all_sections_render_and_reports_use_sql_pagination(): void
