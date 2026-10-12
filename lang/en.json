@@ -1514,5 +1514,16 @@
     "Données du :date": "Data for :date",
     "Les avoirs émis sont déduits du chiffre d’affaires HT.": "Issued credit notes are deducted from revenue excluding tax.",
     "Aucune opération sur cette période.": "No operations in this period.",
-    "Afficher les données du graphe": "Show chart data"
+    "Afficher les données du graphe": "Show chart data",
+    "Situation actuelle, toutes périodes": "Current position, all periods",
+    "Clients actifs": "Active customers",
+    "Clients récents": "Recent customers",
+    "Fournisseurs actifs": "Active suppliers",
+    "Fournisseurs récents": "Recent suppliers",
+    "Commandes fournisseurs en cours": "Ongoing purchase orders",
+    "Commandes à réceptionner": "Orders awaiting receipt",
+    "Ruptures de stock": "Out of stock",
+    "Inventaires ouverts": "Open inventories",
+    "Mouvements récents": "Recent stock movements",
+    "Factures brouillon": "Draft invoices"
 }

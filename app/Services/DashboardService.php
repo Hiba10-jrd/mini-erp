@@ -17,6 +17,18 @@ class DashboardService
 
     public function read(string $from, string $to): array
     {
+        Gate::authorize('erp.access');
+
+        // Reporting keeps its existing transversal contract and exact payload.
+        if (Gate::allows('reports.view')) {
+            return ['reporting' => true] + $this->readReports($from, $to);
+        }
+
+        return ['reporting' => false] + app(DashboardDomainLoader::class)->read();
+    }
+
+    private function readReports(string $from, string $to): array
+    {
         Gate::authorize('reports.view');
         $data = $this->reports->dashboardSummary($from, $to);
         $operations = $this->reports->operationsSummary($from, $to);
