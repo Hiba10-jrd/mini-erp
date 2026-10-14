@@ -1,0 +1,230 @@
+﻿[
+    {
+        "group":  "/reports, False",
+        "median_ms":  367.4061,
+        "min_ms":  358.5583,
+        "max_ms":  372.0351,
+        "query_count":  62,
+        "duplicate_excess":  43,
+        "super_admin_queries":  42,
+        "sql_median_ms":  44.95999999999999,
+        "authorization_median_ms":  27.2222,
+        "method_medians":  [
+                               {
+                                   "name":  "REPORT period()",
+                                   "median_ms":  0.96585
+                               },
+                               {
+                                   "name":  "LIVEWIRE mount admin.reports-manager",
+                                   "median_ms":  14.98258113861084
+                               },
+                               {
+                                   "name":  "REPORT currency()",
+                                   "median_ms":  1.7464
+                               },
+                               {
+                                   "name":  "REPORT summary()",
+                                   "median_ms":  10.29065
+                               },
+                               {
+                                   "name":  "REPORT table query sales",
+                                   "median_ms":  2.98625
+                               },
+                               {
+                                   "name":  "REPORT table formatting sales",
+                                   "median_ms":  0.3983
+                               },
+                               {
+                                   "name":  "REPORT table query credits",
+                                   "median_ms":  1.71065
+                               },
+                               {
+                                   "name":  "REPORT table formatting credits",
+                                   "median_ms":  0.0031
+                               },
+                               {
+                                   "name":  "REPORT monthlySummary()",
+                                   "median_ms":  4.9916
+                               },
+                               {
+                                   "name":  "LIVEWIRE render admin.reports-manager",
+                                   "median_ms":  31.0159921646118165
+                               },
+                               {
+                                   "name":  "LIVEWIRE dehydrate admin.reports-manager",
+                                   "median_ms":  3.0354261398315430
+                               },
+                               {
+                                   "name":  "BLADE expiry check sidebar.blade.php",
+                                   "median_ms":  0.06585
+                               },
+                               {
+                                   "name":  "BLADE cache path sidebar.blade.php",
+                                   "median_ms":  0.00115
+                               },
+                               {
+                                   "name":  "BLADE render resources\\views/components/sidebar.blade.php",
+                                   "median_ms":  17.7473
+                               },
+                               {
+                                   "name":  "HTTP kernel handle",
+                                   "median_ms":  120.3909
+                               }
+                           ]
+    },
+    {
+        "group":  "/reports, True",
+        "median_ms":  525.55455,
+        "min_ms":  511.1802,
+        "max_ms":  537.76,
+        "query_count":  62,
+        "duplicate_excess":  43,
+        "super_admin_queries":  42,
+        "sql_median_ms":  55.4450000000000225,
+        "authorization_median_ms":  63.467600000000019,
+        "method_medians":  [
+                               {
+                                   "name":  "REPORT period()",
+                                   "median_ms":  1.7933
+                               },
+                               {
+                                   "name":  "LIVEWIRE mount admin.reports-manager",
+                                   "median_ms":  17.868399620056152
+                               },
+                               {
+                                   "name":  "REPORT currency()",
+                                   "median_ms":  3.0813
+                               },
+                               {
+                                   "name":  "REPORT summary()",
+                                   "median_ms":  15.8466
+                               },
+                               {
+                                   "name":  "REPORT table query sales",
+                                   "median_ms":  5.6091
+                               },
+                               {
+                                   "name":  "REPORT table formatting sales",
+                                   "median_ms":  0.4006
+                               },
+                               {
+                                   "name":  "REPORT table query credits",
+                                   "median_ms":  3.6948
+                               },
+                               {
+                                   "name":  "REPORT table formatting credits",
+                                   "median_ms":  0.00365
+                               },
+                               {
+                                   "name":  "REPORT monthlySummary()",
+                                   "median_ms":  8.0325
+                               },
+                               {
+                                   "name":  "LIVEWIRE render admin.reports-manager",
+                                   "median_ms":  48.984050750732423
+                               },
+                               {
+                                   "name":  "LIVEWIRE dehydrate admin.reports-manager",
+                                   "median_ms":  3.10742855072021485
+                               },
+                               {
+                                   "name":  "BLADE expiry check sidebar.blade.php",
+                                   "median_ms":  0.0604
+                               },
+                               {
+                                   "name":  "BLADE cache path sidebar.blade.php",
+                                   "median_ms":  0.001
+                               },
+                               {
+                                   "name":  "BLADE render resources\\views/components/sidebar.blade.php",
+                                   "median_ms":  42.55455
+                               },
+                               {
+                                   "name":  "HTTP kernel handle",
+                                   "median_ms":  269.2219
+                               }
+                           ]
+    },
+    {
+        "group":  "/sales/orders, False",
+        "median_ms":  347.48245,
+        "min_ms":  324.1388,
+        "max_ms":  361.9063,
+        "query_count":  51,
+        "duplicate_excess":  38,
+        "super_admin_queries":  38,
+        "sql_median_ms":  33.4849999999999995,
+        "authorization_median_ms":  25.911949999999997,
+        "method_medians":  [
+                               {
+                                   "name":  "LIVEWIRE mount admin.sales-orders-manager",
+                                   "median_ms":  2.8364658355712891
+                               },
+                               {
+                                   "name":  "LIVEWIRE render admin.sales-orders-manager",
+                                   "median_ms":  20.4099416732788085
+                               },
+                               {
+                                   "name":  "LIVEWIRE dehydrate admin.sales-orders-manager",
+                                   "median_ms":  2.45010852813720705
+                               },
+                               {
+                                   "name":  "BLADE expiry check sidebar.blade.php",
+                                   "median_ms":  0.0621
+                               },
+                               {
+                                   "name":  "BLADE cache path sidebar.blade.php",
+                                   "median_ms":  0.00105
+                               },
+                               {
+                                   "name":  "BLADE render resources\\views/components/sidebar.blade.php",
+                                   "median_ms":  17.2237
+                               },
+                               {
+                                   "name":  "HTTP kernel handle",
+                                   "median_ms":  98.25735
+                               }
+                           ]
+    },
+    {
+        "group":  "/sales/orders, True",
+        "median_ms":  493.9889,
+        "min_ms":  474.549,
+        "max_ms":  511.277,
+        "query_count":  51,
+        "duplicate_excess":  38,
+        "super_admin_queries":  38,
+        "sql_median_ms":  43.564999999999995,
+        "authorization_median_ms":  65.25055,
+        "method_medians":  [
+                               {
+                                   "name":  "LIVEWIRE mount admin.sales-orders-manager",
+                                   "median_ms":  3.82900238037109365
+                               },
+                               {
+                                   "name":  "LIVEWIRE render admin.sales-orders-manager",
+                                   "median_ms":  31.359434127807618
+                               },
+                               {
+                                   "name":  "LIVEWIRE dehydrate admin.sales-orders-manager",
+                                   "median_ms":  2.4909973144531250
+                               },
+                               {
+                                   "name":  "BLADE expiry check sidebar.blade.php",
+                                   "median_ms":  0.06185
+                               },
+                               {
+                                   "name":  "BLADE cache path sidebar.blade.php",
+                                   "median_ms":  0.00125
+                               },
+                               {
+                                   "name":  "BLADE render resources\\views/components/sidebar.blade.php",
+                                   "median_ms":  46.70625
+                               },
+                               {
+                                   "name":  "HTTP kernel handle",
+                                   "median_ms":  231.97805
+                               }
+                           ]
+    }
+]

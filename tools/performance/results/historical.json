@@ -1,0 +1,656 @@
+﻿[
+    {
+        "file":  "01M4V20KDHD86D9XGN38N454K3.json",
+        "uri":  "/reports",
+        "total_ms":  3027.440071105957000,
+        "sql_ms":  80.29000000000001000,
+        "query_count":  64,
+        "duplicate_excess":  43,
+        "super_admin_count":  42,
+        "timeline":  [
+                         {
+                             "label":  "Booting",
+                             "start_ms":  0,
+                             "duration_ms":  146.41094207763672000
+                         },
+                         {
+                             "label":  "Application",
+                             "start_ms":  146.43597602844238000,
+                             "duration_ms":  2881.0079097747803000
+                         },
+                         {
+                             "label":  "Routing",
+                             "start_ms":  198.47393035888672000,
+                             "duration_ms":  2.315998077392578000
+                         },
+                         {
+                             "label":  "admin.reports.index",
+                             "start_ms":  257.1849822998047000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "volt-livewire::admin.reports-manager",
+                             "start_ms":  640.28000831604000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.report-period",
+                             "start_ms":  1399.6689319610596000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.secondary-button",
+                             "start_ms":  2653.5329818725586000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.secondary-button",
+                             "start_ms":  2655.1640033721924000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.secondary-button",
+                             "start_ms":  2655.893087387085000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.secondary-button",
+                             "start_ms":  2656.493902206421000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.input-label",
+                             "start_ms":  2657.8738689422607000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.text-input",
+                             "start_ms":  2660.5000495910645000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.input-error",
+                             "start_ms":  2662.6780033111572000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.input-label",
+                             "start_ms":  2663.8920307159424000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.text-input",
+                             "start_ms":  2664.3519401550293000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.input-error",
+                             "start_ms":  2665.0118827819824000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.primary-button",
+                             "start_ms":  2665.9040451049805000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.kpi-card",
+                             "start_ms":  2668.4329509735107000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.kpi-card",
+                             "start_ms":  2781.8360328674316000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.kpi-card",
+                             "start_ms":  2782.8378677368164000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.kpi-card",
+                             "start_ms":  2783.716917037964000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.kpi-card",
+                             "start_ms":  2784.6500873565674000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.kpi-card",
+                             "start_ms":  2785.572052001953000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.kpi-card",
+                             "start_ms":  2786.526918411255000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "livewire::tailwind",
+                             "start_ms":  2790.040969848633000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "livewire::tailwind",
+                             "start_ms":  2792.5870418548584000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "layouts.app",
+                             "start_ms":  2800.0690937042236000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.sidebar",
+                             "start_ms":  2803.394079208374000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.application-logo",
+                             "start_ms":  2805.2849769592285000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "volt-livewire::layout.navigation",
+                             "start_ms":  2917.4928665161133000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.application-logo",
+                             "start_ms":  2918.0150032043457000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.page-context",
+                             "start_ms":  2918.3499813079834000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "volt-livewire::notification-bell",
+                             "start_ms":  2961.979866027832000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.language-switcher",
+                             "start_ms":  2967.043876647949000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.dropdown-link",
+                             "start_ms":  2968.5580730438232000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.dropdown",
+                             "start_ms":  2969.2189693450928000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "Preparing Response",
+                             "start_ms":  2972.3310470581055000,
+                             "duration_ms":  0.21600723266601562000
+                         },
+                         {
+                             "label":  "Preparing Response",
+                             "start_ms":  3000.825881958008000,
+                             "duration_ms":  0.0782012939453125
+                         }
+                     ]
+    },
+    {
+        "file":  "01M4V2XKJW94DXEM0EDFV0HRX1.json",
+        "uri":  "/reports",
+        "total_ms":  681.9159984588623000,
+        "sql_ms":  92.33000,
+        "query_count":  64,
+        "duplicate_excess":  43,
+        "super_admin_count":  42,
+        "timeline":  [
+                         {
+                             "label":  "Booting",
+                             "start_ms":  0,
+                             "duration_ms":  146.18396759033203000
+                         },
+                         {
+                             "label":  "Application",
+                             "start_ms":  146.2080478668213000,
+                             "duration_ms":  535.7120037078857000
+                         },
+                         {
+                             "label":  "Routing",
+                             "start_ms":  195.4190731048584000,
+                             "duration_ms":  3.2889842987060547000
+                         },
+                         {
+                             "label":  "admin.reports.index",
+                             "start_ms":  260.50305366516113000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "volt-livewire::admin.reports-manager",
+                             "start_ms":  420.26519775390625000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.report-period",
+                             "start_ms":  425.42409896850586000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.secondary-button",
+                             "start_ms":  428.99298667907715000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.secondary-button",
+                             "start_ms":  430.2940368652344000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.secondary-button",
+                             "start_ms":  430.9370517730713000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.secondary-button",
+                             "start_ms":  431.5221309661865000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.input-label",
+                             "start_ms":  432.2350025177002000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.text-input",
+                             "start_ms":  433.37297439575195000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.input-error",
+                             "start_ms":  434.50212478637695000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.input-label",
+                             "start_ms":  435.3940486907959000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.text-input",
+                             "start_ms":  435.89210510253906000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.input-error",
+                             "start_ms":  436.36417388916016000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.primary-button",
+                             "start_ms":  437.03603744506836000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.kpi-card",
+                             "start_ms":  438.02618980407715000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.kpi-card",
+                             "start_ms":  440.5660629272461000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.kpi-card",
+                             "start_ms":  441.2391185760498000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.kpi-card",
+                             "start_ms":  441.79415702819824000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.kpi-card",
+                             "start_ms":  442.19112396240234000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.kpi-card",
+                             "start_ms":  442.49510765075684000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.kpi-card",
+                             "start_ms":  442.75999069213867000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "livewire::tailwind",
+                             "start_ms":  443.59302520751953000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "livewire::tailwind",
+                             "start_ms":  444.14401054382324000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "layouts.app",
+                             "start_ms":  448.24719429016113000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.sidebar",
+                             "start_ms":  450.17218589782715000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.application-logo",
+                             "start_ms":  451.30205154418945000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "volt-livewire::layout.navigation",
+                             "start_ms":  570.3170299530029000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.application-logo",
+                             "start_ms":  571.2051391601562000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.page-context",
+                             "start_ms":  571.7849731445312000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "volt-livewire::notification-bell",
+                             "start_ms":  634.6611976623535000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.language-switcher",
+                             "start_ms":  639.1081809997559000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.dropdown-link",
+                             "start_ms":  640.6800746917725000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.dropdown",
+                             "start_ms":  641.4341926574707000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "Preparing Response",
+                             "start_ms":  644.3390846252441000,
+                             "duration_ms":  0.3409385681152344000
+                         },
+                         {
+                             "label":  "Preparing Response",
+                             "start_ms":  654.9291610717773000,
+                             "duration_ms":  0.067949295043945313
+                         }
+                     ]
+    },
+    {
+        "file":  "01M4V1YSZQP6RB42YCMEWA4RWC.json",
+        "uri":  "/sales/orders",
+        "total_ms":  2228.3520698547363000,
+        "sql_ms":  88.43000,
+        "query_count":  53,
+        "duplicate_excess":  38,
+        "super_admin_count":  38,
+        "timeline":  [
+                         {
+                             "label":  "Booting",
+                             "start_ms":  0,
+                             "duration_ms":  128.10802459716797000
+                         },
+                         {
+                             "label":  "Application",
+                             "start_ms":  128.13496589660645000,
+                             "duration_ms":  2100.2209186553955000
+                         },
+                         {
+                             "label":  "Routing",
+                             "start_ms":  179.49295043945312000,
+                             "duration_ms":  3.7441253662109375000
+                         },
+                         {
+                             "label":  "admin.sales-orders.index",
+                             "start_ms":  236.7110252380371000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "volt-livewire::admin.sales-orders-manager",
+                             "start_ms":  553.1020164489746000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.input-label",
+                             "start_ms":  1571.0399150848389000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.text-input",
+                             "start_ms":  1573.3211040496826000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.input-label",
+                             "start_ms":  1574.7809410095215000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.input-label",
+                             "start_ms":  1575.5209922790527000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.input-label",
+                             "start_ms":  1576.3061046600342000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "livewire::tailwind",
+                             "start_ms":  1600.4478931427002000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "layouts.app",
+                             "start_ms":  2013.9639377593994000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.sidebar",
+                             "start_ms":  2017.2319412231445000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.application-logo",
+                             "start_ms":  2018.2230472564697000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "volt-livewire::layout.navigation",
+                             "start_ms":  2127.1519660949707000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.application-logo",
+                             "start_ms":  2127.932071685791000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.page-context",
+                             "start_ms":  2128.467082977295000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "volt-livewire::notification-bell",
+                             "start_ms":  2170.9439754486084000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.language-switcher",
+                             "start_ms":  2175.018072128296000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.dropdown-link",
+                             "start_ms":  2175.9378910064697000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.dropdown",
+                             "start_ms":  2176.7001152038574000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "Preparing Response",
+                             "start_ms":  2179.7220706939697000,
+                             "duration_ms":  0.2689361572265625000
+                         },
+                         {
+                             "label":  "Preparing Response",
+                             "start_ms":  2207.6539993286133000,
+                             "duration_ms":  0.12302398681640625000
+                         }
+                     ]
+    },
+    {
+        "file":  "01M4V2SHBFN0GZWYJMV4ZK07W4.json",
+        "uri":  "/sales/orders",
+        "total_ms":  555.7558536529541000,
+        "sql_ms":  93.23999999999999000,
+        "query_count":  53,
+        "duplicate_excess":  38,
+        "super_admin_count":  38,
+        "timeline":  [
+                         {
+                             "label":  "Booting",
+                             "start_ms":  0,
+                             "duration_ms":  126.44290924072266000
+                         },
+                         {
+                             "label":  "Application",
+                             "start_ms":  126.48892402648926000,
+                             "duration_ms":  429.27002906799316000
+                         },
+                         {
+                             "label":  "Routing",
+                             "start_ms":  179.52990531921387000,
+                             "duration_ms":  3.008127212524414000
+                         },
+                         {
+                             "label":  "admin.sales-orders.index",
+                             "start_ms":  256.1609745025635000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "volt-livewire::admin.sales-orders-manager",
+                             "start_ms":  309.1850280761719000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.input-label",
+                             "start_ms":  316.00499153137207000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.text-input",
+                             "start_ms":  316.93387031555176000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.input-label",
+                             "start_ms":  317.720890045166000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.input-label",
+                             "start_ms":  318.06492805480957000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.input-label",
+                             "start_ms":  318.59683990478516000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "livewire::tailwind",
+                             "start_ms":  336.02190017700195000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "layouts.app",
+                             "start_ms":  343.29891204833984000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.sidebar",
+                             "start_ms":  345.6108570098877000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.application-logo",
+                             "start_ms":  346.621036529541000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "volt-livewire::layout.navigation",
+                             "start_ms":  453.98497581481934000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.application-logo",
+                             "start_ms":  454.6799659729004000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.page-context",
+                             "start_ms":  455.1248550415039000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "volt-livewire::notification-bell",
+                             "start_ms":  499.176025390625000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.language-switcher",
+                             "start_ms":  503.9999485015869000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.dropdown-link",
+                             "start_ms":  505.1989555358887000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "components.dropdown",
+                             "start_ms":  505.9859752655029000,
+                             "duration_ms":  0
+                         },
+                         {
+                             "label":  "Preparing Response",
+                             "start_ms":  508.9468955993652000,
+                             "duration_ms":  0.2789497375488281000
+                         },
+                         {
+                             "label":  "Preparing Response",
+                             "start_ms":  535.2318286895752000,
+                             "duration_ms":  0.23412704467773438000
+                         }
+                     ]
+    }
+]

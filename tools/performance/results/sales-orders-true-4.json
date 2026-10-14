@@ -1,0 +1,407 @@
+﻿{
+    "uri": "/sales/orders",
+    "debugbar": true,
+    "debugbar_env": "true",
+    "view_cache": "existing",
+    "status": 200,
+    "php": "8.4.25",
+    "sapi": "cli",
+    "opcache_cli": "0",
+    "bootstrap_and_setup_ms": 243.1879,
+    "total_ms": 474.549,
+    "query_count": 51,
+    "sql_ms": 38.14999999999999,
+    "duplicate_excess": 38,
+    "super_admin_queries": 38,
+    "spans": [
+        {
+            "name": "AUTH sales.view",
+            "ms": 4.2889
+        },
+        {
+            "name": "BLADE expiry check index.blade.php",
+            "ms": 0.0723
+        },
+        {
+            "name": "BLADE cache path index.blade.php",
+            "ms": 0.0015
+        },
+        {
+            "name": "AUTH sales.view",
+            "ms": 1.634
+        },
+        {
+            "name": "LIVEWIRE mount admin.sales-orders-manager",
+            "ms": 3.4050941467285156
+        },
+        {
+            "name": "AUTH sales.view",
+            "ms": 1.3518
+        },
+        {
+            "name": "BLADE expiry check sales-orders-manager.blade.php",
+            "ms": 0.0606
+        },
+        {
+            "name": "BLADE cache path sales-orders-manager.blade.php",
+            "ms": 0.0011
+        },
+        {
+            "name": "AUTH sales.create",
+            "ms": 1.3923
+        },
+        {
+            "name": "BLADE expiry check input-label.blade.php",
+            "ms": 0.061
+        },
+        {
+            "name": "BLADE cache path input-label.blade.php",
+            "ms": 0.001
+        },
+        {
+            "name": "BLADE render resources\\views/components/input-label.blade.php",
+            "ms": 0.256
+        },
+        {
+            "name": "BLADE expiry check text-input.blade.php",
+            "ms": 0.058
+        },
+        {
+            "name": "BLADE cache path text-input.blade.php",
+            "ms": 0.001
+        },
+        {
+            "name": "BLADE render resources\\views/components/text-input.blade.php",
+            "ms": 0.2364
+        },
+        {
+            "name": "BLADE cache path input-label.blade.php",
+            "ms": 0.0017
+        },
+        {
+            "name": "BLADE render resources\\views/components/input-label.blade.php",
+            "ms": 0.1082
+        },
+        {
+            "name": "BLADE cache path input-label.blade.php",
+            "ms": 0.0016
+        },
+        {
+            "name": "BLADE render resources\\views/components/input-label.blade.php",
+            "ms": 0.0963
+        },
+        {
+            "name": "BLADE cache path input-label.blade.php",
+            "ms": 0.0019
+        },
+        {
+            "name": "BLADE render resources\\views/components/input-label.blade.php",
+            "ms": 0.1144
+        },
+        {
+            "name": "AUTH sales.update",
+            "ms": 1.2812
+        },
+        {
+            "name": "AUTH sales.update",
+            "ms": 1.2058
+        },
+        {
+            "name": "AUTH sales.update",
+            "ms": 2.2705
+        },
+        {
+            "name": "BLADE expiry check tailwind.blade.php",
+            "ms": 0.0684
+        },
+        {
+            "name": "BLADE cache path tailwind.blade.php",
+            "ms": 0.0011
+        },
+        {
+            "name": "BLADE render vendor\\livewire\\livewire\\src\\Features\\SupportPagination/views/tailwind.blade.php",
+            "ms": 0.7602
+        },
+        {
+            "name": "BLADE render resources\\views\\livewire/admin/sales-orders-manager.blade.php",
+            "ms": 13.6621
+        },
+        {
+            "name": "LIVEWIRE render admin.sales-orders-manager",
+            "ms": 29.52098846435547
+        },
+        {
+            "name": "LIVEWIRE dehydrate admin.sales-orders-manager",
+            "ms": 2.4700164794921875
+        },
+        {
+            "name": "BLADE expiry check app.blade.php",
+            "ms": 0.0616
+        },
+        {
+            "name": "BLADE cache path app.blade.php",
+            "ms": 0.0011
+        },
+        {
+            "name": "BLADE expiry check sidebar.blade.php",
+            "ms": 0.0581
+        },
+        {
+            "name": "BLADE cache path sidebar.blade.php",
+            "ms": 0.0015
+        },
+        {
+            "name": "BLADE expiry check application-logo.blade.php",
+            "ms": 0.0596
+        },
+        {
+            "name": "BLADE cache path application-logo.blade.php",
+            "ms": 0.0009
+        },
+        {
+            "name": "BLADE render resources\\views/components/application-logo.blade.php",
+            "ms": 0.2174
+        },
+        {
+            "name": "AUTH customers.access",
+            "ms": 1.4764
+        },
+        {
+            "name": "AUTH sales.view",
+            "ms": 1.3385
+        },
+        {
+            "name": "AUTH sales.view",
+            "ms": 1.2348
+        },
+        {
+            "name": "AUTH sales.view",
+            "ms": 1.1345
+        },
+        {
+            "name": "AUTH invoices.view",
+            "ms": 1.109
+        },
+        {
+            "name": "AUTH invoices.view",
+            "ms": 1.9278
+        },
+        {
+            "name": "AUTH payments.view",
+            "ms": 1.6138
+        },
+        {
+            "name": "AUTH payments.view",
+            "ms": 1.2848
+        },
+        {
+            "name": "AUTH suppliers.access",
+            "ms": 1.2657
+        },
+        {
+            "name": "AUTH purchases.view",
+            "ms": 1.2408
+        },
+        {
+            "name": "AUTH purchases.view",
+            "ms": 1.0707
+        },
+        {
+            "name": "AUTH purchases.view",
+            "ms": 1.0278
+        },
+        {
+            "name": "AUTH payments.view",
+            "ms": 1.056
+        },
+        {
+            "name": "AUTH payments.view",
+            "ms": 1.0694
+        },
+        {
+            "name": "AUTH payments.view",
+            "ms": 1.0825
+        },
+        {
+            "name": "AUTH reports.view",
+            "ms": 1.0436
+        },
+        {
+            "name": "AUTH products.access",
+            "ms": 1.0358
+        },
+        {
+            "name": "AUTH stock.access",
+            "ms": 1.0176
+        },
+        {
+            "name": "AUTH stock.access",
+            "ms": 2.3851
+        },
+        {
+            "name": "AUTH users.administer",
+            "ms": 8.6497
+        },
+        {
+            "name": "AUTH roles.administer",
+            "ms": 1.395
+        },
+        {
+            "name": "AUTH company.administer",
+            "ms": 2.5478
+        },
+        {
+            "name": "AUTH company.administer",
+            "ms": 3.8931
+        },
+        {
+            "name": "AUTH audit.access",
+            "ms": 1.3598
+        },
+        {
+            "name": "BLADE render resources\\views/components/sidebar.blade.php",
+            "ms": 45.8622
+        },
+        {
+            "name": "LIVEWIRE mount layout.navigation",
+            "ms": 0.20694732666015625
+        },
+        {
+            "name": "BLADE expiry check navigation.blade.php",
+            "ms": 0.0611
+        },
+        {
+            "name": "BLADE cache path navigation.blade.php",
+            "ms": 0.001
+        },
+        {
+            "name": "BLADE cache path application-logo.blade.php",
+            "ms": 0.0024
+        },
+        {
+            "name": "BLADE render resources\\views/components/application-logo.blade.php",
+            "ms": 0.1295
+        },
+        {
+            "name": "BLADE expiry check page-context.blade.php",
+            "ms": 0.0556
+        },
+        {
+            "name": "BLADE cache path page-context.blade.php",
+            "ms": 0.0009
+        },
+        {
+            "name": "AUTH sales.view",
+            "ms": 1.9211
+        },
+        {
+            "name": "BLADE render resources\\views/components/page-context.blade.php",
+            "ms": 2.3804
+        },
+        {
+            "name": "AUTH erp.access",
+            "ms": 1.7913
+        },
+        {
+            "name": "LIVEWIRE mount notification-bell",
+            "ms": 0.8370876312255859
+        },
+        {
+            "name": "AUTH erp.access",
+            "ms": 1.4482
+        },
+        {
+            "name": "AUTH payments.view",
+            "ms": 1.6305
+        },
+        {
+            "name": "AUTH stock.access",
+            "ms": 1.3125
+        },
+        {
+            "name": "BLADE expiry check notification-bell.blade.php",
+            "ms": 0.0625
+        },
+        {
+            "name": "BLADE cache path notification-bell.blade.php",
+            "ms": 0.001
+        },
+        {
+            "name": "BLADE render resources\\views\\livewire/notification-bell.blade.php",
+            "ms": 1.5175
+        },
+        {
+            "name": "LIVEWIRE render notification-bell",
+            "ms": 17.325162887573242
+        },
+        {
+            "name": "LIVEWIRE dehydrate notification-bell",
+            "ms": 0.17189979553222656
+        },
+        {
+            "name": "LIVEWIRE child:nwfQAywOygHt6BQdthgb layout.navigation",
+            "ms": 18.564939498901367
+        },
+        {
+            "name": "BLADE expiry check language-switcher.blade.php",
+            "ms": 0.0702
+        },
+        {
+            "name": "BLADE cache path language-switcher.blade.php",
+            "ms": 0.0011
+        },
+        {
+            "name": "BLADE render resources\\views/components/language-switcher.blade.php",
+            "ms": 0.4056
+        },
+        {
+            "name": "BLADE expiry check dropdown-link.blade.php",
+            "ms": 0.0606
+        },
+        {
+            "name": "BLADE cache path dropdown-link.blade.php",
+            "ms": 0.0009
+        },
+        {
+            "name": "BLADE render resources\\views/components/dropdown-link.blade.php",
+            "ms": 0.2189
+        },
+        {
+            "name": "BLADE expiry check dropdown.blade.php",
+            "ms": 0.0527
+        },
+        {
+            "name": "BLADE cache path dropdown.blade.php",
+            "ms": 0.0008
+        },
+        {
+            "name": "BLADE render resources\\views/components/dropdown.blade.php",
+            "ms": 0.253
+        },
+        {
+            "name": "BLADE render resources\\views\\livewire/layout/navigation.blade.php",
+            "ms": 25.7059
+        },
+        {
+            "name": "LIVEWIRE render layout.navigation",
+            "ms": 26.118993759155273
+        },
+        {
+            "name": "LIVEWIRE dehydrate layout.navigation",
+            "ms": 0.1239776611328125
+        },
+        {
+            "name": "BLADE render resources\\views/layouts/app.blade.php",
+            "ms": 74.4402
+        },
+        {
+            "name": "BLADE render resources\\views/admin/sales-orders/index.blade.php",
+            "ms": 118.2717
+        },
+        {
+            "name": "HTTP kernel handle",
+            "ms": 231.3142
+        }
+    ],
+    "formatting_replay": []
+}

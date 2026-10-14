@@ -1,0 +1,62 @@
+{
+    "utc": "2026-10-14T10:33:24+00:00",
+    "php": "8.4.25",
+    "sapi": "cgi-fcgi",
+    "binary": "C:\\Users\\hp\\.config\\herd\\bin\\php84\\php-cgi.exe",
+    "pid": 15788,
+    "ini_loaded": "C:\\Users\\hp\\.config\\herd\\bin\\php84\\php.ini",
+    "ini_scanned": false,
+    "settings": {
+        "opcache.enable": "1",
+        "opcache.enable_cli": "0",
+        "opcache.validate_timestamps": "1",
+        "opcache.revalidate_freq": "2",
+        "opcache.file_update_protection": "2",
+        "opcache.memory_consumption": "128",
+        "opcache.max_accelerated_files": "10000",
+        "opcache.interned_strings_buffer": "8"
+    },
+    "extension_loaded": true,
+    "status": {
+        "opcache_enabled": true,
+        "cache_full": false,
+        "restart_pending": false,
+        "restart_in_progress": false,
+        "memory_usage": {
+            "used_memory": 33339336,
+            "free_memory": 100278712,
+            "wasted_memory": 599680,
+            "current_wasted_percentage": 0.4467964172363281
+        },
+        "interned_strings_usage": {
+            "buffer_size": 8388608,
+            "used_memory": 6737600,
+            "free_memory": 1651008,
+            "number_of_strings": 65737
+        },
+        "opcache_statistics": {
+            "num_cached_scripts": 1069,
+            "num_cached_keys": 2102,
+            "max_cached_keys": 16229,
+            "hits": 11814,
+            "start_time": 1791972938,
+            "last_restart_time": 0,
+            "oom_restarts": 0,
+            "hash_restarts": 0,
+            "manual_restarts": 0,
+            "misses": 1157,
+            "blacklist_misses": 0,
+            "blacklist_miss_ratio": 0,
+            "opcache_hit_rate": 91.08010176547683
+        },
+        "jit": {
+            "enabled": false,
+            "on": false,
+            "kind": 0,
+            "opt_level": 0,
+            "opt_flags": 0,
+            "buffer_size": 0,
+            "buffer_free": 0
+        }
+    }
+}
