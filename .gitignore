@@ -24,3 +24,7 @@ Homestead.yaml
 Thumbs.db
 
 /storage/backups/
+
+/storage/debugbar/
+/storage/framework/performance-views/
+/tools/performance/results/*.json
