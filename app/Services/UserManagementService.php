@@ -37,6 +37,7 @@ class UserManagementService
 
             $oldRoles = $user->roles()->pluck('roles.id')->all();
             $user->roles()->sync($roleIds);
+            app(RequestRbacMemo::class)->forgetUser($user);
             app(AuditTrailService::class)->record($user, 'roles.changed', ['role_ids' => $oldRoles], ['role_ids' => $roleIds]);
 
             return $user->load('roles');
@@ -82,6 +83,7 @@ class UserManagementService
             $user->save();
             $oldRoles = $user->roles()->pluck('roles.id')->all();
             $user->roles()->sync($roleIds);
+            app(RequestRbacMemo::class)->forgetUser($user);
             app(AuditTrailService::class)->record($user, 'roles.changed', ['role_ids' => $oldRoles], ['role_ids' => $roleIds]);
 
             return $user->load('roles');
