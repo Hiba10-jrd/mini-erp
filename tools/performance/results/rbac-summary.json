@@ -1,0 +1,68 @@
+[
+    {
+        "route":  "/finance/cash",
+        "rbac_memo":  false,
+        "samples":  5,
+        "query_count":  53,
+        "duplicated_queries":  37,
+        "super_admin_queries":  37,
+        "sql_ms":  31.66,
+        "kernel_ms":  259.05,
+        "total_ms":  516.2276
+    },
+    {
+        "route":  "/finance/cash",
+        "rbac_memo":  true,
+        "samples":  5,
+        "query_count":  16,
+        "duplicated_queries":  0,
+        "super_admin_queries":  1,
+        "sql_ms":  11,
+        "kernel_ms":  189.0464,
+        "total_ms":  451.33
+    },
+    {
+        "route":  "/reports",
+        "rbac_memo":  false,
+        "samples":  5,
+        "query_count":  61,
+        "duplicated_queries":  43,
+        "super_admin_queries":  42,
+        "sql_ms":  39.490000000000016,
+        "kernel_ms":  295.9561,
+        "total_ms":  555.0379
+    },
+    {
+        "route":  "/reports",
+        "rbac_memo":  true,
+        "samples":  5,
+        "query_count":  19,
+        "duplicated_queries":  1,
+        "super_admin_queries":  1,
+        "sql_ms":  20.299999999999997,
+        "kernel_ms":  233.0256,
+        "total_ms":  499.8144
+    },
+    {
+        "route":  "/sales/orders",
+        "rbac_memo":  false,
+        "samples":  5,
+        "query_count":  50,
+        "duplicated_queries":  38,
+        "super_admin_queries":  38,
+        "sql_ms":  31.140000000000008,
+        "kernel_ms":  253.4687,
+        "total_ms":  525.2416
+    },
+    {
+        "route":  "/sales/orders",
+        "rbac_memo":  true,
+        "samples":  5,
+        "query_count":  12,
+        "duplicated_queries":  0,
+        "super_admin_queries":  1,
+        "sql_ms":  8.309999999999999,
+        "kernel_ms":  197.77,
+        "total_ms":  480.0498
+    }
+]

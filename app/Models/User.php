@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Enums\UserAccountStatus;
 use App\Models\Concerns\RecordsOperations;
+use App\Services\RequestRbacMemo;
 use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -150,9 +151,14 @@ class User extends Authenticatable implements HasLocalePreference
      */
     public function isSuperAdministrator(): bool
     {
-        return $this->roles()
+        return app(RequestRbacMemo::class)->remember($this, 'role', 'super-admin', fn (): bool => $this->roles()
             ->where('slug', 'super-admin')
-            ->exists();
+            ->exists());
+    }
+
+    public function hasAnyRole(): bool
+    {
+        return app(RequestRbacMemo::class)->remember($this, 'role', '*', fn (): bool => $this->roles()->exists());
     }
 
     /**
@@ -171,16 +177,17 @@ class User extends Authenticatable implements HasLocalePreference
 
         // The Super Administrator has access to all
         // registered ERP permissions.
-        if ($this->isSuperAdministrator()) {
-            return true;
-        }
+        return app(RequestRbacMemo::class)->remember($this, 'permission', $permission, function () use ($permission): bool {
+            if ($this->isSuperAdministrator()) {
+                return true;
+            }
 
-        // Check permissions assigned to the user's roles.
-        return $this->roles()
-            ->whereHas('permissions', function ($query) use ($permission) {
-                $query->where('name', $permission);
-            })
-            ->exists();
+            return $this->roles()
+                ->whereHas('permissions', function ($query) use ($permission) {
+                    $query->where('name', $permission);
+                })
+                ->exists();
+        });
     }
 
     public function preferredLocale(): ?string

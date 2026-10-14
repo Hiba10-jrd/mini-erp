@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\EnsurePasswordHasBeenChanged;
 use App\Http\Middleware\EnsureUserAccountIsActive;
+use App\Http\Middleware\ScopeRbacMemo;
 use App\Http\Middleware\SetLocale;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -17,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         'middleware' => ['web', 'auth', 'auth.session', 'verified', 'can:erp.access'],
     ])
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->prepend(ScopeRbacMemo::class);
         $middleware->alias([
             'account.active' => EnsureUserAccountIsActive::class,
             'password.changed' => EnsurePasswordHasBeenChanged::class,

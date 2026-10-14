@@ -59,6 +59,10 @@ class RolePermissionManagementService
 
             $oldPermissions = $role->permissions()->pluck('name')->all();
             $role->permissions()->sync($permissions->modelKeys());
+            app(RequestRbacMemo::class)->forgetRolePermissions($role, array_values(array_unique([
+                ...array_diff($oldPermissions, $permissionNames),
+                ...array_diff($permissionNames, $oldPermissions),
+            ])));
             app(AuditTrailService::class)->record($role, 'permissions.changed', ['permissions' => $oldPermissions], ['permissions' => $permissionNames]);
 
             return $role->load('permissions');

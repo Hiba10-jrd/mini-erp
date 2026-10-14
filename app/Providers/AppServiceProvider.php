@@ -7,6 +7,7 @@ use App\Http\Middleware\EnsureUserAccountIsActive;
 use App\Http\Middleware\SetLocale;
 use App\Models\User;
 use App\Services\AttachmentAuthorizationService;
+use App\Services\RequestRbacMemo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Support\Facades\Gate;
@@ -20,7 +21,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        $this->app->scoped(RequestRbacMemo::class);
     }
 
     /**
@@ -48,7 +49,7 @@ class AppServiceProvider extends ServiceProvider
 
         // Access to the ERP requires at least one assigned role.
         Gate::define('erp.access', function (User $user): bool {
-            return $user->roles()->exists();
+            return $user->hasAnyRole();
         });
 
         // LOT 03-A keeps user administration exclusive to Super Administrators.
