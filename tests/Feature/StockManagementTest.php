@@ -32,9 +32,11 @@ class StockManagementTest extends TestCase
     public function test_stock_route_and_navigation_respect_existing_permissions(): void
     {
         $this->get(route('admin.stock.index'))->assertRedirect(route('login'));
+        $this->get(route('admin.warehouses.index'))->assertRedirect(route('login'));
 
         $unauthorized = $this->createUserWithPermissions([]);
         $this->actingAs($unauthorized)->get(route('admin.stock.index'))->assertForbidden();
+        $this->get(route('admin.warehouses.index'))->assertForbidden();
 
         $viewer = $this->createUserWithPermissions(['stock.view']);
         $this->actingAs($viewer)
@@ -43,10 +45,29 @@ class StockManagementTest extends TestCase
             ->assertSeeVolt('admin.stock-operations-manager')
             ->assertSeeVolt('admin.stock-balances')
             ->assertSeeVolt('admin.stock-movements-history')
-            ->assertSeeVolt('admin.warehouses-manager')
+            ->assertDontSeeVolt('admin.warehouses-manager')
             ->assertDontSee('Valider l’opération');
 
-        $this->get(route('dashboard'))->assertOk()->assertSee('Stocks et dépôts');
+        $this->get(route('admin.warehouses.index'))->assertOk()
+            ->assertSeeVolt('admin.warehouses-manager')
+            ->assertDontSeeVolt('admin.stock-operations-manager')
+            ->assertDontSeeVolt('admin.stock-balances')
+            ->assertDontSeeVolt('admin.stock-movements-history')
+            ->assertDontSee('Ajouter le dépôt');
+
+        $this->get(route('dashboard'))->assertOk()
+            ->assertSeeInOrder(['Produits et services', 'Stocks', 'Dépôts', 'Inventaires'])
+            ->assertSee(route('admin.stock.index'), false)
+            ->assertSee(route('admin.warehouses.index'), false)
+            ->assertDontSee('Stocks et dépôts');
+    }
+
+    public function test_stock_manager_without_view_permission_can_use_both_pages(): void
+    {
+        $this->actingAs($this->createUserWithPermissions(['stock.manage']));
+
+        $this->get(route('admin.stock.index'))->assertOk()->assertSee('Valider l’opération');
+        $this->get(route('admin.warehouses.index'))->assertOk()->assertSee('Ajouter le dépôt');
     }
 
     public function test_viewer_cannot_call_livewire_or_service_mutations_directly(): void
@@ -424,6 +445,7 @@ class StockManagementTest extends TestCase
         $user = User::factory()->create();
         $user->roles()->attach(Role::query()->where('slug', 'super-admin')->firstOrFail());
         $this->actingAs($user)->get(route('admin.stock.index'))->assertOk();
+        $this->get(route('admin.warehouses.index'))->assertOk();
 
         Volt::test('admin.warehouses-manager')
             ->set('code', 'SUPER')

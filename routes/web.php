@@ -227,6 +227,10 @@ Route::view('administration/stock', 'admin.stock.index')
     ->middleware(['auth', 'auth.session', 'verified', 'can:stock.access'])
     ->name('admin.stock.index');
 
+Route::view('administration/warehouses', 'admin.warehouses.index')
+    ->middleware(['auth', 'auth.session', 'verified', 'can:stock.access'])
+    ->name('admin.warehouses.index');
+
 Route::view('administration/inventories', 'admin.inventories.index')
     ->middleware(['auth', 'auth.session', 'verified', 'can:stock.access'])
     ->name('admin.inventories.index');

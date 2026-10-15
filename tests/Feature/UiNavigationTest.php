@@ -24,7 +24,7 @@ class UiNavigationTest extends TestCase
     {
         $this->actingAs($this->userWithPermissions(['stock.view']));
         $this->get(route('dashboard'))->assertOk()
-            ->assertSee('Stocks et dépôts')->assertSee('Inventaires')
+            ->assertSeeInOrder(['Produits et services', 'Stocks', 'Dépôts', 'Inventaires'])
             ->assertDontSee(route('admin.users.index'), false)
             ->assertDontSee(route('sales.invoices.index'), false)
             ->assertDontSee(route('finance.expenses.index'), false)
@@ -38,6 +38,8 @@ class UiNavigationTest extends TestCase
         $this->get(route('dashboard'))->assertOk()
             ->assertSee(route('purchases.payments.index'), false)
             ->assertSee(route('finance.receivables.index'), false)
+            ->assertDontSee(route('admin.stock.index'), false)
+            ->assertDontSee(route('admin.warehouses.index'), false)
             ->assertDontSee(route('purchases.orders.index'), false);
     }
 
@@ -66,7 +68,7 @@ class UiNavigationTest extends TestCase
         $admin->roles()->attach(Role::where('slug', 'super-admin')->first());
         $this->actingAs($admin);
 
-        foreach (['admin.audit.index', 'dashboard', 'admin.customers.index', 'sales.orders.index', 'sales.invoices.index', 'finance.receivables.index', 'finance.expenses.index', 'finance.cash.index', 'admin.stock.index', 'reports.index', 'admin.audit.index'] as $route) {
+        foreach (['admin.audit.index', 'dashboard', 'admin.customers.index', 'sales.orders.index', 'sales.invoices.index', 'finance.receivables.index', 'finance.expenses.index', 'finance.cash.index', 'admin.stock.index', 'admin.warehouses.index', 'reports.index', 'admin.audit.index'] as $route) {
             $response = $this->get(route($route))->assertOk();
             $dom = new \DOMDocument;
             @$dom->loadHTML('<?xml encoding="UTF-8">'.$response->getContent());

@@ -24,7 +24,8 @@
         ],
         'Stock' => [
             ['Produits et services', 'admin.products.index', 'admin.products.*', 'products.access'],
-            ['Stocks et dépôts', 'admin.stock.index', 'admin.stock.*', 'stock.access'],
+            ['Stocks', 'admin.stock.index', 'admin.stock.*', 'stock.access'],
+            ['Dépôts', 'admin.warehouses.index', 'admin.warehouses.*', 'stock.access'],
             ['Inventaires', 'admin.inventories.index', 'admin.inventories.*', 'stock.access'],
         ],
         'Administration' => [
