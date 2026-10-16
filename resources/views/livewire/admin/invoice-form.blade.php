@@ -18,8 +18,11 @@ new class extends \Livewire\Volt\Component
     public string $terms = '';
 
     /**
-     * @var array<int, array{
-     *     delivery_note_item_id:int,
+     * @var array<int|string, array{
+     *     delivery_note_item_id:?int,
+     *     sales_order_item_id:int,
+     *     item_type:string,
+     *     ordered_quantity:string,
      *     selected:bool,
      *     quantity:string,
      *     remaining_quantity:string,
@@ -54,14 +57,17 @@ new class extends \Livewire\Volt\Component
         abort_if(
             $available === [],
             422,
-            __('Aucune quantité livrée ne reste à facturer.')
+            __('Aucune quantité ne reste à facturer.')
         );
 
         foreach ($available as $line) {
-            $sourceId = (int) $line['delivery_note_item_id'];
+            $sourceId = $line['source_key'];
 
             $this->lines[$sourceId] = [
-                'delivery_note_item_id' => $sourceId,
+                'delivery_note_item_id' => $line['delivery_note_item_id'],
+                'sales_order_item_id' => $line['sales_order_item_id'],
+                'item_type' => $line['item_type'],
+                'ordered_quantity' => $line['ordered_quantity'],
                 'selected' => true,
                 'quantity' => $line['remaining_quantity'],
                 'remaining_quantity' => $line['remaining_quantity'],
@@ -88,6 +94,7 @@ new class extends \Livewire\Volt\Component
             ->map(
                 fn (array $line): array => [
                     'delivery_note_item_id' => $line['delivery_note_item_id'],
+                    'sales_order_item_id' => $line['sales_order_item_id'],
                     'quantity' => $line['quantity'],
                 ]
             )
@@ -276,7 +283,7 @@ new class extends \Livewire\Volt\Component
                 </h3>
 
                 <p class="mt-1 text-sm text-gray-500">
-                    {{ __('Les quantités disponibles proviennent uniquement des bons de livraison validés.') }}
+                    {{ __('Les produits sont facturables après livraison validée. Les services sont facturables depuis la commande confirmée.') }}
                 </p>
             </div>
 
@@ -305,7 +312,7 @@ new class extends \Livewire\Volt\Component
                                 </p>
 
                                 <p class="mt-1 text-xs text-gray-500">
-                                    {{ $line['reference'] ?? '—' }}
+                                    {{ $line['reference'] ?? '—' }} · {{ $line['item_type'] === 'service' ? __('Service') : __('Produit') }}
                                     ·
                                     {{ $line['unit_label'] ?? '—' }}
                                 </p>
@@ -313,11 +320,11 @@ new class extends \Livewire\Volt\Component
 
                             <div class="lg:col-span-2">
                                 <p class="text-xs text-gray-500">
-                                    {{ __('Livré') }}
+                                    {{ $line['item_type'] === 'service' ? __('Commandé') : __('Livré') }}
                                 </p>
 
                                 <p class="mt-1 font-medium text-gray-900">
-                                    {{ $line['delivered_quantity'] }}
+                                    {{ $line['item_type'] === 'service' ? $line['ordered_quantity'] : $line['delivered_quantity'] }}
                                 </p>
                             </div>
 

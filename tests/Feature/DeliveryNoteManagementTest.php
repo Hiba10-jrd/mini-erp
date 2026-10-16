@@ -20,6 +20,7 @@ use App\Services\DocumentSequenceManagementService;
 use App\Services\SalesOrderManagementService;
 use Database\Seeders\RbacSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
 use Livewire\Volt\Volt;
 use Tests\TestCase;
@@ -382,19 +383,21 @@ class DeliveryNoteManagementTest extends TestCase
         $order = app(SalesOrderManagementService::class)->transition($order, SalesOrder::STATUS_CONFIRMED);
         $note = app(DeliveryNoteManagementService::class)->createForOrder($order, ['warehouse_id' => $warehouse->id, 'delivery_date' => today()->toDateString()]);
 
+        $this->assertCount(1, $note->items);
+        Volt::test('admin.delivery-note-form', ['orderId' => $order->id])->assertSee('Produit mixte')->assertDontSee('Service mixte');
+
         $note = app(DeliveryNoteManagementService::class)->updateDraft($note, [
             'warehouse_id' => $warehouse->id,
             'delivery_date' => today()->toDateString(),
             'items' => [
                 ['sales_order_item_id' => $order->items->first()->id, 'quantity' => '1.000'],
-                ['sales_order_item_id' => $order->items->last()->id, 'quantity' => '2.000'],
             ],
         ]);
 
         $validated = app(DeliveryNoteManagementService::class)->validate($note);
         $this->assertSame('validated', $validated->status);
         $this->assertSame('1.000', $order->fresh()->items->first()->delivered_quantity);
-        $this->assertSame('2.000', $order->fresh()->items->last()->delivered_quantity);
+        $this->assertSame('0.000', $order->fresh()->items->last()->delivered_quantity);
         $this->assertSame('9.000', WarehouseStock::query()->where('warehouse_id', $warehouse->id)->where('product_id', $product->id)->value('quantity'));
         $this->assertSame(SalesOrder::STATUS_PARTIALLY_DELIVERED, $order->fresh()->status);
         $this->assertSame(1, StockMovement::query()->where('product_id', $product->id)->count());
@@ -405,14 +408,16 @@ class DeliveryNoteManagementTest extends TestCase
             'delivery_date' => today()->toDateString(),
             'items' => [
                 ['sales_order_item_id' => $order->fresh()->items->first()->id, 'quantity' => '1.000'],
-                ['sales_order_item_id' => $order->fresh()->items->last()->id, 'quantity' => '1.000'],
             ],
         ]);
         $validatedSecond = app(DeliveryNoteManagementService::class)->validate($secondNote);
         $this->assertSame('validated', $validatedSecond->status);
         $this->assertSame(SalesOrder::STATUS_DELIVERED, $order->fresh()->status);
         $this->assertSame('2.000', $order->fresh()->items->first()->delivered_quantity);
-        $this->assertSame('3.000', $order->fresh()->items->last()->delivered_quantity);
+        $this->assertSame('0.000', $order->fresh()->items->last()->delivered_quantity);
+        $this->assertCount(2, $order->fresh()->items);
+        $this->get(route('sales.orders.show', $order))->assertDontSee('Créer un bon de livraison');
+        $this->get(route('sales.orders.delivery-notes.create', $order))->assertForbidden();
     }
 
     public function test_delivery_note_validation_is_atomic_and_rejects_insufficient_stock_without_changes(): void
@@ -466,6 +471,69 @@ class DeliveryNoteManagementTest extends TestCase
 
         $this->actingAs($this->createUserWithPermissions([]));
         $this->get(route('sales.delivery-notes.pdf', $note))->assertForbidden();
+    }
+
+    public function test_service_only_order_cannot_enter_delivery_flow(): void
+    {
+        $this->actingAs($this->createUserWithPermissions(['sales.create', 'sales.update', 'sales.view']));
+        $this->createSequence('order', 'CMD');
+        $sequence = $this->createSequence('delivery_note', 'BL');
+        $service = $this->createProduct(['type' => 'service']);
+        $order = app(SalesOrderManagementService::class)->create($this->orderAttributes($this->createCustomer()), [$this->line($service)]);
+        $order = app(SalesOrderManagementService::class)->transition($order, SalesOrder::STATUS_CONFIRMED);
+        $this->get(route('sales.orders.show', $order))->assertOk()->assertDontSee('Créer un bon de livraison');
+        $this->get(route('sales.orders.delivery-notes.create', $order))->assertForbidden();
+        Volt::test('admin.sales-order-details', ['orderId' => $order->id])->call('createDeliveryNote')->assertForbidden();
+        try {
+            app(DeliveryNoteManagementService::class)->createForOrder($order);
+            $this->fail('Services must be rejected without requiring a warehouse.');
+        } catch (ValidationException $exception) {
+            $this->assertArrayHasKey('sales_order_id', $exception->errors());
+            $this->assertArrayNotHasKey('warehouse_id', $exception->errors());
+        }
+        $this->assertDatabaseCount('delivery_notes', 0);
+        $this->assertDatabaseCount('delivery_note_items', 0);
+        $this->assertDatabaseCount('stock_movements', 0);
+        $this->assertSame(0, $sequence->fresh()->counter);
+        $this->assertCount(1, $order->fresh()->items);
+        $this->assertSame('service', $order->fresh()->items->first()->item_type);
+    }
+
+    public function test_forged_service_lines_are_rejected_atomically_on_create_update_and_validation(): void
+    {
+        $this->actingAs($this->createUserWithPermissions(['sales.create', 'sales.update', 'sales.view']));
+        $this->createSequence('order', 'CMD');
+        $this->createSequence('delivery_note', 'BL');
+        $product = $this->createProduct();
+        $service = $this->createProduct(['type' => 'service']);
+        $warehouse = Warehouse::query()->create(['code' => 'FORGED', 'name' => 'Test', 'is_active' => true]);
+        WarehouseStock::query()->create(['warehouse_id' => $warehouse->id, 'product_id' => $product->id, 'quantity' => '10.000']);
+        $order = app(SalesOrderManagementService::class)->create($this->orderAttributes($this->createCustomer()), [$this->line($product), $this->line($service)]);
+        $order = app(SalesOrderManagementService::class)->transition($order, SalesOrder::STATUS_CONFIRMED);
+        $attributes = ['warehouse_id' => $warehouse->id, 'items' => [['sales_order_item_id' => $order->items->last()->id, 'quantity' => '1.000']]];
+        $manager = app(DeliveryNoteManagementService::class);
+        try {
+            $manager->createForOrder($order, $attributes);
+            $this->fail('Forged service creation must fail.');
+        } catch (ValidationException) {
+            $this->assertDatabaseCount('delivery_notes', 0);
+            $this->assertDatabaseCount('delivery_note_items', 0);
+        }
+        $note = $manager->createForOrder($order, ['warehouse_id' => $warehouse->id]);
+        Volt::test('admin.delivery-note-form', ['noteId' => $note->id])
+            ->set('lines', $attributes['items'])->call('save')->assertHasErrors(['lines.0.sales_order_item_id']);
+        $this->assertSame($product->id, $note->items()->firstOrFail()->product_id);
+        // Simulate a legacy or manually corrupted draft, bypassing application guards.
+        DB::table('delivery_note_items')->where('delivery_note_id', $note->id)->update(['sales_order_item_id' => $order->items->last()->id, 'product_id' => $service->id]);
+        try {
+            $manager->validate($note);
+            $this->fail('A legacy service line must never be validated.');
+        } catch (ValidationException) {
+            $this->assertSame('draft', $note->fresh()->status);
+            $this->assertSame('10.000', WarehouseStock::query()->firstOrFail()->quantity);
+            $this->assertDatabaseCount('stock_movements', 0);
+            $this->assertSame('0.000', $order->fresh()->items->last()->delivered_quantity);
+        }
     }
 
     private function createCustomer(array $attributes = []): Customer

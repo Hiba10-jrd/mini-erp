@@ -36,11 +36,18 @@ class DeliveryNoteManagementService
                 ->first();
 
             if ($existingDraft !== null) {
+                foreach ($attributes['items'] ?? [] as $index => $line) {
+                    $item = $lockedOrder->items->firstWhere('id', $line['sales_order_item_id'] ?? null);
+                    if ($item === null || ! $item->isPhysical()) {
+                        throw ValidationException::withMessages(["lines.{$index}.sales_order_item_id" => __('Seules les lignes physiques de cette commande peuvent être livrées.')]);
+                    }
+                }
+
                 return $existingDraft->fresh(['salesOrder', 'warehouse', 'items', 'creator']);
             }
 
             $warehouseId = isset($attributes['warehouse_id']) ? (int) $attributes['warehouse_id'] : null;
-            $hasPhysicalItem = $lockedOrder->items->contains(fn ($item): bool => $item->item_type === 'product' || ($item->product_id !== null && $item->product?->type === 'product'));
+            $hasPhysicalItem = $lockedOrder->physicalItems()->isNotEmpty();
 
             if ($hasPhysicalItem && $warehouseId === null) {
                 throw ValidationException::withMessages(['warehouse_id' => __('Un bon de livraison avec produits physiques exige un dépôt.')]);
@@ -66,8 +73,7 @@ class DeliveryNoteManagementService
                 'created_by' => Auth::id(),
             ]);
 
-            $items = $attributes['items'] ?? $lockedOrder->items
-                ->filter(fn (SalesOrderItem $item): bool => $this->remainingForItem($item) > 0)
+            $items = $attributes['items'] ?? $lockedOrder->deliverableItems()
                 ->map(fn (SalesOrderItem $item): array => [
                     'sales_order_item_id' => $item->id,
                     'quantity' => (string) BigDecimal::of((string) $item->ordered_quantity)->minus((string) $item->delivered_quantity)->toScale(3),
@@ -108,15 +114,14 @@ class DeliveryNoteManagementService
             }
 
             $order = SalesOrder::query()->lockForUpdate()->findOrFail($locked->sales_order_id);
+            $this->ensureOrderEligible($order);
             $locked->fill([
                 'warehouse_id' => array_key_exists('warehouse_id', $attributes) ? $attributes['warehouse_id'] : $locked->warehouse_id,
                 'delivery_date' => $attributes['delivery_date'] ?? $locked->delivery_date,
                 'notes' => $attributes['notes'] ?? $locked->notes,
             ]);
 
-            $hasPhysicalItem = $order->items()->where(function ($query): void {
-                $query->where('item_type', 'product')->orWhereHas('product', fn ($productQuery) => $productQuery->where('type', 'product'));
-            })->exists();
+            $hasPhysicalItem = $order->physicalItems()->isNotEmpty();
             if ($hasPhysicalItem && $locked->warehouse_id === null) {
                 throw ValidationException::withMessages(['warehouse_id' => __('Un bon de livraison avec produits physiques exige un dépôt.')]);
             }
@@ -130,9 +135,14 @@ class DeliveryNoteManagementService
 
             $locked->save();
 
-            if (isset($attributes['items']) && is_array($attributes['items'])) {
-                $this->replaceDraftItems($locked, $order, $attributes['items']);
+            $items = $attributes['items'] ?? $locked->items->map(fn ($item): array => [
+                'sales_order_item_id' => $item->sales_order_item_id,
+                'quantity' => $item->quantity,
+            ])->all();
+            if (! is_array($items)) {
+                throw ValidationException::withMessages(['items' => __('Les lignes du bon de livraison sont invalides.')]);
             }
+            $this->replaceDraftItems($locked, $order, $items);
 
             return $locked->fresh(['salesOrder', 'warehouse', 'items', 'creator']);
         }, 3);
@@ -172,12 +182,22 @@ class DeliveryNoteManagementService
 
             $orderItems = SalesOrderItem::query()->whereIn('id', $locked->items->pluck('sales_order_item_id'))->orderBy('id')->lockForUpdate()->get()->keyBy('id');
             $warehouseId = $locked->warehouse_id;
+            if ($locked->items->isEmpty()) {
+                throw ValidationException::withMessages(['items' => __('Le bon de livraison doit contenir une ligne physique.')]);
+            }
+            if ($warehouseId === null) {
+                throw ValidationException::withMessages(['warehouse_id' => __('Un dépôt est obligatoire pour les produits physiques.')]);
+            }
             $physicalItems = [];
 
             foreach ($locked->items as $line) {
                 $salesOrderItem = $orderItems->get($line->sales_order_item_id);
                 if ($salesOrderItem === null) {
                     throw ValidationException::withMessages(['delivery_note' => __('Une ligne du bon de livraison n’existe plus dans la commande.')]);
+                }
+
+                if ($salesOrderItem->sales_order_id !== $order->id || ! $salesOrderItem->isPhysical() || $line->item_type !== 'product' || $line->product_id !== $salesOrderItem->product_id) {
+                    throw ValidationException::withMessages(['items' => __('Seules les lignes physiques de cette commande peuvent être livrées.')]);
                 }
 
                 $remaining = $this->remainingForItem($salesOrderItem);
@@ -277,7 +297,7 @@ class DeliveryNoteManagementService
             throw ValidationException::withMessages(['sales_order_id' => __('Une commande non confirmée ne peut pas recevoir de bon de livraison.')]);
         }
 
-        $remaining = $order->items->sum(fn ($item): float => (float) $this->remainingForItem($item));
+        $remaining = $order->deliverableItems()->sum(fn ($item): float => $this->remainingForItem($item));
         if ($remaining <= 0) {
             throw ValidationException::withMessages(['sales_order_id' => __('Aucune quantité n’est restante à livrer sur cette commande.')]);
         }
@@ -315,6 +335,10 @@ class DeliveryNoteManagementService
                 throw ValidationException::withMessages(["lines.{$index}.sales_order_item_id" => __('La ligne sélectionnée n’appartient pas à cette commande.')]);
             }
 
+            if (! $item->isPhysical()) {
+                throw ValidationException::withMessages(["lines.{$index}.sales_order_item_id" => __('Un service ne peut pas figurer dans un bon de livraison.')]);
+            }
+
             $requested = BigDecimal::of($quantity)->toScale(3);
             $remaining = BigDecimal::of((string) $item->ordered_quantity)->minus((string) $item->delivered_quantity)->toScale(3);
             if ($requested->compareTo(BigDecimal::zero()) <= 0) {
@@ -338,7 +362,7 @@ class DeliveryNoteManagementService
             $deliveryNote->items()->create([
                 'sales_order_item_id' => $item->id,
                 'product_id' => $item->product_id,
-                'item_type' => $item->item_type,
+                'item_type' => 'product',
                 'reference' => $item->reference,
                 'description' => $item->description,
                 'unit_label' => $item->unit_label,
@@ -351,14 +375,14 @@ class DeliveryNoteManagementService
     private function resolveOrderStatus(int $orderId): string
     {
         $order = SalesOrder::query()->with('items')->findOrFail($orderId);
-        $remaining = $order->items->sum(fn ($item): float => (float) $this->remainingForItem($item));
-        $allDelivered = $order->items->every(fn ($item): bool => (float) $item->delivered_quantity >= (float) $item->ordered_quantity);
+        $remaining = $order->deliverableItems()->sum(fn ($item): float => $this->remainingForItem($item));
+        $allDelivered = $order->physicalItems()->every(fn ($item): bool => (float) $item->delivered_quantity >= (float) $item->ordered_quantity);
 
         if ($remaining <= 0 && $allDelivered) {
             return SalesOrder::STATUS_DELIVERED;
         }
 
-        if ($remaining > 0 && $order->items->some(fn ($item): bool => (float) $item->delivered_quantity > 0)) {
+        if ($remaining > 0 && $order->physicalItems()->some(fn ($item): bool => (float) $item->delivered_quantity > 0)) {
             return SalesOrder::STATUS_PARTIALLY_DELIVERED;
         }
 

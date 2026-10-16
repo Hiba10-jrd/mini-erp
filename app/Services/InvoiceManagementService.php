@@ -29,7 +29,7 @@ class InvoiceManagementService
     ) {}
 
     /**
-     * @param  array{invoice_date?: string, notes?: ?string, terms?: ?string, items?: array<int, array{delivery_note_item_id: int|string, quantity: int|float|string}>}  $attributes
+     * @param  array{invoice_date?: string, notes?: ?string, terms?: ?string, items?: array<int, array{delivery_note_item_id?: int|string|null, sales_order_item_id?: int|string, quantity: int|float|string}>}  $attributes
      */
     public function createForOrder(SalesOrder $order, array $attributes = []): Invoice
     {
@@ -39,7 +39,7 @@ class InvoiceManagementService
         return DB::transaction(function () use ($order, $attributes): Invoice {
             $lockedOrder = SalesOrder::query()->lockForUpdate()->findOrFail($order->id);
             $this->ensureOrderInvoiceable($lockedOrder);
-            $sources = $this->lockValidatedSources($lockedOrder);
+            $sources = $this->lockBillableSources($lockedOrder);
             $requestedItems = $attributes['items'] ?? $this->allAvailableItems($sources, null);
             $prepared = $this->prepareItems($sources, $requestedItems, null);
             $totals = $this->totals($prepared);
@@ -67,7 +67,7 @@ class InvoiceManagementService
     }
 
     /**
-     * @param  array{invoice_date?: string, notes?: ?string, terms?: ?string, items?: array<int, array{delivery_note_item_id: int|string, quantity: int|float|string}>}  $attributes
+     * @param  array{invoice_date?: string, notes?: ?string, terms?: ?string, items?: array<int, array{delivery_note_item_id?: int|string|null, sales_order_item_id?: int|string, quantity: int|float|string}>}  $attributes
      */
     public function updateDraft(Invoice $invoice, array $attributes = []): Invoice
     {
@@ -84,11 +84,12 @@ class InvoiceManagementService
             $this->ensureDraft($locked);
             $this->ensureOrderInvoiceable($order);
 
-            $sources = $this->lockValidatedSources($order);
+            $sources = $this->lockBillableSources($order);
             $requestedItems = $attributes['items'] ?? $locked->items()
-                ->get(['delivery_note_item_id', 'quantity'])
+                ->get(['delivery_note_item_id', 'sales_order_item_id', 'quantity'])
                 ->map(fn (InvoiceItem $item): array => [
                     'delivery_note_item_id' => $item->delivery_note_item_id,
+                    'sales_order_item_id' => $item->sales_order_item_id,
                     'quantity' => (string) $item->quantity,
                 ])
                 ->all();
@@ -145,10 +146,11 @@ class InvoiceManagementService
             $this->ensureDraft($locked);
             $this->ensureOrderInvoiceable($order);
 
-            $sources = $this->lockValidatedSources($order);
+            $sources = $this->lockBillableSources($order);
             $requestedItems = $locked->items
                 ->map(fn (InvoiceItem $item): array => [
                     'delivery_note_item_id' => $item->delivery_note_item_id,
+                    'sales_order_item_id' => $item->sales_order_item_id,
                     'quantity' => (string) $item->quantity,
                 ])
                 ->all();
@@ -170,9 +172,8 @@ class InvoiceManagementService
         }, 3);
     }
 
-    /** @return array<string, mixed> */
     /**
-     * Retourne les lignes de livraison encore facturables pour l'interface.
+     * Retourne les lignes de commande encore facturables pour l'interface.
      *
      * @return array<int, array<string, mixed>>
      */
@@ -207,7 +208,7 @@ class InvoiceManagementService
                 $this->ensureDraft($lockedInvoice);
             }
 
-            $sources = $this->lockValidatedSources($lockedOrder);
+            $sources = $this->lockBillableSources($lockedOrder);
 
             if ($sources === []) {
                 return [];
@@ -219,14 +220,14 @@ class InvoiceManagementService
             );
 
             return collect($sources)
-                ->map(function (DeliveryNoteItem $source) use ($remaining): array {
+                ->map(function (array $source, int|string $key) use ($remaining): array {
                     /** @var SalesOrderItem $orderItem */
-                    $orderItem = $source->getRelation('salesOrderItem');
+                    $orderItem = $source['order_item'];
 
-                    $delivered = BigDecimal::of((string) $source->quantity)
+                    $delivered = BigDecimal::of($source['quantity'])
                         ->toScale(3);
 
-                    $available = $remaining[$source->id]
+                    $available = $remaining[$key]
                         ?? BigDecimal::zero()->toScale(3);
 
                     $alreadyReserved = $delivered
@@ -234,15 +235,18 @@ class InvoiceManagementService
                         ->toScale(3);
 
                     return [
-                        'delivery_note_item_id' => $source->id,
-                        'delivery_note_id' => $source->delivery_note_id,
-                        'sales_order_item_id' => $source->sales_order_item_id,
+                        'source_key' => $key,
+                        'delivery_note_item_id' => $source['delivery_note_item_id'],
+                        'delivery_note_id' => $source['delivery_note_id'],
+                        'sales_order_item_id' => $orderItem->id,
+                        'item_type' => $source['item_type'],
+                        'ordered_quantity' => (string) $orderItem->ordered_quantity,
 
                         'reference' => $orderItem->reference,
                         'description' => $orderItem->description,
                         'unit_label' => $orderItem->unit_label,
 
-                        'delivered_quantity' => (string) $delivered,
+                        'delivered_quantity' => $source['item_type'] === 'product' ? (string) $delivered : '0.000',
                         'already_invoiced_quantity' => (string) $alreadyReserved,
                         'remaining_quantity' => (string) $available,
 
@@ -273,7 +277,8 @@ class InvoiceManagementService
             'notes' => ['sometimes', 'nullable', 'string', 'max:10000'],
             'terms' => ['sometimes', 'nullable', 'string', 'max:10000'],
             'items' => ['sometimes', 'array', 'min:1', 'max:100'],
-            'items.*.delivery_note_item_id' => ['required_with:items', 'integer', 'min:1'],
+            'items.*.delivery_note_item_id' => ['nullable', 'required_without:items.*.sales_order_item_id', 'integer', 'min:1'],
+            'items.*.sales_order_item_id' => ['nullable', 'required_without:items.*.delivery_note_item_id', 'integer', 'min:1'],
             'items.*.quantity' => ['required_with:items', 'numeric', 'gt:0', 'decimal:0,3', 'max:999999999999.999'],
         ];
 
@@ -292,70 +297,84 @@ class InvoiceManagementService
             SalesOrder::STATUS_PARTIALLY_DELIVERED,
             SalesOrder::STATUS_DELIVERED,
         ], true)) {
-            throw ValidationException::withMessages(['sales_order_id' => __('Seule une commande confirmée avec des livraisons peut être facturée.')]);
+            throw ValidationException::withMessages(['sales_order_id' => __('Seule une commande confirmée peut être facturée.')]);
         }
     }
 
-    /** @return array<int, DeliveryNoteItem> */
-    private function lockValidatedSources(SalesOrder $order): array
+    /**
+     * The caller holds the order lock, serializing invoice reservations.
+     * Products keep their validated delivery source; services use their order line.
+     *
+     * @return array<int|string, array{order_item: SalesOrderItem, delivery_note_item_id: ?int, delivery_note_id: ?int, item_type: string, quantity: string, legacy_delivery_note_item_ids?: array<int, int>}>
+     */
+    private function lockBillableSources(SalesOrder $order): array
     {
+        $orderItems = SalesOrderItem::query()->with('product')
+            ->where('sales_order_id', $order->id)->orderBy('id')->lockForUpdate()->get()->keyBy('id');
         $deliveryNoteIds = DeliveryNote::query()
-            ->where('sales_order_id', $order->id)
-            ->where('status', 'validated')
-            ->orderBy('id')
-            ->lockForUpdate()
-            ->pluck('id');
+            ->where('sales_order_id', $order->id)->where('status', 'validated')
+            ->orderBy('id')->lockForUpdate()->pluck('id');
+        $deliveries = DeliveryNoteItem::query()->whereIn('delivery_note_id', $deliveryNoteIds)
+            ->orderBy('id')->lockForUpdate()->get();
 
-        $sources = DeliveryNoteItem::query()
-            ->whereIn('delivery_note_id', $deliveryNoteIds)
-            ->orderBy('id')
-            ->lockForUpdate()
-            ->get();
+        $sources = [];
+        foreach ($deliveries as $delivery) {
+            $item = $orderItems->get($delivery->sales_order_item_id);
+            if ($item !== null && $item->isPhysical() && $delivery->item_type === 'product' && $delivery->product_id === $item->product_id) {
+                $sources[$delivery->id] = [
+                    'order_item' => $item,
+                    'delivery_note_item_id' => $delivery->id,
+                    'delivery_note_id' => $delivery->delivery_note_id,
+                    'item_type' => 'product',
+                    'quantity' => (string) $delivery->quantity,
+                ];
+            }
+        }
+        foreach ($orderItems as $item) {
+            $isService = $item->product_id !== null ? $item->product?->isService() === true : $item->item_type === 'service';
+            if ($isService) {
+                $sources['service-'.$item->id] = [
+                    'order_item' => $item,
+                    'delivery_note_item_id' => null,
+                    'delivery_note_id' => null,
+                    'item_type' => 'service',
+                    'quantity' => (string) $item->ordered_quantity,
+                    'legacy_delivery_note_item_ids' => $deliveries
+                        ->filter(fn (DeliveryNoteItem $line): bool => $line->sales_order_item_id === $item->id && $line->item_type === 'service' && $line->product_id === $item->product_id)
+                        ->pluck('id')->all(),
+                ];
+            }
+        }
 
-        $orderItems = SalesOrderItem::query()
-            ->whereIn('id', $sources->pluck('sales_order_item_id')->unique())
-            ->where('sales_order_id', $order->id)
-            ->orderBy('id')
-            ->lockForUpdate()
-            ->get()
-            ->keyBy('id');
-
-        return $sources
-            ->filter(fn (DeliveryNoteItem $source): bool => $orderItems->has($source->sales_order_item_id))
-            ->map(function (DeliveryNoteItem $source) use ($orderItems): DeliveryNoteItem {
-                $source->setRelation('salesOrderItem', $orderItems->get($source->sales_order_item_id));
-
-                return $source;
-            })
-            ->keyBy('id')
-            ->all();
+        return $sources;
     }
 
-    /** @param array<int, DeliveryNoteItem> $sources
-     * @return array<int, array{delivery_note_item_id: int, quantity: string}>
+    /** @param array<int|string, array<string, mixed>> $sources
+     * @return array<int, array{delivery_note_item_id: ?int, sales_order_item_id: int, quantity: string}>
      */
     private function allAvailableItems(array $sources, ?int $excludeInvoiceId): array
     {
         $remaining = $this->remainingQuantities($sources, $excludeInvoiceId);
 
         return collect($sources)
-            ->map(fn (DeliveryNoteItem $source): array => [
-                'delivery_note_item_id' => $source->id,
-                'quantity' => (string) ($remaining[$source->id] ?? BigDecimal::zero()->toScale(3)),
+            ->map(fn (array $source, int|string $key): array => [
+                'delivery_note_item_id' => $source['delivery_note_item_id'],
+                'sales_order_item_id' => $source['order_item']->id,
+                'quantity' => (string) ($remaining[$key] ?? BigDecimal::zero()->toScale(3)),
             ])
             ->filter(fn (array $line): bool => BigDecimal::of($line['quantity'])->isGreaterThan(0))
             ->values()
             ->all();
     }
 
-    /** @param array<int, DeliveryNoteItem> $sources
-     * @param  array<int, array{delivery_note_item_id: int|string, quantity: int|float|string}>  $requested
+    /** @param array<int|string, array<string, mixed>> $sources
+     * @param  array<int, array{delivery_note_item_id?: int|string|null, sales_order_item_id?: int|string, quantity: int|float|string}>  $requested
      * @return array<int, array<string, mixed>>
      */
     private function prepareItems(array $sources, array $requested, ?int $excludeInvoiceId): array
     {
         if ($requested === []) {
-            throw ValidationException::withMessages(['items' => __('Aucune quantité livrée ne reste à facturer.')]);
+            throw ValidationException::withMessages(['items' => __('Aucune quantité ne reste à facturer.')]);
         }
 
         $remaining = $this->remainingQuantities($sources, $excludeInvoiceId);
@@ -363,16 +382,27 @@ class InvoiceManagementService
         $prepared = [];
 
         foreach (array_values($requested) as $position => $line) {
-            $sourceId = (int) $line['delivery_note_item_id'];
+            $sourceId = isset($line['delivery_note_item_id'])
+                ? (int) $line['delivery_note_item_id']
+                : 'service-'.(int) ($line['sales_order_item_id'] ?? 0);
+            if (isset($line['delivery_note_item_id']) && ! isset($sources[$sourceId])) {
+                foreach ($sources as $key => $candidate) {
+                    if (in_array($sourceId, $candidate['legacy_delivery_note_item_ids'] ?? [], true)) {
+                        $sourceId = $key;
+                        break;
+                    }
+                }
+            }
+            $sourceField = isset($line['delivery_note_item_id']) ? 'delivery_note_item_id' : 'sales_order_item_id';
             if (isset($seen[$sourceId])) {
-                throw ValidationException::withMessages(["items.{$position}.delivery_note_item_id" => __('Une même ligne de livraison ne peut apparaître qu’une fois.')]);
+                throw ValidationException::withMessages(["items.{$position}.{$sourceField}" => __('Une même source de facturation ne peut apparaître qu’une fois.')]);
             }
             $seen[$sourceId] = true;
 
             $source = $sources[$sourceId] ?? null;
             $available = $remaining[$sourceId] ?? BigDecimal::zero()->toScale(3);
-            if ($source === null || $source->delivery_note_id === null) {
-                throw ValidationException::withMessages(["items.{$position}.delivery_note_item_id" => __('La ligne doit appartenir à un bon de livraison validé de cette commande.')]);
+            if ($source === null || (isset($line['sales_order_item_id']) && (int) $line['sales_order_item_id'] !== $source['order_item']->id)) {
+                throw ValidationException::withMessages(["items.{$position}.{$sourceField}" => __('La ligne doit être un service de cette commande ou provenir d’un BL produit validé de cette commande.')]);
             }
 
             try {
@@ -385,11 +415,11 @@ class InvoiceManagementService
                 throw ValidationException::withMessages(["items.{$position}.quantity" => __('La quantité doit être supérieure à zéro.')]);
             }
             if ($quantity->isGreaterThan($available)) {
-                throw ValidationException::withMessages(["items.{$position}.quantity" => __('La quantité dépasse le reste livrée et non facturée.')]);
+                throw ValidationException::withMessages(["items.{$position}.quantity" => __('La quantité dépasse le restant facturable.')]);
             }
 
             /** @var SalesOrderItem $orderItem */
-            $orderItem = $source->getRelation('salesOrderItem');
+            $orderItem = $source['order_item'];
             try {
                 $calculated = $this->calculator->line(
                     (string) $quantity,
@@ -403,10 +433,10 @@ class InvoiceManagementService
 
             $prepared[] = [
                 'sales_order_item_id' => $orderItem->id,
-                'delivery_note_item_id' => $source->id,
+                'delivery_note_item_id' => isset($line['delivery_note_item_id']) ? (int) $line['delivery_note_item_id'] : $source['delivery_note_item_id'],
                 'product_id' => $orderItem->product_id,
                 'tax_rate_id' => $orderItem->tax_rate_id,
-                'item_type' => $orderItem->item_type,
+                'item_type' => $source['item_type'],
                 'reference' => $orderItem->reference,
                 'description' => $orderItem->description,
                 'unit_label' => $orderItem->unit_label,
@@ -426,35 +456,62 @@ class InvoiceManagementService
         return $prepared;
     }
 
-    /** @param array<int, DeliveryNoteItem> $sources
-     * @return array<int, BigDecimal>
+    /** @param array<int|string, array<string, mixed>> $sources
+     * @return array<int|string, BigDecimal>
      */
     private function remainingQuantities(array $sources, ?int $excludeInvoiceId): array
     {
-        $sourceIds = array_keys($sources);
-        if ($sourceIds === []) {
+        if ($sources === []) {
             return [];
         }
 
-        $billedQuery = DB::table('invoice_items')
-            ->join('invoices', 'invoices.id', '=', 'invoice_items.invoice_id')
-            ->whereIn('invoice_items.delivery_note_item_id', $sourceIds)
-            ->where('invoices.status', '!=', Invoice::STATUS_CANCELLED);
+        // Drafts reserve quantities. Legacy service invoices linked to a BL also count.
+        $billedQuery = InvoiceItem::query()
+            ->whereIn('sales_order_item_id', collect($sources)->pluck('order_item.id')->unique())
+            ->whereHas('invoice', fn ($query) => $query->where('status', '!=', Invoice::STATUS_CANCELLED));
         if ($excludeInvoiceId !== null) {
-            $billedQuery->where('invoices.id', '!=', $excludeInvoiceId);
+            $billedQuery->where('invoice_id', '!=', $excludeInvoiceId);
+        }
+        $billed = $billedQuery->orderBy('id')->lockForUpdate()->get();
+
+        $billedByOrder = [];
+        $billedByDelivery = [];
+        foreach ($billed as $line) {
+            $orderItemId = $line->sales_order_item_id;
+            $billedByOrder[$orderItemId] = ($billedByOrder[$orderItemId] ?? BigDecimal::zero())->plus((string) $line->quantity);
+            if ($line->delivery_note_item_id !== null) {
+                $deliveryItemId = $line->delivery_note_item_id;
+                $billedByDelivery[$deliveryItemId] = ($billedByDelivery[$deliveryItemId] ?? BigDecimal::zero())->plus((string) $line->quantity);
+            }
         }
 
-        $billed = $billedQuery
-            ->select('invoice_items.delivery_note_item_id', DB::raw('SUM(invoice_items.quantity) as billed_quantity'))
-            ->groupBy('invoice_items.delivery_note_item_id')
-            ->get()
-            ->keyBy('delivery_note_item_id');
+        $productBudgets = [];
+        foreach ($sources as $source) {
+            if ($source['item_type'] === 'product') {
+                $orderItemId = $source['order_item']->id;
+                $productBudgets[$orderItemId] = ($productBudgets[$orderItemId] ?? BigDecimal::zero())->plus($source['quantity']);
+            }
+        }
+        foreach ($productBudgets as $orderItemId => $delivered) {
+            $productBudgets[$orderItemId] = $delivered->minus($billedByOrder[$orderItemId] ?? BigDecimal::zero());
+        }
 
         $remaining = [];
         foreach ($sources as $sourceId => $source) {
-            $alreadyBilled = (string) ($billed->get($sourceId)?->billed_quantity ?? '0.000');
-            $available = BigDecimal::of((string) $source->quantity)->minus($alreadyBilled)->toScale(3);
-            $remaining[$sourceId] = $available->isLessThan(0) ? BigDecimal::zero()->toScale(3) : $available;
+            $orderItemId = $source['order_item']->id;
+            $reserved = $source['item_type'] === 'service'
+                ? ($billedByOrder[$orderItemId] ?? BigDecimal::zero())
+                : ($billedByDelivery[$source['delivery_note_item_id']] ?? BigDecimal::zero());
+            $available = BigDecimal::of($source['quantity'])->minus($reserved)->toScale(3);
+            if ($source['item_type'] === 'product') {
+                // Also cap by the order line, including any legacy invoice without a delivery link.
+                if ($available->isGreaterThan($productBudgets[$orderItemId])) {
+                    $available = $productBudgets[$orderItemId];
+                }
+                $available = $available->isLessThan(0) ? BigDecimal::zero()->toScale(3) : $available;
+                $productBudgets[$orderItemId] = $productBudgets[$orderItemId]->minus($available);
+            }
+            $remaining[$sourceId] = $available->isLessThan(0) ? BigDecimal::zero()->toScale(3) : $available->toScale(3);
         }
 
         return $remaining;

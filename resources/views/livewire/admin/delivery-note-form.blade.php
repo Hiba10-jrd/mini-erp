@@ -53,7 +53,9 @@ new class extends \Livewire\Volt\Component
         $this->orderId = $orderId;
         $order = SalesOrder::query()->with('items')->findOrFail($orderId);
 
-        foreach ($order->items as $item) {
+        abort_unless($order->canCreateDeliveryNote(), 403);
+
+        foreach ($order->deliverableItems() as $item) {
             $remaining = $this->remainingForItem($item);
             if ($remaining <= 0) {
                 continue;
@@ -65,7 +67,7 @@ new class extends \Livewire\Volt\Component
             ];
         }
 
-        $this->warehouseId = $order->items->contains(fn ($item) => $item->item_type === 'product') ? '' : '0';
+        $this->warehouseId = '';
     }
 
     public function save(DeliveryNoteManagementService $service): void
@@ -167,7 +169,7 @@ new class extends \Livewire\Volt\Component
                 <h3 class="text-base font-semibold text-gray-900">{{ __('Lignes à livrer') }}</h3>
             </div>
             <div class="divide-y divide-gray-200">
-                @foreach ($order->items as $item)
+                @foreach ($order->deliverableItems() as $item)
                     @php($remaining = $item->ordered_quantity - $item->delivered_quantity)
                     @if ((float) $remaining <= 0 || ! isset($lines[$item->id]))
                         @continue

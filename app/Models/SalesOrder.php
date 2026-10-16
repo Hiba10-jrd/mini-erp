@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Brick\Math\BigDecimal;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -124,6 +125,24 @@ class SalesOrder extends Model
     public function baseHt(): string
     {
         return (string) BigDecimal::of($this->subtotal_ht)->minus($this->discount_total)->toScale(2);
+    }
+
+    public function physicalItems(): Collection
+    {
+        $this->loadMissing('items.product');
+
+        return $this->items->filter(fn (SalesOrderItem $item): bool => $item->isPhysical());
+    }
+
+    public function deliverableItems(): Collection
+    {
+        return $this->physicalItems()->filter(fn (SalesOrderItem $item): bool => BigDecimal::of($this->remainingQuantity($item))->isGreaterThan(0));
+    }
+
+    public function canCreateDeliveryNote(): bool
+    {
+        return in_array($this->status, [self::STATUS_CONFIRMED, self::STATUS_PARTIALLY_DELIVERED], true)
+            && $this->deliverableItems()->isNotEmpty();
     }
 
     public function remainingQuantity(SalesOrderItem $item): string

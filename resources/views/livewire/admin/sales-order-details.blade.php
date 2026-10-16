@@ -33,9 +33,7 @@ new class extends \Livewire\Volt\Component
     {
         Gate::authorize('sales.create');
         $order = SalesOrder::query()->with('items')->findOrFail($this->orderId);
-        $remaining = $order->items->sum(fn ($item): float => (float) ($item->ordered_quantity - $item->delivered_quantity));
-
-        abort_unless(in_array($order->status, [SalesOrder::STATUS_CONFIRMED, SalesOrder::STATUS_PARTIALLY_DELIVERED], true) && $remaining > 0, 403, __('Cette commande ne peut pas recevoir de bon de livraison.'));
+        abort_unless($order->canCreateDeliveryNote(), 403);
 
         $draft = \App\Models\DeliveryNote::query()
             ->where('sales_order_id', $order->id)
@@ -97,19 +95,7 @@ new class extends \Livewire\Volt\Component
                 fn ($item): bool => $item->delivered_quantity === '0.000'
             ),
 
-            'canCreateDeliveryNote' => in_array(
-                $order->status,
-                [
-                    SalesOrder::STATUS_CONFIRMED,
-                    SalesOrder::STATUS_PARTIALLY_DELIVERED,
-                ],
-                true
-            ) && $order->items->sum(
-                fn ($item): float => (float) (
-                    $item->ordered_quantity
-                    - $item->delivered_quantity
-                )
-            ) > 0,
+            'canCreateDeliveryNote' => $order->canCreateDeliveryNote(),
 
             'canCreateInvoice' => $canCreateInvoice,
         ];

@@ -81,6 +81,13 @@ class SalesOrderItem extends Model
         });
     }
 
+    public function isPhysical(): bool
+    {
+        return $this->product_id !== null
+            ? $this->product?->type === 'product'
+            : $this->item_type === 'product';
+    }
+
     public function salesOrder(): BelongsTo
     {
         return $this->belongsTo(SalesOrder::class);
