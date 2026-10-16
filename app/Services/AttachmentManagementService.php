@@ -31,6 +31,9 @@ class AttachmentManagementService
         Validator::make([...$attributes, 'file' => $file], [
             'file' => ['required', 'file', 'max:5120', 'mimetypes:application/pdf,image/jpeg,image/png,image/webp'],
             'category' => ['nullable', 'string', 'max:100'], 'description' => ['nullable', 'string', 'max:2000'],
+        ], [
+            'file.max' => __('Le fichier ne doit pas dépasser 5 Mo.'),
+            'file.mimetypes' => __('Choisissez un fichier PDF, JPG, PNG ou WebP valide.'),
         ])->validate();
         $mime = MimeTypes::getDefault()->guessMimeType($file->getPathname());
         $name = self::cleanName($file->getClientOriginalName());
