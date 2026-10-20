@@ -1,4 +1,5 @@
 @import './dashboard.css';
+@import './supplier-invoices.css';
 
 @tailwind base;
 @tailwind components;

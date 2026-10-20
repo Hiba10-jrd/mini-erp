@@ -51,6 +51,10 @@ class AttachmentAuthorizationService
 
     public function canDelete(Model $parent): bool
     {
+        if ($parent instanceof SupplierInvoice && $parent->histories()->whereIn('event', ['submitted_for_review', 'reconciliation_saved'])->exists()) {
+            return false;
+        }
+
         return method_exists($parent, 'isEditable') && $parent->isEditable();
     }
 }

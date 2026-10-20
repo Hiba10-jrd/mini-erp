@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Attachment;
+use App\Models\SupplierInvoice;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
@@ -56,6 +57,11 @@ class AttachmentManagementService
                 // Serialize additions/deletions with parent state transitions.
                 $locked = $parent::query()->lockForUpdate()->findOrFail($parent->getKey());
                 $this->authorization->authorize($locked, true);
+                if ($locked instanceof SupplierInvoice
+                    && ($attributes['category'] ?? null) === SupplierInvoice::ORIGINAL_DOCUMENT_CATEGORY
+                    && ! $locked->isEditable()) {
+                    throw ValidationException::withMessages(['file' => __('Les documents officiels sont verrouillés pendant et après la vérification.')]);
+                }
                 $attachment = Attachment::create([
                     'attachable_type' => $locked->getMorphClass(), 'attachable_id' => $locked->getKey(),
                     'original_name' => $name, 'path' => $path, 'mime_type' => $mime,

@@ -21,11 +21,13 @@ use Database\Seeders\RbacSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+use Tests\Support\SubmitsSupplierInvoices;
 use Tests\TestCase;
 
 class SupplierInvoiceManagementTest extends TestCase
 {
     use RefreshDatabase;
+    use SubmitsSupplierInvoices;
 
     protected function setUp(): void
     {
@@ -76,7 +78,7 @@ class SupplierInvoiceManagementTest extends TestCase
         $first = $service->createDraft($order, $this->attributes($source, 'F-001', '4.000'));
         $second = $service->createDraft($order, $this->attributes($source, 'F-002', '3.000'));
         $this->createSequence();
-        $second = $service->validate($second);
+        $second = $service->validate($this->submitMatchingInvoice($second));
 
         $general = $service->availableItemsForOrder($order);
         $this->assertSame('3.000', $general[0]['available_quantity']);
@@ -136,6 +138,7 @@ class SupplierInvoiceManagementTest extends TestCase
         $service = $this->service();
         $draft = $service->createDraft($order, $this->attributes($source, 'SUP-777', '1.000'));
 
+        $supplierData = $this->matchingReconciliation($draft);
         DB::table('supplier_invoice_items')->where('supplier_invoice_id', $draft->id)->update([
             'unit_price' => '0.01', 'discount_percent' => '0.00', 'discount_amount' => '0.00',
             'tax_rate_percent' => '0.00', 'subtotal_ht' => '0.01', 'tax_amount' => '0.00', 'total_ttc' => '0.01',
@@ -144,7 +147,7 @@ class SupplierInvoiceManagementTest extends TestCase
             'subtotal_ht' => '0.01', 'discount_total' => '0.00', 'tax_total' => '0.00', 'total_ttc' => '0.01',
         ]);
 
-        $validated = $service->validate($draft->fresh());
+        $validated = $service->validate($service->submitForReview($draft->fresh(), $supplierData));
         $this->assertSame('FAF-'.today()->year.'-00001', $validated->number);
         $this->assertSame(SupplierInvoice::STATUS_VALIDATED, $validated->status);
         $this->assertSame('100.00', $validated->items->firstOrFail()->unit_price);
@@ -152,7 +155,7 @@ class SupplierInvoiceManagementTest extends TestCase
         $this->assertSame('10.00', $validated->discount_total);
         $this->assertSame('18.00', $validated->tax_total);
         $this->assertSame('108.00', $validated->total_ttc);
-        $this->assertEqualsCanonicalizing(['created', 'validated'], $validated->histories->pluck('event')->all());
+        $this->assertEqualsCanonicalizing(['created', 'submitted_for_review', 'validated'], $validated->histories->pluck('event')->all());
         $this->assertDatabaseHas('purchase_order_histories', ['purchase_order_id' => $order->id, 'event' => 'supplier_invoice_validated']);
 
         $historyCount = $validated->histories()->count();
@@ -186,7 +189,7 @@ class SupplierInvoiceManagementTest extends TestCase
             'tax_rate_percent' => '0.00', 'subtotal_ht' => '10.00', 'tax_amount' => '0.00', 'total_ttc' => '10.00', 'position' => 1,
         ]);
 
-        $this->expectValidationMessage(fn () => $service->validate($draft), 'items.0.quantity');
+        $this->expectValidationMessage(fn () => $this->submitMatchingInvoice($draft), 'items.0.quantity');
         $this->assertSame(SupplierInvoice::STATUS_DRAFT, $draft->fresh()->status);
         $this->assertNull($draft->fresh()->number);
         $this->assertSame(0, $sequence->fresh()->counter);
@@ -209,7 +212,7 @@ class SupplierInvoiceManagementTest extends TestCase
         $service = $this->service();
         $draft = $service->createDraft($order, $this->attributes($source, 'NO-STOCK', '2.000'));
         $beforeValidation = WarehouseStock::query()->where('product_id', $source->product_id)->value('quantity');
-        $service->validate($draft);
+        $service->validate($this->submitMatchingInvoice($draft));
 
         $this->assertSame($beforeValidation, WarehouseStock::query()->where('product_id', $source->product_id)->value('quantity'));
         $this->assertSame($movementCount, StockMovement::query()->count());

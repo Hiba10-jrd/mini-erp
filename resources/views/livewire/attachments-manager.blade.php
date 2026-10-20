@@ -16,6 +16,9 @@ new class extends \Livewire\Volt\Component
     #[Locked]
     public int $parentId;
 
+    #[Locked]
+    public bool $excludeOriginalInvoice = false;
+
     public $file = null;
 
     public string $category = '';
@@ -26,10 +29,11 @@ new class extends \Livewire\Volt\Component
 
     public string $description = '';
 
-    public function mount(string $parentType, int $parentId): void
+    public function mount(string $parentType, int $parentId, bool $excludeOriginalInvoice = false): void
     {
         $this->parentType = $parentType;
         $this->parentId = $parentId;
+        $this->excludeOriginalInvoice = $excludeOriginalInvoice && $parentType === 'supplier-invoice';
         $this->parent();
     }
 
@@ -91,7 +95,9 @@ new class extends \Livewire\Volt\Component
                 'goods-receipt' => __('Documents liés à cette réception'),
             },
             'documentTypes' => self::DOCUMENT_TYPES,
-            'documents' => $parent->attachments()->with('uploader:id,name')->latest()->paginate(10, ['*'], 'attachmentsPage'),
+            'documents' => $parent->attachments()->with('uploader:id,name')
+                ->when($this->excludeOriginalInvoice, fn ($query) => $query->where(fn ($query) => $query->whereNull('category')->orWhere('category', '!=', \App\Models\SupplierInvoice::ORIGINAL_DOCUMENT_CATEGORY)))
+                ->latest()->paginate(10, ['*'], 'attachmentsPage'),
             'canUpload' => \Illuminate\Support\Facades\Gate::allows($write),
             'canRemove' => \Illuminate\Support\Facades\Gate::allows($write) && $authorization->canDelete($parent),
             'legacyExpense' => $parent instanceof \App\Models\Expense && $parent->receipt_path ? $parent : null,

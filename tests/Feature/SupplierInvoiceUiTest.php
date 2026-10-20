@@ -11,20 +11,28 @@ use App\Models\Role;
 use App\Models\StockMovement;
 use App\Models\Supplier;
 use App\Models\SupplierInvoice;
+use App\Models\SupplierPayment;
 use App\Models\Unit;
 use App\Models\User;
 use App\Models\Warehouse;
 use App\Models\WarehouseStock;
+use App\Services\AttachmentManagementService;
+use App\Services\AuditTrailService;
 use App\Services\SupplierInvoiceManagementService;
 use Database\Seeders\RbacSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Volt\Volt;
+use PHPUnit\Framework\Attributes\DataProvider;
+use Tests\Support\SubmitsSupplierInvoices;
 use Tests\TestCase;
 
 class SupplierInvoiceUiTest extends TestCase
 {
     use RefreshDatabase;
+    use SubmitsSupplierInvoices;
 
     protected function setUp(): void
     {
@@ -132,6 +140,200 @@ class SupplierInvoiceUiTest extends TestCase
         $this->assertDatabaseHas('supplier_invoices', ['supplier_invoice_number' => 'GENERAL-001', 'status' => 'draft']);
     }
 
+    public function test_supplier_invoice_draft_uploads_and_protects_the_original_pdf_without_financial_or_stock_side_effects(): void
+    {
+        Storage::fake('attachments');
+        $this->actingAs($this->userWithPermissions(['purchases.create', 'purchases.view', 'purchases.update']));
+        $order = $this->createOrder();
+        $source = $this->createReceipt($order, '2.000')->items->firstOrFail();
+        $movementCount = StockMovement::query()->count();
+        $paymentCount = SupplierPayment::query()->count();
+        $file = UploadedFile::fake()->createWithContent('original-fournisseur.pdf', "%PDF-1.4\n%%EOF");
+
+        Volt::test('admin.supplier-invoice-form', ['orderId' => $order->id])
+            ->set('supplierInvoiceNumber', 'ORIGINAL-PDF')
+            ->set('originalInvoiceFile', $file)
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $invoice = SupplierInvoice::query()->where('supplier_invoice_number', 'ORIGINAL-PDF')->sole();
+        $attachment = $invoice->attachments()->sole();
+        $this->assertSame(SupplierInvoice::ORIGINAL_DOCUMENT_CATEGORY, $attachment->category);
+        $this->assertTrue($attachment->attachable->is($invoice));
+        $this->assertSame('original-fournisseur.pdf', $attachment->original_name);
+        $this->assertSame($file->getSize(), (int) $attachment->size);
+        Storage::disk('attachments')->assertExists($attachment->path);
+        $this->assertSame($movementCount, StockMovement::query()->count());
+        $this->assertSame($paymentCount, SupplierPayment::query()->count());
+        $this->assertSame('20.00', $invoice->subtotal_ht);
+
+        Volt::test('admin.supplier-invoice-details', ['invoiceId' => $invoice->id])
+            ->assertSee('Document du fournisseur')
+            ->assertSee('original-fournisseur.pdf')
+            ->assertSee('Vérification des montants');
+        $this->get(route('attachments.download', $attachment))
+            ->assertOk()
+            ->assertDownload('original-fournisseur.pdf');
+
+        $this->actingAs($this->userWithPermissions(['purchases.view']));
+        $this->get(route('attachments.download', $attachment))->assertOk();
+        $this->actingAs($this->userWithPermissions(['stock.view']));
+        $this->get(route('attachments.download', $attachment))->assertForbidden();
+    }
+
+    public static function supplierInvoiceImageFormats(): array
+    {
+        return [['jpg'], ['jpeg'], ['png']];
+    }
+
+    #[DataProvider('supplierInvoiceImageFormats')]
+    public function test_supplier_invoice_form_accepts_jpeg_and_png_originals(string $extension): void
+    {
+        Storage::fake('attachments');
+        $this->actingAs($this->userWithPermissions(['purchases.create', 'purchases.view', 'purchases.update']));
+        $order = $this->createOrder();
+        $this->createReceipt($order, '1.000');
+        $file = UploadedFile::fake()->image('original.'.$extension);
+
+        Volt::test('admin.supplier-invoice-form', ['orderId' => $order->id])
+            ->set('supplierInvoiceNumber', 'IMAGE-'.$extension)
+            ->set('originalInvoiceFile', $file)
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $attachment = SupplierInvoice::query()->where('supplier_invoice_number', 'IMAGE-'.$extension)->firstOrFail()->attachments()->sole();
+        $this->assertSame(SupplierInvoice::ORIGINAL_DOCUMENT_CATEGORY, $attachment->category);
+        $this->assertSame($extension === 'png' ? 'image/png' : 'image/jpeg', $attachment->mime_type);
+        Storage::disk('attachments')->assertExists($attachment->path);
+    }
+
+    public function test_supplier_invoice_original_rejects_unsupported_content_and_oversized_files(): void
+    {
+        Storage::fake('attachments');
+        $this->actingAs($this->userWithPermissions(['purchases.create', 'purchases.view', 'purchases.update']));
+        $order = $this->createOrder();
+        $this->createReceipt($order, '3.000');
+        $component = Volt::test('admin.supplier-invoice-form', ['orderId' => $order->id])
+            ->set('supplierInvoiceNumber', 'INVALID-ORIGINAL')
+            ->set('originalInvoiceFile', UploadedFile::fake()->createWithContent('text.txt', 'not a document'))
+            ->call('save')
+            ->assertHasErrors(['originalInvoiceFile']);
+        $component->set('originalInvoiceFile', UploadedFile::fake()->image('unsupported.webp'))
+            ->call('save')
+            ->assertHasErrors(['originalInvoiceFile']);
+        $component->set('originalInvoiceFile', UploadedFile::fake()->create('oversized.pdf', 5121, 'application/pdf'))
+            ->call('save')
+            ->assertHasErrors(['originalInvoiceFile']);
+        $this->assertDatabaseCount('supplier_invoices', 0);
+        $this->assertDatabaseCount('attachments', 0);
+        $this->assertSame([], Storage::disk('attachments')->allFiles());
+    }
+
+    public function test_selected_original_can_be_removed_before_saving_the_invoice(): void
+    {
+        Storage::fake('attachments');
+        $this->actingAs($this->userWithPermissions(['purchases.create', 'purchases.view', 'purchases.update']));
+        $order = $this->createOrder();
+        $this->createReceipt($order, '1.000');
+        $component = Volt::test('admin.supplier-invoice-form', ['orderId' => $order->id])
+            ->set('supplierInvoiceNumber', 'REMOVED-ORIGINAL')
+            ->set('originalInvoiceFile', UploadedFile::fake()->createWithContent('selected.pdf', "%PDF-1.4\n%%EOF"))
+            ->assertSee('selected.pdf')
+            ->assertSee('Ko');
+
+        $component->call('clearOriginalInvoiceFile')
+            ->assertHasNoErrors(['originalInvoiceFile'])
+            ->assertSet('originalInvoiceFile', null)
+            ->assertDontSee('selected.pdf')
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $invoice = SupplierInvoice::query()->where('supplier_invoice_number', 'REMOVED-ORIGINAL')->sole();
+        $this->assertSame(0, $invoice->attachments()->count());
+    }
+
+    public function test_create_permission_alone_can_save_without_a_document_but_cannot_attach_one(): void
+    {
+        $order = $this->createOrder();
+        $this->createReceipt($order, '2.000');
+        $this->actingAs($this->userWithPermissions(['purchases.create']));
+
+        Volt::test('admin.supplier-invoice-form', ['orderId' => $order->id])
+            ->assertSee('Vous pouvez enregistrer le brouillon sans fichier')
+            ->set('supplierInvoiceNumber', 'CREATE-ONLY')
+            ->call('save')
+            ->assertHasNoErrors();
+        $this->assertDatabaseHas('supplier_invoices', ['supplier_invoice_number' => 'CREATE-ONLY']);
+
+        $otherOrder = $this->createOrder();
+        $this->createReceipt($otherOrder, '2.000');
+        Volt::test('admin.supplier-invoice-form', ['orderId' => $otherOrder->id])
+            ->set('supplierInvoiceNumber', 'CREATE-WITH-FILE')
+            ->set('originalInvoiceFile', UploadedFile::fake()->createWithContent('blocked.pdf', "%PDF-1.4\n%%EOF"))
+            ->call('save')
+            ->assertForbidden();
+        $this->assertDatabaseMissing('supplier_invoices', ['supplier_invoice_number' => 'CREATE-WITH-FILE']);
+        $this->assertDatabaseCount('attachments', 0);
+    }
+
+    public function test_original_upload_database_failure_rolls_back_invoice_and_cleans_stored_file(): void
+    {
+        Storage::fake('attachments');
+        $this->actingAs($this->userWithPermissions(['purchases.create', 'purchases.view', 'purchases.update']));
+        $order = $this->createOrder();
+        $this->createReceipt($order, '1.000');
+        $this->mock(AuditTrailService::class)->shouldReceive('record')->andThrow(new \RuntimeException('audit write failed'));
+
+        try {
+            Volt::test('admin.supplier-invoice-form', ['orderId' => $order->id])
+                ->set('supplierInvoiceNumber', 'ROLLBACK-ORIGINAL')
+                ->set('originalInvoiceFile', UploadedFile::fake()->createWithContent('rollback.pdf', "%PDF-1.4\n%%EOF"))
+                ->call('save');
+            $this->fail('The simulated attachment database failure was not propagated.');
+        } catch (\RuntimeException $exception) {
+            $this->assertSame('audit write failed', $exception->getMessage());
+        }
+
+        $this->assertDatabaseMissing('supplier_invoices', ['supplier_invoice_number' => 'ROLLBACK-ORIGINAL']);
+        $this->assertDatabaseCount('attachments', 0);
+        $this->assertSame([], Storage::disk('attachments')->allFiles());
+    }
+
+    public function test_editing_a_draft_can_add_its_original_invoice_without_changing_reservations(): void
+    {
+        Storage::fake('attachments');
+        $this->actingAs($this->userWithPermissions(['purchases.create', 'purchases.view', 'purchases.update']));
+        $order = $this->createOrder();
+        $source = $this->createReceipt($order, '3.000')->items->firstOrFail();
+        $invoice = $this->createDraft($order, $source, 'EDIT-ORIGINAL', '2.000');
+        $movementCount = StockMovement::query()->count();
+        $file = UploadedFile::fake()->createWithContent('edit-original.pdf', "%PDF-1.4\n%%EOF");
+
+        Volt::test('admin.supplier-invoice-form', ['invoiceId' => $invoice->id])
+            ->set('originalInvoiceFile', $file)
+            ->call('save')
+            ->assertHasNoErrors();
+
+        $invoice->refresh();
+        $this->assertSame('2.000', $invoice->items()->sole()->quantity);
+        $this->assertSame(SupplierInvoice::ORIGINAL_DOCUMENT_CATEGORY, $invoice->attachments()->sole()->category);
+        $this->assertSame($movementCount, StockMovement::query()->count());
+    }
+
+    public function test_historic_unclassified_attachments_are_not_relabelled_as_original_invoices(): void
+    {
+        Storage::fake('attachments');
+        $this->actingAs($this->userWithPermissions(['purchases.create', 'purchases.view', 'purchases.update']));
+        $order = $this->createOrder();
+        $source = $this->createReceipt($order, '1.000')->items->firstOrFail();
+        $invoice = $this->createDraft($order, $source, 'HISTORIC-INVOICE', '1.000');
+        $historicalAttachment = app(AttachmentManagementService::class)->upload($invoice, UploadedFile::fake()->createWithContent('historique.pdf', "%PDF-1.4\n%%EOF"));
+        $this->assertNull($historicalAttachment->category);
+
+        Volt::test('admin.supplier-invoice-details', ['invoiceId' => $invoice->id])
+            ->assertSee('Aucune facture originale jointe.');
+    }
+
     public function test_form_displays_reservations_and_edit_updates_only_draft_quantity(): void
     {
         $this->actingAs($this->userWithPermissions(['purchases.create', 'purchases.update', 'purchases.view']));
@@ -166,7 +368,7 @@ class SupplierInvoiceUiTest extends TestCase
             'quantity' => '9.000',
         ]);
         $this->createSequence();
-        $draft = $this->createDraft($order, $source, 'VALIDATE-UI', '2.000');
+        $draft = $this->submitMatchingInvoice($this->createDraft($order, $source, 'VALIDATE-UI', '2.000'));
         $stockBefore = WarehouseStock::query()->value('quantity');
         $movementsBefore = StockMovement::query()->count();
 

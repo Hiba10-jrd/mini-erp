@@ -35,6 +35,8 @@ new class extends \Livewire\Volt\Component
 
         $statuses = [
             SupplierInvoice::STATUS_DRAFT,
+            SupplierInvoice::STATUS_UNDER_REVIEW,
+            SupplierInvoice::STATUS_DISPUTED,
             SupplierInvoice::STATUS_VALIDATED,
             SupplierInvoice::STATUS_CANCELLED,
         ];
@@ -91,7 +93,7 @@ new class extends \Livewire\Volt\Component
                 <x-input-label for="supplier-invoice-status" :value="__('Statut')" />
                 <select id="supplier-invoice-status" wire:model.live="statusFilter" class="mt-1 block w-full border-gray-300 shadow-sm">
                     <option value="all">{{ __('Tous les statuts') }}</option>
-                    <option value="draft">{{ __('Brouillon') }}</option>
+                    <option value="under_review">{{ __('En vérification') }}</option><option value="disputed">{{ __('Contestée') }}</option><option value="draft">{{ __('Brouillon') }}</option>
                     <option value="validated">{{ __('Validée') }}</option>
                     <option value="cancelled">{{ __('Annulée') }}</option>
                 </select>
@@ -109,8 +111,8 @@ new class extends \Livewire\Volt\Component
     </div>
 
     @php
-        $statusLabels = ['draft' => __('Brouillon'), 'validated' => __('Validée'), 'cancelled' => __('Annulée')];
-        $statusClasses = ['draft' => 'bg-gray-100 text-gray-700', 'validated' => 'bg-emerald-100 text-emerald-800', 'cancelled' => 'bg-rose-100 text-rose-800'];
+        $statusLabels = ['under_review' => __('En vérification'), 'disputed' => __('Contestée'), 'draft' => __('Brouillon'), 'validated' => __('Validée'), 'cancelled' => __('Annulée')];
+        $statusClasses = ['under_review' => 'bg-amber-100 text-amber-800', 'disputed' => 'bg-rose-100 text-rose-800', 'draft' => 'bg-gray-100 text-gray-700', 'validated' => 'bg-emerald-100 text-emerald-800', 'cancelled' => 'bg-rose-100 text-rose-800'];
     @endphp
 
     <div class="overflow-hidden border-y border-gray-200 bg-white">
@@ -136,7 +138,7 @@ new class extends \Livewire\Volt\Component
                             <td class="whitespace-nowrap px-4 py-4">{{ $invoice->purchaseOrder->number }}</td>
                             <td class="min-w-44 px-4 py-4">{{ $invoice->supplier_name }}</td>
                             <td class="whitespace-nowrap px-4 py-4">{{ $invoice->invoice_date->format('d/m/Y') }}</td>
-                            <td class="whitespace-nowrap px-4 py-4 text-end font-medium">{{ str_replace('.', ',', $invoice->total_ttc) }}</td>
+                            <td class="whitespace-nowrap px-4 py-4 text-end font-medium">{{ str_replace('.', ',', ($invoice->status === SupplierInvoice::STATUS_VALIDATED ? $invoice->payableAmount() : $invoice->total_ttc)) }}</td>
                             <td class="px-4 py-4"><span class="px-2 py-1 text-xs font-medium {{ $statusClasses[$invoice->status] ?? 'bg-gray-100 text-gray-700' }}">{{ $statusLabels[$invoice->status] ?? $invoice->status }}</span></td>
                             <td class="whitespace-nowrap px-4 py-4 text-end">
                                 <a href="{{ route('purchases.invoices.show', $invoice) }}" wire:navigate class="font-medium text-indigo-700">{{ __('Consulter') }}</a>
