@@ -356,7 +356,7 @@ new class extends \Livewire\Volt\Component
                             'supplier_invoice_number' => $invoice->supplier_invoice_number,
                             'invoice_date' => $invoice->invoice_date,
                             'due_date' => $invoice->due_date,
-                            'total_ttc' => $invoice->total_ttc,
+                            'total_ttc' => ($invoice->status === SupplierInvoice::STATUS_VALIDATED ? $invoice->payableAmount() : $invoice->total_ttc),
                             'remaining' => $service->remainingAmount($invoice),
                             'state' => $service->paymentState($invoice),
                         ];

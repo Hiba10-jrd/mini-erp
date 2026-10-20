@@ -3,7 +3,7 @@
         <div>
             <p class="text-sm font-medium text-indigo-600">{{ __('Achats') }}</p>
             <h2 class="text-xl font-semibold leading-tight text-gray-800">
-                {{ isset($supplierInvoice) ? __('Modifier la facture fournisseur') : __('Nouvelle facture fournisseur') }}
+                {{ __('Factures fournisseurs') }}
             </h2>
         </div>
     </x-slot>

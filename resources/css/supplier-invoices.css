@@ -1,0 +1,121 @@
+/* Scoped supplier invoice workspace. Reuses the ERP palette and controls. */
+.si-workspace { min-width: 0; font-size: 14px; }
+.si-workspace .si-panel { min-width: 0; padding: 24px; border: 1px solid var(--erp-border); border-radius: 12px; background: #fff; }
+.si-page-intro, .si-section-heading, .si-document-row, .si-comparison-status { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.si-page-intro h2 { color: var(--erp-text); font-size: 20px; font-weight: 700; }
+.si-page-intro p, .si-section-heading p { margin-top: 4px; color: var(--erp-muted); font-size: 14px; }
+.si-page-intro > a { flex-shrink: 0; font-size: 13px; }
+.si-section-heading { justify-content: flex-start; margin-bottom: 22px; }
+.si-section-heading h3 { font-size: 16px; font-weight: 700; color: var(--erp-navy); }
+.si-section-heading > .erp-badge { margin-inline-start: auto; }
+.si-step { display: flex; align-items: center; justify-content: center; flex-shrink: 0; height: 30px; width: 30px; border-radius: 50%; color: var(--erp-primary-dark); background: #eff6ff; font-weight: 700; font-size: 13px; }
+.si-information-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 18px 22px; }
+.si-workspace .si-field { min-width: 0; display: grid; align-content: start; gap: 7px; }
+.si-workspace :is(.si-field label,.si-label) { color: #334155; font-size: 14px; font-weight: 550; }
+.si-workspace :is(input:not([type=checkbox]):not([type=file]),select,textarea) { width: 100%; min-width: 0; font-size: 14px; min-height: 42px; }
+.erp-main .si-workspace :is(input:not([type=checkbox]):not([type=radio]):not([type=hidden]):not([type=file]),select,textarea) { font-size: 14px; min-height: 42px; }
+.si-workspace input:disabled, .si-workspace textarea:disabled { color: #475569; background: #f8fafc; opacity: 1; }
+.si-readonly-value { min-height: 42px; padding: 9px 0; font-weight: 600; overflow-wrap: anywhere; }
+.si-context-line { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-top: 20px; color: var(--erp-muted); font-size: 13px; }
+.si-receipt-tag { padding: 3px 8px; border-radius: 4px; background: #f1f5f9; color: #475569; }
+.si-secondary { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--erp-border); min-width: 0; }
+.si-workspace summary { cursor: pointer; color: var(--erp-primary-dark); font-weight: 550; padding: 4px 0; overflow-wrap: anywhere; }
+.si-workspace details[open] > summary { margin-bottom: 14px; }
+.si-muted { color: var(--erp-muted); font-size: 13px; line-height: 1.6; }
+.si-document-row { padding: 16px; background: #f8fafc; border-radius: 8px; }
+.si-document-row > div { min-width: 0; flex: 1; }
+.si-document-row a { flex-shrink: 0; }
+.si-text-button { margin-top: 12px; color: var(--erp-primary-dark); text-decoration: underline; text-underline-offset: 3px; }
+.si-upload { display: grid; gap: 12px; padding: 20px; border: 1px dashed #b8c8dc; border-radius: 8px; background: #fafcff; }
+.si-upload input[type=file] { max-width: 100%; font-size: 14px; }
+.si-version-list li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; padding: 10px 0; border-bottom: 1px solid #f1f5f9; }
+.si-version-list span { min-width: 0; overflow-wrap: anywhere; }
+.si-line-heading, .si-line { display: grid; grid-template-columns: minmax(0,1fr) 100px 140px 120px; gap: 12px 22px; align-items: center; }
+.si-line-heading { padding-bottom: 12px; color: var(--erp-muted); font-size: 13px; }
+.si-line-heading > :not(:first-child) { text-align: end; }
+.si-line { padding: 17px 0; border-top: 1px solid var(--erp-border); }
+.si-product { display: flex; align-items: flex-start; gap: 12px; min-width: 0; }
+.si-product input { margin-top: 4px; width: 18px; height: 18px; flex-shrink: 0; }
+.si-workspace .si-product-name { font-size: 14px; font-weight: 600; overflow-wrap: anywhere; }
+.si-product p { overflow-wrap: anywhere; }
+.si-number { text-align: end; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.si-quantity input { text-align: end; }
+.si-line-details { grid-column: 1/-1; font-size: 13px; }
+.si-line-details > summary { color: var(--erp-muted); font-weight: 400; }
+.si-detail-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; padding: 12px 16px; background: #f8fafc; border-radius: 6px; }
+.si-detail-grid dt { color: var(--erp-muted); font-size: 13px; }
+.si-detail-grid dd { margin-top: 3px; font-weight: 550; }
+.si-mobile-label { display: none; }
+.si-total-line { border-top: 1px solid var(--erp-border); padding-top: 18px; justify-content: flex-end; }
+.si-total-line strong { color: var(--erp-text); margin-inline-start: 6px; font-variant-numeric: tabular-nums; }
+.si-comparison { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 28px; }
+.si-comparison h4 { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 18px; font-weight: 650; font-size: 15px; }
+.si-erp-column { background: #f8fafc; border-radius: 8px; padding: 20px; }
+.si-supplier-column { padding: 20px 0; min-width: 0; }
+.si-erp-totals > div { display: flex; justify-content: space-between; align-items: center; gap: 18px; min-height: 51px; }
+.si-erp-totals dd { font-weight: 600; font-size: 16px; font-variant-numeric: tabular-nums; }
+.si-grand-total { margin-top: 12px; border-top: 1px solid var(--erp-border); padding-top: 12px; }
+.si-grand-total dd { font-size: 21px; color: var(--erp-navy); }
+.si-amount-fields { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; }
+.si-amount-fields > :last-child { grid-column: 1/-1; }
+.si-amount-fields input[type=number] { text-align: end; font-variant-numeric: tabular-nums; }
+.si-computed-total { display: flex; justify-content: space-between; gap: 16px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--erp-border); font-weight: 600; }
+.si-computed-total output { font-size: 21px; color: var(--erp-navy); font-variant-numeric: tabular-nums; }
+.si-message { padding: 14px 16px; border-radius: 8px; margin: 16px 0; line-height: 1.6; }
+.si-difference-totals { display: flex; flex-wrap: wrap; gap: 8px 24px; margin-top: 10px; }
+.si-difference-totals > div { display: flex; gap: 7px; align-items: baseline; }
+.si-difference-totals dt { color: inherit; opacity: .8; }
+.si-difference-totals dd { font-weight: 650; font-variant-numeric: tabular-nums; }
+.si-difference-fields { display: grid; grid-template-columns: minmax(0,1fr) minmax(180px,320px); align-items: center; gap: 10px 18px; margin-top: 18px; }
+.si-charge-confirmation { padding: 16px; border-radius: 8px; background: #f8fafc; }
+.si-charge-confirmation > p { margin-bottom: 12px; }
+.si-confirm-treatment { display: flex; align-items: flex-start; gap: 9px; font-size: 14px; }
+.si-confirm-treatment input { width: 18px; height: 18px; margin-top: 2px; flex: 0 0 auto; }
+.si-workspace button:disabled { cursor: not-allowed; opacity: .58; }
+.si-message p { margin-top: 4px; }
+.si-success { background: #ecf9f1; color: #126d45; }
+.si-warning { background: #fff8eb; color: #8b530e; }
+.si-error { background: #fff1f2; color: #a52536; }
+.si-neutral { background: #f1f5f9; color: #475569; }
+.si-error-text { color: #b52435; }
+.si-tax-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; margin-bottom: 16px; }
+.si-tax-component { border: 1px solid var(--erp-border); border-radius: 8px; padding: 16px; margin: 16px 0; min-width: 0; }
+.si-tax-component legend { font-weight: 600; padding: 0 6px; }
+.si-difference-reason { margin-top: 20px; }
+.si-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
+.si-readiness { margin: 14px 0; color: #475569; }
+.si-dispute-form { display: grid; gap: 12px; margin-top: 20px; }
+.si-dispute-form button { justify-self: start; }
+.si-accepted-totals { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 20px; margin: 22px 0; }
+.si-accepted-totals dt { color: var(--erp-muted); font-size: 13px; }
+.si-accepted-totals dd { font-size: 21px; font-weight: 650; margin-top: 6px; font-variant-numeric: tabular-nums; }
+.si-history li { padding: 12px 0; border-bottom: 1px solid var(--erp-border); }
+.si-payment-row { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; }
+.si-payment-row > strong { margin-inline-start: auto; }
+.si-empty { padding: 20px 0; color: var(--erp-muted); }
+@media (max-width: 1050px) {
+    .si-information-grid, .si-tax-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    .si-line-heading, .si-line { grid-template-columns: minmax(0,1fr) 80px 110px 90px; gap: 12px; }
+    .si-comparison { gap: 20px; }
+    .si-accepted-totals { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 700px) {
+    .si-workspace .si-panel { padding: 18px; }
+    .si-page-intro { align-items: flex-start; flex-direction: column; }
+    .si-information-grid, .si-tax-grid, .si-comparison { grid-template-columns: minmax(0,1fr); }
+    .si-difference-fields { grid-template-columns: minmax(0,1fr); }
+    .si-section-heading { gap: 10px; align-items: flex-start; }
+    .si-section-heading > .erp-badge { white-space: normal; text-align: center; }
+    .si-document-row { flex-direction: column; align-items: stretch; }
+    .si-document-row a { align-self: flex-start; }
+    .si-line-heading { display: none; }
+    .si-line { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 14px; }
+    .si-product { grid-column: 1/-1; }
+    .si-mobile-label { display: block; color: var(--erp-muted); font-size: 12px; margin-bottom: 6px; }
+    .si-number, .si-quantity input { text-align: start; }
+    .si-detail-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    .si-total-line { justify-content: flex-start; }
+    .si-supplier-column { padding-block: 4px 12px; }
+    .si-comparison-status { flex-wrap: wrap; }
+    .si-actions > :is(button,a) { flex: 1 1 180px; }
+}

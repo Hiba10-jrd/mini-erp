@@ -28,7 +28,7 @@ new class extends \Livewire\Volt\Component
                     'supplier:id,code,name,trade_name',
                     'paymentMethod:id,name,payment_type',
                     'creator:id,name',
-                    'allocations.supplierInvoice:id,number,supplier_invoice_number,total_ttc',
+                    'allocations.supplierInvoice:id,number,supplier_invoice_number,total_ttc,status',
                 ])
                 ->findOrFail($this->supplierPaymentId),
         ];
@@ -278,7 +278,7 @@ new class extends \Livewire\Volt\Component
                                 {{ str_replace(
                                     '.',
                                     ',',
-                                    $allocation->supplierInvoice->total_ttc
+                                    $allocation->supplierInvoice->payableAmount()
                                 ) }}
                             </td>
 

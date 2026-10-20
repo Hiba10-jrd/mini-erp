@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div>
             <p class="text-sm font-medium text-indigo-600">{{ __('Achats') }}</p>
-            <h2 class="text-xl font-semibold leading-tight text-gray-800">{{ __('Fiche facture fournisseur') }}</h2>
+            <h2 class="text-xl font-semibold leading-tight text-gray-800">{{ __('Factures fournisseurs') }}</h2>
         </div>
     </x-slot>
 
@@ -11,5 +11,4 @@
             <livewire:admin.supplier-invoice-details :invoice-id="$supplierInvoice->id" />
         </div>
     </div>
-<div class="mx-auto max-w-7xl px-4 pb-8"><livewire:attachments-manager parent-type="supplier-invoice" :parent-id="$supplierInvoice->id" /></div>
 </x-app-layout>

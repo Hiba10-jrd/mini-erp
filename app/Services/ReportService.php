@@ -65,7 +65,7 @@ class ReportService
             'invoice' => [Invoice::query()->where('status', Invoice::STATUS_ISSUED), 'invoice_date', 'subtotal_ht - discount_total'],
             'credit' => [CreditNote::query()->where('status', CreditNote::STATUS_ISSUED), 'credit_date', 'subtotal_ht - discount_total'],
             'payment' => [Payment::query(), 'payment_date', 'amount'],
-            'purchase' => [SupplierInvoice::query()->where('status', SupplierInvoice::STATUS_VALIDATED), 'invoice_date', 'total_ttc'],
+            'purchase' => [SupplierInvoice::query()->where('status', SupplierInvoice::STATUS_VALIDATED), 'invoice_date', SupplierInvoice::payableSql()],
             'expense' => [Expense::query(), 'expense_date', 'amount'],
         ];
     }
@@ -170,7 +170,7 @@ class ReportService
         $query = $this->during($query, $date, $from, $to);
         $remaining = $this->supplierBalance();
 
-        return ['Achats HT' => $this->sum(clone $query, 'subtotal_ht - discount_total'), 'TVA achats' => $this->sum(clone $query, 'tax_total'), 'Achats facturés TTC' => $this->sum(clone $query, 'total_ttc'), 'Paiements fournisseurs' => $this->sum(SupplierPayment::query()->where('payment_date', '>=', $from)->where('payment_date', '<', Carbon::parse($to)->addDay()->toDateString()), 'amount'), 'Fournisseurs à payer actuels' => self::decimal($remaining)];
+        return ['Achats HT' => $this->sum(clone $query, SupplierInvoice::payableSql('net_ht')), 'TVA achats' => $this->sum(clone $query, SupplierInvoice::payableSql('tax_total')), 'Achats facturés TTC' => $this->sum(clone $query, SupplierInvoice::payableSql()), 'Paiements fournisseurs' => $this->sum(SupplierPayment::query()->where('payment_date', '>=', $from)->where('payment_date', '<', Carbon::parse($to)->addDay()->toDateString()), 'amount'), 'Fournisseurs à payer actuels' => self::decimal($remaining)];
     }
 
     public function paymentSummary(string $from, string $to): array

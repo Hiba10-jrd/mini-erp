@@ -6,6 +6,7 @@ use Brick\Math\BigDecimal;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use LogicException;
 
@@ -19,6 +20,10 @@ class SupplierInvoice extends Model
     }
 
     public const STATUS_DRAFT = 'draft';
+
+    public const STATUS_UNDER_REVIEW = 'under_review';
+
+    public const STATUS_DISPUTED = 'disputed';
 
     public const STATUS_VALIDATED = 'validated';
 
@@ -45,6 +50,7 @@ class SupplierInvoice extends Model
             'total_ttc' => 'decimal:2',
             'validated_at' => 'datetime',
             'cancelled_at' => 'datetime',
+            'lock_version' => 'integer',
         ];
     }
 
@@ -54,19 +60,24 @@ class SupplierInvoice extends Model
             $originalStatus = $invoice->getOriginal('status');
             $targetStatus = $invoice->status;
 
-            if ($originalStatus === self::STATUS_DRAFT && $targetStatus === self::STATUS_DRAFT) {
+            if (in_array($originalStatus, [self::STATUS_DRAFT, self::STATUS_DISPUTED], true) && $targetStatus === $originalStatus) {
                 return;
             }
 
             $statusChanged = $invoice->isDirty('status');
-            if (! $statusChanged || $originalStatus !== self::STATUS_DRAFT || ! in_array($targetStatus, [self::STATUS_VALIDATED, self::STATUS_CANCELLED], true)) {
+            $transitions = [
+                self::STATUS_DRAFT => [self::STATUS_UNDER_REVIEW, self::STATUS_CANCELLED],
+                self::STATUS_DISPUTED => [self::STATUS_UNDER_REVIEW],
+                self::STATUS_UNDER_REVIEW => [self::STATUS_VALIDATED, self::STATUS_DISPUTED],
+            ];
+            if (! $statusChanged || ! in_array($targetStatus, $transitions[$originalStatus] ?? [], true)) {
                 throw new LogicException(__('Cette transition de facture fournisseur est interdite.'));
             }
 
-            $allowed = ['status', 'updated_at'];
+            $allowed = ['status', 'updated_at', 'lock_version'];
             if ($targetStatus === self::STATUS_VALIDATED) {
-                array_push($allowed, 'number', 'subtotal_ht', 'discount_total', 'tax_total', 'total_ttc', 'validated_by', 'validated_at');
-            } else {
+                array_push($allowed, 'number', 'validated_by', 'validated_at');
+            } elseif ($targetStatus === self::STATUS_CANCELLED) {
                 $allowed[] = 'cancelled_at';
             }
 
@@ -117,7 +128,30 @@ class SupplierInvoice extends Model
 
     public function isEditable(): bool
     {
-        return $this->status === self::STATUS_DRAFT;
+        return in_array($this->status, [self::STATUS_DRAFT, self::STATUS_DISPUTED], true);
+    }
+
+    public function reconciliation(): HasOne
+    {
+        return $this->hasOne(SupplierInvoiceReconciliation::class);
+    }
+
+    /** Historical invoices keep their original debt. Only validated invoices are payable. */
+    public function payableAmount(): string
+    {
+        return $this->status === self::STATUS_VALIDATED
+            ? ($this->reconciliation?->total_ttc ?? $this->total_ttc)
+            : '0.00';
+    }
+
+    public static function payableSql(string $field = 'total_ttc'): string
+    {
+        if (! in_array($field, ['net_ht', 'tax_total', 'total_ttc'], true)) {
+            throw new \InvalidArgumentException('Invalid payable field');
+        }
+        $fallback = $field === 'net_ht' ? '(supplier_invoices.subtotal_ht - supplier_invoices.discount_total)' : 'supplier_invoices.'.$field;
+
+        return "COALESCE((SELECT sir.{$field} FROM supplier_invoice_reconciliations sir WHERE sir.supplier_invoice_id = supplier_invoices.id), {$fallback})";
     }
 
     public function baseHt(): string

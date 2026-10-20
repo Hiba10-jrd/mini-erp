@@ -357,7 +357,7 @@ new class extends \Livewire\Volt\Component
             @forelse($supplierInvoices as $invoice)
                 <a href="{{ route('purchases.invoices.show', $invoice) }}" wire:navigate class="flex items-center justify-between gap-4 px-5 py-4 hover:bg-gray-50">
                     <div><p class="font-medium text-indigo-700">{{ $invoice->number ?? __('Brouillon #:id', ['id' => $invoice->id]) }}</p><p class="text-sm text-gray-500">{{ $invoice->supplier_invoice_number }}</p></div>
-                    <span class="text-sm text-gray-600">{{ ['draft' => __('Brouillon'), 'validated' => __('Validée'), 'cancelled' => __('Annulée')][$invoice->status] ?? $invoice->status }}</span>
+                    <span class="text-sm text-gray-600">{{ ['under_review' => __('En vérification'), 'disputed' => __('Contestée'), 'draft' => __('Brouillon'), 'validated' => __('Validée'), 'cancelled' => __('Annulée')][$invoice->status] ?? $invoice->status }}</span>
                 </a>
             @empty
                 <p class="px-5 py-4 text-sm text-gray-500">{{ __('Aucune facture fournisseur liée à cette réception.') }}</p>

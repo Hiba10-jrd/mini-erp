@@ -19,9 +19,11 @@ class SupplierPaymentManagementService
     {
         $paid = SupplierPaymentAllocation::query()->selectRaw('supplier_invoice_id, SUM(amount) AS paid')->groupBy('supplier_invoice_id');
 
-        return SupplierInvoice::query()->where('supplier_invoices.status', SupplierInvoice::STATUS_VALIDATED)
+        $payable = SupplierInvoice::payableSql();
+
+        return SupplierInvoice::query()->with('reconciliation')->where('supplier_invoices.status', SupplierInvoice::STATUS_VALIDATED)
             ->leftJoinSub($paid, 'paid', 'paid.supplier_invoice_id', '=', 'supplier_invoices.id')
-            ->select('supplier_invoices.*')->selectRaw('COALESCE(paid.paid, 0) AS report_paid, CASE WHEN total_ttc - COALESCE(paid.paid, 0) > 0 THEN total_ttc - COALESCE(paid.paid, 0) ELSE 0 END AS report_remaining');
+            ->select('supplier_invoices.*')->selectRaw("{$payable} AS report_payable, COALESCE(paid.paid, 0) AS report_paid, CASE WHEN {$payable} - COALESCE(paid.paid, 0) > 0 THEN {$payable} - COALESCE(paid.paid, 0) ELSE 0 END AS report_remaining");
     }
 
     /**
@@ -362,7 +364,7 @@ class SupplierPaymentManagementService
         }
 
         $totalCents = $this->toCents(
-            (string) $invoice->total_ttc
+            $invoice->payableAmount()
         );
 
         $paidCents =
@@ -415,7 +417,7 @@ class SupplierPaymentManagementService
         return max(
             0,
             $this->toCents(
-                (string) $invoice->total_ttc
+                $invoice->payableAmount()
             )
             - $this->paidAmountCents(
                 $invoice

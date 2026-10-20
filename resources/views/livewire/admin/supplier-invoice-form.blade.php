@@ -1,72 +1,75 @@
 <?php
 
+use App\Livewire\Concerns\PreparesSupplierInvoiceAmounts;
 use App\Models\PurchaseOrder;
 use App\Models\SupplierInvoice;
 use App\Services\AttachmentManagementService;
 use App\Services\QuoteCalculator;
 use App\Services\SupplierInvoiceManagementService;
+use App\Services\SupplierPaymentManagementService;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Locked;
 use Livewire\WithFileUploads;
 
-new class extends \Livewire\Volt\Component
-{
-    use WithFileUploads;
+new class extends \Livewire\Volt\Component {
+    use WithFileUploads, PreparesSupplierInvoiceAmounts;
 
-    #[Locked]
-    public ?int $invoiceId = null;
-
-    #[Locked]
-    public ?int $fixedOrderId = null;
-
+    #[Locked] public ?int $invoiceId = null;
+    #[Locked] public int $version = 0;
+    #[Locked] public ?int $fixedOrderId = null;
+    #[Locked] public bool $viewOnly = false;
     public string $purchaseOrderId = '';
-
     public string $supplierInvoiceNumber = '';
-
     public string $invoiceDate = '';
-
     public string $dueDate = '';
-
     public string $notes = '';
-
     public $originalInvoiceFile = null;
-
-    /** @var array<int, array<string, mixed>> */
     public array $lines = [];
+    public bool $showCorrection = false;
+    public bool $showDispute = false;
 
-    public function mount(?int $invoiceId = null, ?int $orderId = null): void
+    public function mount(?int $invoiceId = null, ?int $orderId = null, bool $viewOnly = false): void
     {
+        $this->viewOnly = $viewOnly;
         $this->invoiceDate = today()->toDateString();
-
         if ($invoiceId !== null) {
-            Gate::authorize('purchases.update');
-            $invoice = SupplierInvoice::query()->with(['items', 'purchaseOrder'])->findOrFail($invoiceId);
-            abort_unless($invoice->isEditable(), 403);
-
-            $this->invoiceId = $invoice->id;
+            Gate::authorize($viewOnly ? 'purchases.view' : 'purchases.update');
+            $invoice = SupplierInvoice::with(['items.goodsReceiptItem.goodsReceipt', 'purchaseOrder', 'reconciliation'])->findOrFail($invoiceId);
+            if (! $viewOnly) abort_unless($invoice->isEditable(), 403);
+            $this->invoiceId = $invoiceId;
+            $this->version = $invoice->lock_version;
             $this->fixedOrderId = $invoice->purchase_order_id;
             $this->purchaseOrderId = (string) $invoice->purchase_order_id;
             $this->supplierInvoiceNumber = $invoice->supplier_invoice_number;
             $this->invoiceDate = $invoice->invoice_date->toDateString();
             $this->dueDate = $invoice->due_date?->toDateString() ?? '';
             $this->notes = $invoice->notes ?? '';
-            $this->initializeLines(
-                $invoice->purchaseOrder,
-                app(SupplierInvoiceManagementService::class),
-                $invoice,
-            );
-
+            if ($invoice->isEditable() && Gate::allows('purchases.update')) {
+                $this->initializeLines($invoice->purchaseOrder, app(SupplierInvoiceManagementService::class), $invoice);
+            } else {
+                foreach ($invoice->items as $item) {
+                    $receipt = $item->goodsReceiptItem?->goodsReceipt;
+                    $this->lines[$item->goods_receipt_item_id] = [
+                        'goods_receipt_item_id' => $item->goods_receipt_item_id, 'selected' => true,
+                        'quantity' => $item->quantity, 'description' => $item->description, 'reference' => $item->reference,
+                        'unit_label' => $item->unit_label, 'unit_price' => $item->unit_price,
+                        'discount_percent' => $item->discount_percent, 'tax_rate_percent' => $item->tax_rate_percent,
+                        'goods_receipt_number' => $receipt?->number, 'goods_receipt_id' => $receipt?->id,
+                        'received_quantity' => $item->goodsReceiptItem?->quantity, 'available_quantity' => null, 'total_ttc' => $item->total_ttc,
+                    ];
+                }
+            }
+            if (Gate::allows('purchases.view')) $this->initializeAmounts($invoice);
             return;
         }
-
         Gate::authorize('purchases.create');
         if ($orderId !== null) {
-            $order = PurchaseOrder::query()->findOrFail($orderId);
+            $order = PurchaseOrder::findOrFail($orderId);
             abort_unless($order->status === PurchaseOrder::STATUS_CONFIRMED, 422);
-            $this->fixedOrderId = $order->id;
-            $this->purchaseOrderId = (string) $order->id;
+            $this->fixedOrderId = $orderId;
+            $this->purchaseOrderId = (string) $orderId;
             $this->initializeLines($order, app(SupplierInvoiceManagementService::class));
         }
     }
@@ -76,12 +79,40 @@ new class extends \Livewire\Volt\Component
         $this->authorizeMutation();
         abort_if($this->fixedOrderId !== null, 403);
         $this->lines = [];
-
         if ($this->purchaseOrderId !== '') {
-            $order = PurchaseOrder::query()->findOrFail($this->purchaseOrderId);
+            $order = PurchaseOrder::findOrFail($this->purchaseOrderId);
             abort_unless($order->status === PurchaseOrder::STATUS_CONFIRMED, 422);
             $this->initializeLines($order, $service);
         }
+    }
+
+    private function initializeLines(PurchaseOrder $order, SupplierInvoiceManagementService $service, ?SupplierInvoice $invoice = null): void
+    {
+        $available = $service->availableItemsForOrder($order, $invoice);
+        $current = $invoice?->items->keyBy('goods_receipt_item_id') ?? collect();
+        foreach ($available as $line) {
+            $id = (int) $line['goods_receipt_item_id'];
+            $this->lines[$id] = [...$line, 'selected' => $invoice === null || $current->has($id),
+                'quantity' => $current->get($id)?->quantity ?? ($invoice === null ? $line['available_quantity'] : '0.000')];
+        }
+        $rates = collect($this->lines)->filter(fn ($line) => $line['selected'] ?? false)->pluck('tax_rate_percent')->unique();
+        $this->rate = $rates->count() === 1 ? (string) $rates->first() : '';
+        if ($rates->count() > 1 && $this->breakdown === []) {
+            $this->detailed = true;
+            $this->breakdown = $rates->map(fn ($rate) => ['kind' => 'purchase', 'label' => __('Achats'), 'net_ht' => '', 'rate' => (string) $rate, 'tax' => '', 'tax_reason' => '', 'rounding_reason' => ''])->values()->all();
+        }
+    }
+
+    private function authorizeMutation(): void
+    {
+        Gate::authorize($this->invoiceId === null ? 'purchases.create' : 'purchases.update');
+        if ($this->invoiceId !== null) abort_unless(SupplierInvoice::findOrFail($this->invoiceId)->isEditable(), 403);
+    }
+
+    private function displayedInvoice(): SupplierInvoice
+    {
+        Gate::authorize('purchases.view');
+        return SupplierInvoice::findOrFail($this->invoiceId)->forceFill(['lock_version' => $this->version]);
     }
 
     public function clearOriginalInvoiceFile(): void
@@ -92,317 +123,169 @@ new class extends \Livewire\Volt\Component
 
     public function save(SupplierInvoiceManagementService $service): void
     {
+        $this->persistWorkspace($service, false);
+    }
+
+    public function submit(SupplierInvoiceManagementService $service): void
+    {
+        $this->authorizeAmountEdit();
+        $this->persistWorkspace($service, true);
+    }
+
+    private function persistWorkspace(SupplierInvoiceManagementService $service, bool $submit): void
+    {
         $this->authorizeMutation();
-        $this->validate([
-            'originalInvoiceFile' => ['nullable', 'file', 'max:5120', 'mimes:pdf,jpg,jpeg,png', 'mimetypes:application/pdf,image/jpeg,image/png'],
-        ], [
+        $hasAmounts = $submit || $this->netHt !== '' || $this->tax !== '';
+        if ($hasAmounts) $this->authorizeAmountEdit();
+        $this->validate(['originalInvoiceFile' => ['nullable', 'file', 'max:5120', 'mimes:pdf,jpg,jpeg,png', 'mimetypes:application/pdf,image/jpeg,image/png']], [
             'originalInvoiceFile.max' => __('Le fichier ne doit pas dépasser 5 Mo.'),
             'originalInvoiceFile.mimes' => __('Choisissez une facture originale au format PDF, JPG, JPEG ou PNG.'),
             'originalInvoiceFile.mimetypes' => __('Le contenu du fichier ne correspond pas à un format autorisé.'),
         ]);
-        if ($this->originalInvoiceFile !== null) {
-            Gate::authorize('purchases.view');
-            Gate::authorize('purchases.update');
-        }
-
+        if ($this->originalInvoiceFile !== null) $this->authorizeAmountEdit();
         $order = $this->resolveOrder();
-        if ($order === null) {
-            $this->addError('purchase_order_id', __('Sélectionnez une commande fournisseur confirmée.'));
-
-            return;
-        }
-
-        $items = collect($this->lines)
-            ->filter(fn (array $line): bool => (bool) ($line['selected'] ?? false))
-            ->map(fn (array $line): array => [
-                'goods_receipt_item_id' => $line['goods_receipt_item_id'],
-                'quantity' => $line['quantity'],
-            ])->values()->all();
-
-        if ($items === []) {
-            $this->addError('items', __('Sélectionnez au moins une ligne de réception à facturer.'));
-
-            return;
-        }
-
-        $attributes = [
-            'supplier_invoice_number' => $this->supplierInvoiceNumber,
-            'invoice_date' => $this->invoiceDate,
-            'due_date' => $this->dueDate === '' ? null : $this->dueDate,
-            'notes' => $this->notes,
-            'items' => $items,
-        ];
-
-        $saveDraft = fn (): SupplierInvoice => $this->invoiceId === null
-            ? $service->createDraft($order, $attributes)
-            : $service->updateDraft(SupplierInvoice::query()->findOrFail($this->invoiceId), $attributes);
-
-        if ($this->originalInvoiceFile === null) {
-            $invoice = $saveDraft();
-        } else {
-            $uploadedAttachment = null;
+        if ($order === null) { $this->addError('purchase_order_id', __('Sélectionnez une commande fournisseur confirmée.')); return; }
+        $items = collect($this->lines)->filter(fn ($line) => (bool) ($line['selected'] ?? false))
+            ->map(fn ($line) => ['goods_receipt_item_id' => $line['goods_receipt_item_id'], 'quantity' => $line['quantity']])->values()->all();
+        if ($items === []) { $this->addError('items', __('Sélectionnez au moins une ligne de réception à facturer.')); return; }
+        if ($submit) {
             try {
-                $invoice = DB::transaction(function () use ($saveDraft, &$uploadedAttachment): SupplierInvoice {
-                    $invoice = $saveDraft();
-                    $uploadedAttachment = app(AttachmentManagementService::class)->upload(
-                        $invoice,
-                        $this->originalInvoiceFile,
-                        ['category' => SupplierInvoice::ORIGINAL_DOCUMENT_CATEGORY],
-                    );
-
-                    return $invoice;
-                });
-            } catch (\Throwable $exception) {
-                if ($uploadedAttachment !== null) {
-                    Storage::disk('attachments')->delete($uploadedAttachment->path);
-                }
-
-                throw $exception;
+                $amountState = $this->amountPresentation($this->currentErpTotals());
+            } catch (\Throwable) {
+                $this->addError('items', __('Vérifiez les quantités des lignes sélectionnées avant de soumettre.'));
+                return;
+            }
+            if ($amountState['categoryRequired']) {
+                $this->addError('differenceCategory', __('Choisissez le motif qui explique la différence.'));
+                return;
+            }
+            if ($amountState['differenceTreatmentRequired']) {
+                $this->addError('confirmDifferenceTaxTreatment', __('Confirmez le montant et le traitement TVA avant de soumettre.'));
+                return;
+            }
+            if ($amountState['reasonRequired']) {
+                $this->addError('reconciliation', __('Justifiez les écarts avant de soumettre.'));
+                return;
+            }
+            if ($this->differenceCategory === 'other' && trim($this->differenceReason) === '') {
+                $this->addError('differenceReason', __('Précisez cet autre motif avant de soumettre.'));
+                return;
             }
         }
-
-        session()->flash('status', $this->invoiceId === null
-            ? __('La facture fournisseur brouillon a été créée.')
-            : __('Le brouillon de facture fournisseur a été mis à jour.'));
+        $attributes = ['supplier_invoice_number' => $this->supplierInvoiceNumber, 'invoice_date' => $this->invoiceDate,
+            'due_date' => $this->dueDate ?: null, 'notes' => $this->notes, 'items' => $items];
+        $uploaded = null;
+        try {
+            // Coordinate existing services atomically; their financial rules remain unchanged.
+            $invoice = DB::transaction(function () use ($service, $submit, $hasAmounts, $order, $attributes, &$uploaded) {
+                $invoice = $this->invoiceId === null ? $service->createDraft($order, $attributes)
+                    : $service->updateDraft(SupplierInvoice::findOrFail($this->invoiceId)->forceFill(['lock_version' => $this->version]), $attributes);
+                $data = $this->supplierData();
+                if ($this->originalInvoiceFile !== null) {
+                    $uploaded = app(AttachmentManagementService::class)->upload($invoice, $this->originalInvoiceFile, ['category' => SupplierInvoice::ORIGINAL_DOCUMENT_CATEGORY]);
+                    $data['attachment_id'] = $uploaded->id;
+                }
+                if ($submit) return $service->submitForReview($invoice, $data);
+                if ($hasAmounts) return $service->saveReconciliationDraft($invoice, $data);
+                return $invoice;
+            });
+        } catch (\Throwable $exception) {
+            if ($uploaded !== null) Storage::disk('attachments')->delete($uploaded->path);
+            if ($exception instanceof \Illuminate\Validation\ValidationException) {
+                $errors = $exception->errors();
+                $labels = ['net_ht' => __('Montant HT du document'), 'tax_total' => __('TVA du document'), 'total_ttc' => __('TTC fournisseur calculé'), 'rate' => __('Taux de TVA (%)'), 'tax' => __('TVA du document'), 'label' => __('Libellé'), 'kind' => __('Nature')];
+                foreach ($errors as $key => &$messages) {
+                    if (preg_match('/^breakdown\.(\d+)\.(\w+)$/', $key, $matches)) {
+                        $messages = [__('Vérifiez le champ « :field » de la composante :number.', ['field' => $labels[$matches[2]] ?? __('Montants'), 'number' => (int)$matches[1] + 1])];
+                    } elseif (isset($labels[$key])) {
+                        $messages = [__('Vérifiez le champ « :field » : saisissez un montant valide avec deux décimales au maximum.', ['field' => $labels[$key]])];
+                    } elseif ($key === 'attachment_id') {
+                        $messages = [__('Ajoutez le document fournisseur avant de soumettre.')];
+                    }
+                }
+                unset($messages);
+                throw \Illuminate\Validation\ValidationException::withMessages($errors);
+            }
+            throw $exception;
+        }
+        session()->flash('status', $submit ? __('Facture soumise à vérification.') : __('Le brouillon et les informations saisies ont été enregistrés.'));
         $this->redirectRoute('purchases.invoices.show', ['supplierInvoice' => $invoice], navigate: true);
     }
 
-    public function with(QuoteCalculator $calculator, SupplierInvoiceManagementService $service): array
+    public function accept(SupplierInvoiceManagementService $service): void
     {
-        $this->authorizeMutation();
-        $order = $this->resolveOrder();
-        $calculatedLines = [];
-
-        foreach ($this->lines as $sourceId => $line) {
-            if (! ($line['selected'] ?? false)) {
-                continue;
-            }
-            try {
-                $calculatedLines[$sourceId] = $calculator->line(
-                    (string) $line['quantity'],
-                    (string) $line['unit_price'],
-                    (string) $line['discount_percent'],
-                    (string) $line['tax_rate_percent'],
-                );
-            } catch (\Throwable) {
-                $calculatedLines[$sourceId] = null;
-            }
-        }
-
-        $orders = collect();
-        if ($this->fixedOrderId === null) {
-            $orders = PurchaseOrder::query()
-                ->where('status', PurchaseOrder::STATUS_CONFIRMED)
-                ->latest('order_date')
-                ->get()
-                ->filter(fn (PurchaseOrder $candidate): bool => $service->availableItemsForOrder($candidate) !== []);
-        }
-
-        $canAttachOriginal = Gate::allows('purchases.view') && Gate::allows('purchases.update');
-        $originalAttachments = collect();
-        if ($this->invoiceId !== null && Gate::allows('purchases.view')) {
-            $originalAttachments = SupplierInvoice::query()->findOrFail($this->invoiceId)
-                ->attachments()
-                ->where('category', SupplierInvoice::ORIGINAL_DOCUMENT_CATEGORY)
-                ->latest()
-                ->get();
-        }
-
-        return [
-            'order' => $order,
-            'orders' => $orders,
-            'calculatedLines' => $calculatedLines,
-            'previewTotals' => $calculator->totals(collect($calculatedLines)->filter()->values()->all()),
-            'canAttachOriginal' => $canAttachOriginal,
-            'originalAttachments' => $originalAttachments,
-        ];
+        $service->validate($this->displayedInvoice());
+        session()->flash('status', __('La facture fournisseur a été validée avec succès.'));
+        $this->redirectRoute('purchases.invoices.show', ['supplierInvoice' => $this->invoiceId], navigate: true);
     }
 
-    private function initializeLines(
-        PurchaseOrder $order,
-        SupplierInvoiceManagementService $service,
-        ?SupplierInvoice $invoice = null,
-    ): void {
-        $available = $service->availableItemsForOrder($order, $invoice);
-        abort_if($available === [], 422, __('Aucune quantité reçue ne reste à facturer.'));
-        $current = $invoice?->items->keyBy('goods_receipt_item_id') ?? collect();
-
-        foreach ($available as $line) {
-            $sourceId = (int) $line['goods_receipt_item_id'];
-            $currentItem = $current->get($sourceId);
-            $this->lines[$sourceId] = [
-                'goods_receipt_item_id' => $sourceId,
-                'selected' => $invoice === null || $currentItem !== null,
-                'quantity' => $currentItem?->quantity ?? ($invoice === null ? $line['available_quantity'] : '0.000'),
-                ...$line,
-            ];
-        }
+    public function dispute(SupplierInvoiceManagementService $service): void
+    {
+        $service->dispute($this->displayedInvoice(), $this->disputeReason);
+        $this->redirectRoute('purchases.invoices.show', ['supplierInvoice' => $this->invoiceId], navigate: true);
     }
 
-    private function authorizeMutation(): void
+    public function cancel(SupplierInvoiceManagementService $service): void
     {
-        Gate::authorize($this->invoiceId === null ? 'purchases.create' : 'purchases.update');
-        if ($this->invoiceId !== null) {
-            abort_unless(SupplierInvoice::query()->findOrFail($this->invoiceId)->isEditable(), 403);
-        }
+        $service->cancelDraft($this->displayedInvoice());
+        $this->redirectRoute('purchases.invoices.show', ['supplierInvoice' => $this->invoiceId], navigate: true);
     }
 
     private function resolveOrder(): ?PurchaseOrder
     {
-        $orderId = $this->fixedOrderId ?? filter_var($this->purchaseOrderId, FILTER_VALIDATE_INT);
-        if ($orderId === false || $orderId === null) {
-            return null;
-        }
+        $id = $this->fixedOrderId ?? filter_var($this->purchaseOrderId, FILTER_VALIDATE_INT);
+        return $id ? PurchaseOrder::findOrFail($id) : null;
+    }
 
-        return PurchaseOrder::query()->findOrFail($orderId);
+    public function with(QuoteCalculator $calculator, SupplierInvoiceManagementService $service): array
+    {
+        Gate::authorize($this->viewOnly ? 'purchases.view' : ($this->invoiceId === null ? 'purchases.create' : 'purchases.update'));
+        $invoice = $this->invoiceId ? SupplierInvoice::with(['reconciliation', 'histories.user', 'paymentAllocations.payment'])->findOrFail($this->invoiceId) : null;
+        $canEdit = ($invoice === null || $invoice->isEditable()) && Gate::allows($invoice === null ? 'purchases.create' : 'purchases.update');
+        $order = $this->resolveOrder();
+        $calculatedLines = [];
+        foreach ($this->lines as $id => $line) {
+            if (! ($line['selected'] ?? false)) continue;
+            try { $calculatedLines[$id] = $calculator->line((string) $line['quantity'], (string) $line['unit_price'], (string) $line['discount_percent'], (string) $line['tax_rate_percent']); }
+            catch (\Throwable) { $calculatedLines[$id] = null; }
+        }
+        $previewTotals = $invoice !== null && ! $canEdit
+            ? ['subtotal_ht' => $invoice->subtotal_ht, 'discount_total' => $invoice->discount_total, 'base_ht' => $invoice->baseHt(), 'tax_total' => $invoice->tax_total, 'total_ttc' => $invoice->total_ttc]
+            : $calculator->totals(collect($calculatedLines)->filter()->values()->all());
+        $orders = collect();
+        if ($this->fixedOrderId === null) $orders = PurchaseOrder::where('status', PurchaseOrder::STATUS_CONFIRMED)->latest('order_date')->get()->filter(fn ($candidate) => $service->availableItemsForOrder($candidate) !== []);
+        $canAttachOriginal = $canEdit && Gate::allows('purchases.view') && Gate::allows('purchases.update');
+        $canPrepareAmounts = $canAttachOriginal;
+        $documents = $invoice && Gate::allows('purchases.view') ? $invoice->attachments()->where('category', SupplierInvoice::ORIGINAL_DOCUMENT_CATEGORY)->latest('id')->get() : collect();
+        $activeDocument = $documents->firstWhere('id', (int) $this->attachmentId) ?? $documents->first();
+        $payments = app(SupplierPaymentManagementService::class);
+        $remaining = $invoice ? $payments->remainingAmount($invoice) : '0.00';
+        $paidAmount = $invoice ? $payments->paidAmount($invoice) : '0.00';
+        $paymentState = $invoice ? $payments->paymentState($invoice) : 'not_applicable';
+        $dispute = $invoice?->histories->where('event', 'disputed')->last();
+        $selectedReceipts = collect($this->lines)->filter(fn ($line) => $line['selected'] ?? false)->unique('goods_receipt_id');
+
+        $invalidSelectedLine = collect($this->lines)->contains(fn ($line, $id) => ($line['selected'] ?? false) && ! isset($calculatedLines[$id]));
+        $amountState = $this->amountPresentation($previewTotals);
+        $canSubmit = $canPrepareAmounts
+            && $order !== null
+            && $this->lines !== []
+            && $selectedReceipts->isNotEmpty()
+            && ! $invalidSelectedLine
+            && trim($this->supplierInvoiceNumber) !== ''
+            && $this->invoiceDate !== ''
+            && ($activeDocument !== null || $this->originalInvoiceFile !== null)
+            && $this->netHt !== ''
+            && $this->tax !== ''
+            && $this->documentTtc !== ''
+            && $amountState['fiscalIssue'] === null
+            && ! $amountState['categoryRequired']
+            && ! $amountState['differenceTreatmentRequired']
+            && ! $amountState['reasonRequired']
+            && ! ($this->differenceCategory === 'other' && trim($this->differenceReason) === '');
+
+        return compact('invoice', 'order', 'orders', 'canEdit', 'canAttachOriginal', 'canPrepareAmounts', 'canSubmit', 'invalidSelectedLine', 'calculatedLines', 'previewTotals', 'documents', 'activeDocument', 'remaining', 'paidAmount', 'paymentState', 'dispute', 'selectedReceipts') + $amountState;
     }
 }; ?>
 
-<section class="space-y-6">
-    <div class="flex justify-end">
-        <a href="{{ route('purchases.invoices.index') }}" wire:navigate class="text-sm font-medium text-indigo-700 hover:text-indigo-900">{{ __('Retour aux factures fournisseurs') }}</a>
-    </div>
-
-    @if ($errors->any())
-        <div class="border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
-            <ul class="list-disc space-y-1 ps-5">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
-        </div>
-    @endif
-
-    <form wire:submit="save" class="space-y-6">
-        <section class="border-y border-gray-200 bg-white p-5 sm:p-6">
-            <h3 class="text-base font-semibold text-gray-900">{{ __('Facture originale reçue du fournisseur') }}</h3>
-            <p class="mt-1 text-sm text-gray-600">{{ __('Importez, si disponible, le document reçu du fournisseur. Cet import ne crée ni mouvement de stock ni paiement.') }}</p>
-            @if ($canAttachOriginal)
-                <div class="mt-4 space-y-3">
-                    <label for="supplier-original-invoice" class="block text-sm font-medium text-gray-700">{{ __('Importer la facture originale reçue (facultatif)') }}</label>
-                    <input id="supplier-original-invoice" type="file" wire:model="originalInvoiceFile" accept=".pdf,.jpg,.jpeg,.png" class="block w-full text-sm text-gray-700 file:me-4 file:rounded file:border-0 file:bg-gray-100 file:px-4 file:py-2" aria-describedby="supplier-original-invoice-help" />
-                    <p id="supplier-original-invoice-help" class="text-xs text-gray-500">{{ __('Format accepté : PDF, JPG ou PNG · 5 Mo maximum') }}</p>
-                    <x-input-error :messages="$errors->get('originalInvoiceFile')" />
-                    @if ($originalInvoiceFile)
-                        <div class="flex flex-wrap items-center gap-3 text-sm">
-                            <p role="status" class="break-all"><bdi>{{ $originalInvoiceFile->getClientOriginalName() }}</bdi> · {{ number_format($originalInvoiceFile->getSize() / 1024, 1) }} {{ __('Ko') }}</p>
-                            <button type="button" wire:click="clearOriginalInvoiceFile" class="text-red-600 hover:underline">{{ __('Retirer') }}</button>
-                        </div>
-                    @endif
-                    @if ($originalAttachments->isNotEmpty())
-                        <ul class="space-y-2 border-t border-gray-100 pt-3">
-                            @foreach ($originalAttachments as $attachment)
-                                <li class="flex flex-wrap items-center justify-between gap-2 text-sm" wire:key="original-invoice-{{ $attachment->id }}">
-                                    <span class="break-all"><bdi>{{ $attachment->original_name }}</bdi> · {{ number_format($attachment->size / 1024, 1) }} {{ __('Ko') }}</span>
-                                    <a class="text-indigo-700 underline" href="{{ route('attachments.download', $attachment) }}">{{ __('Télécharger la facture originale') }}</a>
-                                </li>
-                            @endforeach
-                        </ul>
-                    @endif
-                </div>
-            @else
-                <p class="mt-4 rounded bg-amber-50 p-3 text-sm text-amber-800">{{ __('Vous pouvez enregistrer le brouillon sans fichier. Pour joindre un document, les autorisations de consultation et de mise à jour des achats sont nécessaires.') }}</p>
-            @endif
-        </section>
-
-        <section class="border-y border-gray-200 bg-white p-5 sm:p-6">
-            <h3 class="text-base font-semibold text-gray-900">{{ __('Informations de la facture fournisseur') }}</h3>
-            <div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <div class="sm:col-span-2">
-                    <x-input-label for="supplier-invoice-order" :value="__('Commande fournisseur confirmée')" />
-                    @if ($fixedOrderId !== null)
-                        <x-text-input id="supplier-invoice-order" value="{{ $order?->number }} · {{ $order?->supplier_name }}" disabled class="mt-1 block w-full bg-gray-50" />
-                    @else
-                        <select id="supplier-invoice-order" wire:model.live="purchaseOrderId" required class="mt-1 block w-full border-gray-300 shadow-sm">
-                            <option value="">{{ __('Sélectionner une commande') }}</option>
-                            @foreach($orders as $candidate)<option value="{{ $candidate->id }}">{{ $candidate->number }} · {{ $candidate->supplier_name }}</option>@endforeach
-                        </select>
-                    @endif
-                    <x-input-error :messages="$errors->get('purchase_order_id')" class="mt-2" />
-                </div>
-                <div class="sm:col-span-2">
-                    <x-input-label for="supplier-invoice-reference" :value="__('Numéro de facture fournisseur')" />
-                    <x-text-input id="supplier-invoice-reference" wire:model="supplierInvoiceNumber" required maxlength="100" class="mt-1 block w-full" />
-                    <x-input-error :messages="$errors->get('supplier_invoice_number')" class="mt-2" />
-                </div>
-                <div>
-                    <x-input-label for="supplier-invoice-date" :value="__('Date de facture')" />
-                    <x-text-input id="supplier-invoice-date" type="date" wire:model="invoiceDate" required class="mt-1 block w-full" />
-                    <x-input-error :messages="$errors->get('invoice_date')" class="mt-2" />
-                </div>
-                <div>
-                    <x-input-label for="supplier-invoice-due-date" :value="__('Échéance')" />
-                    <x-text-input id="supplier-invoice-due-date" type="date" wire:model="dueDate" class="mt-1 block w-full" />
-                    <x-input-error :messages="$errors->get('due_date')" class="mt-2" />
-                </div>
-                <div class="sm:col-span-2 lg:col-span-4">
-                    <x-input-label for="supplier-invoice-notes" :value="__('Notes')" />
-                    <textarea id="supplier-invoice-notes" wire:model="notes" rows="3" class="mt-1 block w-full border-gray-300 shadow-sm"></textarea>
-                    <x-input-error :messages="$errors->get('notes')" class="mt-2" />
-                </div>
-            </div>
-        </section>
-
-        @if ($order)
-            <section class="border-y border-gray-200 bg-white">
-                <div class="border-b border-gray-200 px-5 py-4 sm:px-6">
-                    <h3 class="text-base font-semibold text-gray-900">{{ __('Réceptions à facturer') }}</h3>
-                    <p class="mt-1 text-sm text-gray-500">{{ __('Prix, remise et TVA proviennent de la commande fournisseur et sont en lecture seule.') }}</p>
-                </div>
-                <x-input-error :messages="$errors->get('items')" class="mx-5 mt-3" />
-                <div class="overflow-x-auto">
-                    <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200 text-sm">
-                        <thead class="bg-gray-50 text-start text-xs uppercase text-gray-500">
-                            <tr>
-                                <th class="px-4 py-3">{{ __('Inclure') }}</th>
-                                <th class="px-4 py-3">{{ __('Réception source') }}</th>
-                                <th class="px-4 py-3">{{ __('Article') }}</th>
-                                <th class="px-4 py-3 text-end">{{ __('Reçue') }}</th>
-                                <th class="px-4 py-3 text-end">{{ __('Réservée brouillons') }}</th>
-                                <th class="px-4 py-3 text-end">{{ __('Déjà facturée') }}</th>
-                                <th class="px-4 py-3 text-end">{{ __('Disponible') }}</th>
-                                <th class="px-4 py-3">{{ __('À facturer') }}</th>
-                                <th class="px-4 py-3 text-end">{{ __('PU HT') }}</th>
-                                <th class="px-4 py-3 text-end">{{ __('Remise') }}</th>
-                                <th class="px-4 py-3 text-end">{{ __('TVA') }}</th>
-                                <th class="px-4 py-3 text-end">{{ __('TTC ligne') }}</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100">
-                            @forelse($lines as $sourceId => $line)
-                                <tr wire:key="supplier-invoice-line-{{ $sourceId }}">
-                                    <td class="px-4 py-4"><input type="checkbox" wire:model.live="lines.{{ $sourceId }}.selected" class="border-gray-300"></td>
-                                    <td class="whitespace-nowrap px-4 py-4"><p class="font-medium text-indigo-700">{{ $line['goods_receipt_number'] }}</p><p class="text-xs text-gray-500">{{ $line['goods_receipt_date']->format('d/m/Y') }}</p></td>
-                                    <td class="min-w-52 px-4 py-4"><p class="font-medium">{{ $line['description'] }}</p><p class="text-xs text-gray-500">{{ $line['reference'] ?? '—' }} · {{ $line['unit_label'] ?? '—' }}</p></td>
-                                    <td class="px-4 py-4 text-end">{{ $line['received_quantity'] }}</td>
-                                    <td class="px-4 py-4 text-end">{{ $line['reserved_by_other_drafts'] }}</td>
-                                    <td class="px-4 py-4 text-end">{{ $line['validated_invoiced_quantity'] }}</td>
-                                    <td class="px-4 py-4 text-end font-medium">{{ $line['available_quantity'] }}</td>
-                                    <td class="w-40 px-4 py-4">
-                                        <x-text-input type="number" min="0.001" max="{{ $line['available_quantity'] }}" step="0.001" wire:model.live="lines.{{ $sourceId }}.quantity" :disabled="! $line['selected']" class="block w-full" />
-                                    </td>
-                                    <td class="px-4 py-4 text-end">{{ str_replace('.', ',', $line['unit_price']) }}</td>
-                                    <td class="px-4 py-4 text-end">{{ str_replace('.', ',', $line['discount_percent']) }} %</td>
-                                    <td class="px-4 py-4 text-end">{{ str_replace('.', ',', $line['tax_rate_percent']) }} %</td>
-                                    <td class="px-4 py-4 text-end font-medium">{{ isset($calculatedLines[$sourceId]['total_ttc']) ? str_replace('.', ',', $calculatedLines[$sourceId]['total_ttc']) : '—' }}</td>
-                                </tr>
-                            @empty
-                                <tr><td colspan="12" class="px-6 py-8 text-center text-gray-500">{{ __('Aucune quantité reçue ne reste à facturer.') }}</td></tr>
-                            @endforelse
-                        </tbody>
-                    </table></div>
-                </div>
-            </section>
-
-            <section class="border-y border-gray-200 bg-white p-5 sm:p-6">
-                <dl class="grid gap-4 text-sm sm:grid-cols-2 lg:grid-cols-4">
-                    <div><dt class="text-gray-500">{{ __('Brut HT') }}</dt><dd class="font-medium">{{ str_replace('.', ',', $previewTotals['subtotal_ht']) }}</dd></div>
-                    <div><dt class="text-gray-500">{{ __('Remises') }}</dt><dd class="font-medium">{{ str_replace('.', ',', $previewTotals['discount_total']) }}</dd></div>
-                    <div><dt class="text-gray-500">{{ __('TVA') }}</dt><dd class="font-medium">{{ str_replace('.', ',', $previewTotals['tax_total']) }}</dd></div>
-                    <div><dt class="text-gray-500">{{ __('Total TTC') }}</dt><dd class="font-semibold">{{ str_replace('.', ',', $previewTotals['total_ttc']) }}</dd></div>
-                </dl>
-                <p class="mt-4 border-t border-amber-200 pt-3 text-sm text-amber-800">{{ __('Le montant calculé par l’ERP doit être comparé manuellement au montant indiqué sur la facture originale du fournisseur.') }}</p>
-            </section>
-        @endif
-
-        <div class="flex justify-end border-y border-gray-200 bg-white p-5 sm:p-6">
-            <x-primary-button :disabled="$order === null">{{ $invoiceId === null ? __('Enregistrer le brouillon') : __('Enregistrer le brouillon') }}</x-primary-button>
-        </div>
-    </form>
-</section>
+@include('livewire.admin.partials.supplier-invoice-workspace')

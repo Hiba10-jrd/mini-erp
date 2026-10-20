@@ -27,9 +27,8 @@ class SupplierInvoiceManagementService
     ) {}
 
     /**
-     * Les écarts réels de prix, remise ou TVA entre la commande et la facture du
-     * fournisseur sont hors périmètre du LOT 16. Ces valeurs sont toujours
-     * reconstruites depuis les snapshots des lignes de commande fournisseur.
+     * Les montants ERP restent reconstruits depuis les snapshots de commande.
+     * Les montants du document fournisseur sont conservés séparément.
      *
      * @param  array<string, mixed>  $attributes
      */
@@ -38,6 +37,7 @@ class SupplierInvoiceManagementService
         Gate::authorize('purchases.create');
 
         return DB::transaction(function () use ($order, $attributes): SupplierInvoice {
+            $this->lockSupplierForOrder($order->id);
             $lockedOrder = PurchaseOrder::query()->lockForUpdate()->findOrFail($order->id);
             $this->ensureOrderEligible($lockedOrder);
             Supplier::query()->lockForUpdate()->findOrFail($lockedOrder->supplier_id);
@@ -81,10 +81,12 @@ class SupplierInvoiceManagementService
         $orderId = $this->invoiceOrderId($invoice);
 
         return DB::transaction(function () use ($invoice, $attributes, $orderId): SupplierInvoice {
+            $this->lockSupplierForOrder($orderId);
             $order = PurchaseOrder::query()->lockForUpdate()->findOrFail($orderId);
             $locked = SupplierInvoice::query()->lockForUpdate()->findOrFail($invoice->id);
             $this->ensureInvoiceMatchesOrder($locked, $order);
             $this->ensureEditable($locked);
+            $this->ensureVersion($locked, $invoice->lock_version);
             $this->ensureOrderEligible($order);
             Supplier::query()->lockForUpdate()->findOrFail($order->supplier_id);
 
@@ -106,12 +108,13 @@ class SupplierInvoiceManagementService
                 'due_date' => $this->dueDate($header, $order),
                 'notes' => $header['notes'],
             ])->forceFill([
+                'lock_version' => $locked->lock_version + 1,
                 ...$this->supplierSnapshots($order),
                 ...$totals,
             ])->save();
             $locked->items()->get()->each->delete();
             $this->persistItems($locked, $prepared);
-            $this->recordHistory($locked, 'draft_updated', SupplierInvoice::STATUS_DRAFT, SupplierInvoice::STATUS_DRAFT, __('Brouillon de facture fournisseur modifié.'), null, 'Brouillon de facture fournisseur modifié.');
+            $this->recordHistory($locked, 'draft_updated', $locked->status, $locked->status, __('Brouillon de facture fournisseur modifié.'), ['erp' => $totals], 'Brouillon de facture fournisseur modifié.');
 
             return $this->load($locked);
         }, 3);
@@ -123,10 +126,14 @@ class SupplierInvoiceManagementService
         $orderId = $this->invoiceOrderId($invoice);
 
         return DB::transaction(function () use ($invoice, $orderId): SupplierInvoice {
+            $this->lockSupplierForOrder($orderId);
             $order = PurchaseOrder::query()->lockForUpdate()->findOrFail($orderId);
             $locked = SupplierInvoice::query()->with('items')->lockForUpdate()->findOrFail($invoice->id);
             $this->ensureInvoiceMatchesOrder($locked, $order);
-            $this->ensureEditable($locked);
+            $this->ensureVersion($locked, $invoice->lock_version);
+            if ($locked->status !== SupplierInvoice::STATUS_UNDER_REVIEW) {
+                throw ValidationException::withMessages(['status' => __('La facture doit être en vérification.')]);
+            }
             $this->ensureOrderEligible($order);
             Supplier::query()->lockForUpdate()->findOrFail($order->supplier_id);
             $this->ensureSupplierReferenceAvailable($order->supplier_id, $locked->supplier_invoice_number, $locked->id);
@@ -139,8 +146,14 @@ class SupplierInvoiceManagementService
             $prepared = $this->prepareItems($order, $sources, $requested, $locked->id);
             $totals = $this->totals($prepared);
 
-            $locked->items()->get()->each->delete();
-            $this->persistItems($locked, $prepared);
+            foreach ($totals as $field => $value) {
+                if (! BigDecimal::of($locked->$field)->isEqualTo($value)) {
+                    throw ValidationException::withMessages(['reconciliation' => __('La référence ERP a changé. Une nouvelle vérification est nécessaire.')]);
+                }
+            }
+            $reconciliation = $locked->reconciliation()->firstOrFail();
+            $values = app(SupplierInvoiceReconciliationCalculator::class)->calculate($reconciliation->toArray());
+            $this->ensureReconciliation($locked, $values);
 
             // Le numéro interne n'est consommé qu'après tous les contrôles métier.
             $number = $this->sequences->allocate('supplier_invoice', Carbon::parse($locked->invoice_date)->year);
@@ -149,9 +162,9 @@ class SupplierInvoiceManagementService
                 'status' => SupplierInvoice::STATUS_VALIDATED,
                 'validated_by' => Auth::id(),
                 'validated_at' => now(),
-                ...$totals,
+                'lock_version' => $locked->lock_version + 1,
             ])->save();
-            $this->recordHistory($locked, 'validated', SupplierInvoice::STATUS_DRAFT, SupplierInvoice::STATUS_VALIDATED, __('Validation de la facture fournisseur.'), null, 'Validation de la facture fournisseur.');
+            $this->recordHistory($locked, 'validated', SupplierInvoice::STATUS_UNDER_REVIEW, SupplierInvoice::STATUS_VALIDATED, __('Validation de la facture fournisseur.'), ['supplier' => $values, 'erp' => $totals, 'difference_ttc' => (string) BigDecimal::of($values['total_ttc'])->minus($locked->total_ttc)], 'Validation de la facture fournisseur.');
             $this->recordOrderHistory($order, 'supplier_invoice_validated', __('Facture fournisseur :number validée.', ['number' => $number]), $locked, 'Facture fournisseur :number validée.', ['number' => $number]);
 
             return $this->load($locked);
@@ -164,13 +177,19 @@ class SupplierInvoiceManagementService
         $orderId = $this->invoiceOrderId($invoice);
 
         return DB::transaction(function () use ($invoice, $orderId): SupplierInvoice {
+            $this->lockSupplierForOrder($orderId);
             $order = PurchaseOrder::query()->lockForUpdate()->findOrFail($orderId);
             $locked = SupplierInvoice::query()->lockForUpdate()->findOrFail($invoice->id);
             $this->ensureInvoiceMatchesOrder($locked, $order);
             $this->ensureEditable($locked);
+            $this->ensureVersion($locked, $invoice->lock_version);
+            if ($locked->status !== SupplierInvoice::STATUS_DRAFT) {
+                throw ValidationException::withMessages(['status' => __('Seul un brouillon peut être annulé.')]);
+            }
             $locked->forceFill([
                 'status' => SupplierInvoice::STATUS_CANCELLED,
                 'cancelled_at' => now(),
+                'lock_version' => $locked->lock_version + 1,
             ])->save();
             $this->recordHistory($locked, 'cancelled', SupplierInvoice::STATUS_DRAFT, SupplierInvoice::STATUS_CANCELLED, __('Facture fournisseur annulée.'), null, 'Facture fournisseur annulée.');
             $this->recordOrderHistory($order, 'supplier_invoice_cancelled', __('Facture fournisseur :reference annulée.', ['reference' => $locked->supplier_invoice_number]), $locked, 'Facture fournisseur :reference annulée.', ['reference' => $locked->supplier_invoice_number]);
@@ -179,12 +198,122 @@ class SupplierInvoiceManagementService
         }, 3);
     }
 
+    public function saveReconciliationDraft(SupplierInvoice $invoice, array $data): SupplierInvoice
+    {
+        Gate::authorize('purchases.update');
+
+        return DB::transaction(function () use ($invoice, $data): SupplierInvoice {
+            $this->lockSupplierForOrder($this->invoiceOrderId($invoice));
+            $locked = SupplierInvoice::query()->lockForUpdate()->findOrFail($invoice->id);
+            $this->ensureEditable($locked);
+            $this->ensureVersion($locked, $invoice->lock_version);
+            $values = app(SupplierInvoiceReconciliationCalculator::class)->calculate($data);
+            $this->ensureReconciliation($locked, $values, false);
+            $before = $locked->reconciliation()->first()?->toArray();
+            $locked->reconciliation()->updateOrCreate([], $values);
+            $locked->forceFill(['lock_version' => $locked->lock_version + 1])->save();
+            $this->recordHistory($locked, 'reconciliation_saved', $locked->status, $locked->status, __('Montants fournisseur enregistrés.'), ['before' => $before, 'supplier' => $values]);
+
+            return $this->load($locked);
+        }, 3);
+    }
+
+    /** Saving and submitting are separate from accepting a supplier debt. */
+    public function submitForReview(SupplierInvoice $invoice, array $data): SupplierInvoice
+    {
+        Gate::authorize('purchases.update');
+
+        return DB::transaction(function () use ($invoice, $data): SupplierInvoice {
+            $this->lockSupplierForOrder($this->invoiceOrderId($invoice));
+            $order = PurchaseOrder::query()->lockForUpdate()->findOrFail($invoice->purchase_order_id);
+            $locked = SupplierInvoice::query()->lockForUpdate()->findOrFail($invoice->id);
+            $this->ensureInvoiceMatchesOrder($locked, $order);
+            $this->ensureEditable($locked);
+            $this->ensureVersion($locked, $invoice->lock_version);
+            $this->ensureOrderEligible($order);
+            $this->validateHeader($locked->toArray());
+            $sources = $this->lockValidatedSources($order);
+            $requested = $locked->items()->get()->map(fn ($line) => ['goods_receipt_item_id' => $line->goods_receipt_item_id, 'quantity' => $line->quantity])->all();
+            $prepared = $this->prepareItems($order, $sources, $requested, $locked->id);
+            $totals = $this->totals($prepared);
+            // Refresh ERP reference before freezing the review, never from supplier values.
+            $locked->forceFill($totals)->save();
+            $locked->items()->get()->each->delete();
+            $this->persistItems($locked, $prepared);
+            $values = app(SupplierInvoiceReconciliationCalculator::class)->calculate($data);
+            $this->ensureReconciliation($locked, $values);
+            $before = $locked->reconciliation()->first()?->toArray();
+            $locked->reconciliation()->updateOrCreate([], $values);
+            $from = $locked->status;
+            $locked->forceFill(['status' => SupplierInvoice::STATUS_UNDER_REVIEW, 'lock_version' => $locked->lock_version + 1])->save();
+            $this->recordHistory($locked, 'submitted_for_review', $from, $locked->status, __('Facture soumise à vérification.'), ['before' => $before, 'supplier' => $values, 'erp' => $totals]);
+
+            return $this->load($locked);
+        }, 3);
+    }
+
+    public function dispute(SupplierInvoice $invoice, string $reason): SupplierInvoice
+    {
+        Gate::authorize('purchases.update');
+        $reason = trim($reason);
+        Validator::make(['reason' => $reason], ['reason' => ['required', 'string', 'max:5000']])->validate();
+
+        return DB::transaction(function () use ($invoice, $reason): SupplierInvoice {
+            $this->lockSupplierForOrder($this->invoiceOrderId($invoice));
+            $locked = SupplierInvoice::query()->lockForUpdate()->findOrFail($invoice->id);
+            $this->ensureVersion($locked, $invoice->lock_version);
+            if ($locked->status !== SupplierInvoice::STATUS_UNDER_REVIEW) {
+                throw ValidationException::withMessages(['status' => __('La facture doit être en vérification.')]);
+            }
+            $locked->forceFill(['status' => SupplierInvoice::STATUS_DISPUTED, 'lock_version' => $locked->lock_version + 1])->save();
+            $this->recordHistory($locked, 'disputed', SupplierInvoice::STATUS_UNDER_REVIEW, $locked->status, __('Facture contestée.'), ['reason' => $reason, 'supplier' => $locked->reconciliation()->firstOrFail()->toArray()]);
+
+            return $this->load($locked);
+        }, 3);
+    }
+
+    private function ensureReconciliation(SupplierInvoice $invoice, array $values, bool $submission = true): void
+    {
+        $document = $invoice->attachments()->whereKey($values['attachment_id'])
+            ->where('category', SupplierInvoice::ORIGINAL_DOCUMENT_CATEGORY)
+            ->whereIn('mime_type', ['application/pdf', 'image/jpeg', 'image/png'])->lockForUpdate()->first();
+        if ($document === null) {
+            throw ValidationException::withMessages(['reconciliation' => __('Sélectionnez le document original de cette facture.')]);
+        }
+        $different = ! BigDecimal::of($values['net_ht'])->isEqualTo($invoice->baseHt())
+            || ! BigDecimal::of($values['tax_total'])->isEqualTo($invoice->tax_total)
+            || ! BigDecimal::of($values['total_ttc'])->isEqualTo($invoice->total_ttc);
+        $hasRounding = collect($values['breakdown'])->contains(fn ($line) => ! BigDecimal::of($line['rounding_difference'])->isZero());
+        if ($submission && ($different || $hasRounding) && empty($values['difference_reason'])) {
+            throw ValidationException::withMessages(['reconciliation' => __('Un motif est obligatoire pour justifier les écarts.')]);
+        }
+        $previous = $invoice->histories()->where('event', 'disputed')->latest('id')->first();
+        if ($submission && $invoice->status === SupplierInvoice::STATUS_DISPUTED && $previous !== null
+            && (int) ($previous->metadata['supplier']['attachment_id'] ?? 0) === (int) $values['attachment_id']) {
+            throw ValidationException::withMessages(['reconciliation' => __('Ajoutez et sélectionnez un document corrigé avant de resoumettre la facture.')]);
+        }
+    }
+
+    private function ensureVersion(SupplierInvoice $invoice, ?int $expected): void
+    {
+        if ((int) $expected !== $invoice->lock_version) {
+            throw ValidationException::withMessages(['status' => __('La facture a été modifiée. Rechargez la page avant de continuer.')]);
+        }
+    }
+
+    private function lockSupplierForOrder(int $orderId): void
+    {
+        $supplierId = PurchaseOrder::query()->whereKey($orderId)->valueOrFail('supplier_id');
+        Supplier::query()->lockForUpdate()->findOrFail($supplierId);
+    }
+
     /** @return array<int, array<string, mixed>> */
     public function availableItemsForOrder(PurchaseOrder $order, ?SupplierInvoice $invoice = null): array
     {
         abort_unless(Gate::allows('purchases.view') || Gate::allows('purchases.create') || Gate::allows('purchases.update'), 403);
 
         return DB::transaction(function () use ($order, $invoice): array {
+            $this->lockSupplierForOrder($order->id);
             $lockedOrder = PurchaseOrder::query()->lockForUpdate()->findOrFail($order->id);
             $this->ensureOrderEligible($lockedOrder);
             $excludeInvoiceId = null;
@@ -439,7 +568,7 @@ class SupplierInvoiceManagementService
             $validated = BigDecimal::zero()->toScale(3);
             foreach ($reservedItems->where('goods_receipt_item_id', $sourceId) as $reservedItem) {
                 $status = $invoices->get($reservedItem->supplier_invoice_id)?->status;
-                if ($status === SupplierInvoice::STATUS_DRAFT) {
+                if (in_array($status, [SupplierInvoice::STATUS_DRAFT, SupplierInvoice::STATUS_UNDER_REVIEW, SupplierInvoice::STATUS_DISPUTED], true)) {
                     $draft = $draft->plus($reservedItem->quantity);
                 } elseif ($status === SupplierInvoice::STATUS_VALIDATED) {
                     $validated = $validated->plus($reservedItem->quantity);

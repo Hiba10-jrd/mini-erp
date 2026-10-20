@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\SupplierInvoice;
+
 use App\Models\Supplier;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Locked;
@@ -280,7 +282,7 @@ new class extends Component
                                 {{ str_replace(
                                     '.',
                                     ',',
-                                    $invoice->total_ttc
+                                    ($invoice->status === SupplierInvoice::STATUS_VALIDATED ? $invoice->payableAmount() : $invoice->total_ttc)
                                 ) }}
                             </p>
                         </div>

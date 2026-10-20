@@ -46,6 +46,9 @@ class SupplierInvoiceItem extends Model
     protected static function booted(): void
     {
         static::saving(function (SupplierInvoiceItem $item): void {
+            if ($item->exists && $item->isDirty('supplier_invoice_id')) {
+                throw new LogicException(__('Les lignes d’une facture fournisseur non modifiable sont immuables.'));
+            }
             $invoice = $item->supplierInvoice()->first();
             if ($invoice !== null && ! $invoice->isEditable()) {
                 throw new LogicException(__('Les lignes d’une facture fournisseur non modifiable sont immuables.'));

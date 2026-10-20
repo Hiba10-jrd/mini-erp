@@ -26,11 +26,13 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Volt\Volt;
 use PHPUnit\Framework\Attributes\DataProvider;
+use Tests\Support\SubmitsSupplierInvoices;
 use Tests\TestCase;
 
 class SupplierInvoiceUiTest extends TestCase
 {
     use RefreshDatabase;
+    use SubmitsSupplierInvoices;
 
     protected function setUp(): void
     {
@@ -166,9 +168,9 @@ class SupplierInvoiceUiTest extends TestCase
         $this->assertSame('20.00', $invoice->subtotal_ht);
 
         Volt::test('admin.supplier-invoice-details', ['invoiceId' => $invoice->id])
-            ->assertSee('Facture originale reçue du fournisseur')
+            ->assertSee('Document du fournisseur')
             ->assertSee('original-fournisseur.pdf')
-            ->assertSee('comparé manuellement');
+            ->assertSee('Vérification des montants');
         $this->get(route('attachments.download', $attachment))
             ->assertOk()
             ->assertDownload('original-fournisseur.pdf');
@@ -366,7 +368,7 @@ class SupplierInvoiceUiTest extends TestCase
             'quantity' => '9.000',
         ]);
         $this->createSequence();
-        $draft = $this->createDraft($order, $source, 'VALIDATE-UI', '2.000');
+        $draft = $this->submitMatchingInvoice($this->createDraft($order, $source, 'VALIDATE-UI', '2.000'));
         $stockBefore = WarehouseStock::query()->value('quantity');
         $movementsBefore = StockMovement::query()->count();
 
