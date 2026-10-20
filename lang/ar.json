@@ -1525,5 +1525,15 @@
     "Ruptures de stock": "نفاد المخزون",
     "Inventaires ouverts": "عمليات الجرد المفتوحة",
     "Mouvements récents": "أحدث حركات المخزون",
-    "Factures brouillon": "مسودات الفواتير"
+    "Factures brouillon": "مسودات الفواتير",
+    "Facture originale reçue du fournisseur": "الفاتورة الأصلية المستلمة من المورد",
+    "Importer la facture originale reçue (facultatif)": "تحميل الفاتورة الأصلية المستلمة (اختياري)",
+    "Importez, si disponible, le document reçu du fournisseur. Cet import ne crée ni mouvement de stock ni paiement.": "حمّل المستند المستلم من المورد إن توفر. لا يؤدي هذا التحميل إلى حركة مخزون أو دفعة.",
+    "Vous pouvez enregistrer le brouillon sans fichier. Pour joindre un document, les autorisations de consultation et de mise à jour des achats sont nécessaires.": "يمكنك حفظ المسودة دون ملف. لإرفاق مستند، يلزم توفر صلاحية عرض المشتريات وتحديثها.",
+    "Le montant calculé par l’ERP doit être comparé manuellement au montant indiqué sur la facture originale du fournisseur.": "يجب مقارنة المبلغ المحسوب في النظام يدويًا بالمبلغ الوارد في الفاتورة الأصلية للمورد.",
+    "Aucune facture originale jointe.": "لا توجد فاتورة أصلية مرفقة.",
+    "Télécharger la facture originale": "تنزيل الفاتورة الأصلية",
+    "Choisissez une facture originale au format PDF, JPG, JPEG ou PNG.": "اختر فاتورة أصلية بتنسيق PDF أو JPG أو JPEG أو PNG.",
+    "Le contenu du fichier ne correspond pas à un format autorisé.": "محتوى الملف لا يطابق تنسيقًا مسموحًا به.",
+    "Le fichier ne doit pas dépasser 5 Mo.": "يجب ألا يتجاوز حجم الملف 5 ميغابايت."
 }

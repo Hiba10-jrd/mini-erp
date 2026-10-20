@@ -2,13 +2,19 @@
 
 use App\Models\PurchaseOrder;
 use App\Models\SupplierInvoice;
+use App\Services\AttachmentManagementService;
 use App\Services\QuoteCalculator;
 use App\Services\SupplierInvoiceManagementService;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\Locked;
+use Livewire\WithFileUploads;
 
 new class extends \Livewire\Volt\Component
 {
+    use WithFileUploads;
+
     #[Locked]
     public ?int $invoiceId = null;
 
@@ -24,6 +30,8 @@ new class extends \Livewire\Volt\Component
     public string $dueDate = '';
 
     public string $notes = '';
+
+    public $originalInvoiceFile = null;
 
     /** @var array<int, array<string, mixed>> */
     public array $lines = [];
@@ -76,9 +84,27 @@ new class extends \Livewire\Volt\Component
         }
     }
 
+    public function clearOriginalInvoiceFile(): void
+    {
+        $this->reset('originalInvoiceFile');
+        $this->resetValidation('originalInvoiceFile');
+    }
+
     public function save(SupplierInvoiceManagementService $service): void
     {
         $this->authorizeMutation();
+        $this->validate([
+            'originalInvoiceFile' => ['nullable', 'file', 'max:5120', 'mimes:pdf,jpg,jpeg,png', 'mimetypes:application/pdf,image/jpeg,image/png'],
+        ], [
+            'originalInvoiceFile.max' => __('Le fichier ne doit pas dépasser 5 Mo.'),
+            'originalInvoiceFile.mimes' => __('Choisissez une facture originale au format PDF, JPG, JPEG ou PNG.'),
+            'originalInvoiceFile.mimetypes' => __('Le contenu du fichier ne correspond pas à un format autorisé.'),
+        ]);
+        if ($this->originalInvoiceFile !== null) {
+            Gate::authorize('purchases.view');
+            Gate::authorize('purchases.update');
+        }
+
         $order = $this->resolveOrder();
         if ($order === null) {
             $this->addError('purchase_order_id', __('Sélectionnez une commande fournisseur confirmée.'));
@@ -107,9 +133,33 @@ new class extends \Livewire\Volt\Component
             'items' => $items,
         ];
 
-        $invoice = $this->invoiceId === null
+        $saveDraft = fn (): SupplierInvoice => $this->invoiceId === null
             ? $service->createDraft($order, $attributes)
             : $service->updateDraft(SupplierInvoice::query()->findOrFail($this->invoiceId), $attributes);
+
+        if ($this->originalInvoiceFile === null) {
+            $invoice = $saveDraft();
+        } else {
+            $uploadedAttachment = null;
+            try {
+                $invoice = DB::transaction(function () use ($saveDraft, &$uploadedAttachment): SupplierInvoice {
+                    $invoice = $saveDraft();
+                    $uploadedAttachment = app(AttachmentManagementService::class)->upload(
+                        $invoice,
+                        $this->originalInvoiceFile,
+                        ['category' => SupplierInvoice::ORIGINAL_DOCUMENT_CATEGORY],
+                    );
+
+                    return $invoice;
+                });
+            } catch (\Throwable $exception) {
+                if ($uploadedAttachment !== null) {
+                    Storage::disk('attachments')->delete($uploadedAttachment->path);
+                }
+
+                throw $exception;
+            }
+        }
 
         session()->flash('status', $this->invoiceId === null
             ? __('La facture fournisseur brouillon a été créée.')
@@ -148,11 +198,23 @@ new class extends \Livewire\Volt\Component
                 ->filter(fn (PurchaseOrder $candidate): bool => $service->availableItemsForOrder($candidate) !== []);
         }
 
+        $canAttachOriginal = Gate::allows('purchases.view') && Gate::allows('purchases.update');
+        $originalAttachments = collect();
+        if ($this->invoiceId !== null && Gate::allows('purchases.view')) {
+            $originalAttachments = SupplierInvoice::query()->findOrFail($this->invoiceId)
+                ->attachments()
+                ->where('category', SupplierInvoice::ORIGINAL_DOCUMENT_CATEGORY)
+                ->latest()
+                ->get();
+        }
+
         return [
             'order' => $order,
             'orders' => $orders,
             'calculatedLines' => $calculatedLines,
             'previewTotals' => $calculator->totals(collect($calculatedLines)->filter()->values()->all()),
+            'canAttachOriginal' => $canAttachOriginal,
+            'originalAttachments' => $originalAttachments,
         ];
     }
 
@@ -208,6 +270,37 @@ new class extends \Livewire\Volt\Component
     @endif
 
     <form wire:submit="save" class="space-y-6">
+        <section class="border-y border-gray-200 bg-white p-5 sm:p-6">
+            <h3 class="text-base font-semibold text-gray-900">{{ __('Facture originale reçue du fournisseur') }}</h3>
+            <p class="mt-1 text-sm text-gray-600">{{ __('Importez, si disponible, le document reçu du fournisseur. Cet import ne crée ni mouvement de stock ni paiement.') }}</p>
+            @if ($canAttachOriginal)
+                <div class="mt-4 space-y-3">
+                    <label for="supplier-original-invoice" class="block text-sm font-medium text-gray-700">{{ __('Importer la facture originale reçue (facultatif)') }}</label>
+                    <input id="supplier-original-invoice" type="file" wire:model="originalInvoiceFile" accept=".pdf,.jpg,.jpeg,.png" class="block w-full text-sm text-gray-700 file:me-4 file:rounded file:border-0 file:bg-gray-100 file:px-4 file:py-2" aria-describedby="supplier-original-invoice-help" />
+                    <p id="supplier-original-invoice-help" class="text-xs text-gray-500">{{ __('Format accepté : PDF, JPG ou PNG · 5 Mo maximum') }}</p>
+                    <x-input-error :messages="$errors->get('originalInvoiceFile')" />
+                    @if ($originalInvoiceFile)
+                        <div class="flex flex-wrap items-center gap-3 text-sm">
+                            <p role="status" class="break-all"><bdi>{{ $originalInvoiceFile->getClientOriginalName() }}</bdi> · {{ number_format($originalInvoiceFile->getSize() / 1024, 1) }} {{ __('Ko') }}</p>
+                            <button type="button" wire:click="clearOriginalInvoiceFile" class="text-red-600 hover:underline">{{ __('Retirer') }}</button>
+                        </div>
+                    @endif
+                    @if ($originalAttachments->isNotEmpty())
+                        <ul class="space-y-2 border-t border-gray-100 pt-3">
+                            @foreach ($originalAttachments as $attachment)
+                                <li class="flex flex-wrap items-center justify-between gap-2 text-sm" wire:key="original-invoice-{{ $attachment->id }}">
+                                    <span class="break-all"><bdi>{{ $attachment->original_name }}</bdi> · {{ number_format($attachment->size / 1024, 1) }} {{ __('Ko') }}</span>
+                                    <a class="text-indigo-700 underline" href="{{ route('attachments.download', $attachment) }}">{{ __('Télécharger la facture originale') }}</a>
+                                </li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+            @else
+                <p class="mt-4 rounded bg-amber-50 p-3 text-sm text-amber-800">{{ __('Vous pouvez enregistrer le brouillon sans fichier. Pour joindre un document, les autorisations de consultation et de mise à jour des achats sont nécessaires.') }}</p>
+            @endif
+        </section>
+
         <section class="border-y border-gray-200 bg-white p-5 sm:p-6">
             <h3 class="text-base font-semibold text-gray-900">{{ __('Informations de la facture fournisseur') }}</h3>
             <div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -304,10 +397,11 @@ new class extends \Livewire\Volt\Component
                     <div><dt class="text-gray-500">{{ __('TVA') }}</dt><dd class="font-medium">{{ str_replace('.', ',', $previewTotals['tax_total']) }}</dd></div>
                     <div><dt class="text-gray-500">{{ __('Total TTC') }}</dt><dd class="font-semibold">{{ str_replace('.', ',', $previewTotals['total_ttc']) }}</dd></div>
                 </dl>
+                <p class="mt-4 border-t border-amber-200 pt-3 text-sm text-amber-800">{{ __('Le montant calculé par l’ERP doit être comparé manuellement au montant indiqué sur la facture originale du fournisseur.') }}</p>
             </section>
         @endif
 
-        <div class="flex justify-end">
+        <div class="flex justify-end border-y border-gray-200 bg-white p-5 sm:p-6">
             <x-primary-button :disabled="$order === null">{{ $invoiceId === null ? __('Enregistrer le brouillon') : __('Enregistrer le brouillon') }}</x-primary-button>
         </div>
     </form>

@@ -11,6 +11,8 @@ use LogicException;
 
 class SupplierInvoice extends Model
 {
+    public const ORIGINAL_DOCUMENT_CATEGORY = 'Facture originale fournisseur';
+
     public function attachments(): MorphMany
     {
         return $this->morphMany(Attachment::class, 'attachable');

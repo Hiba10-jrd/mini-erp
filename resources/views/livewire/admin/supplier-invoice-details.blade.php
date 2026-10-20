@@ -73,6 +73,10 @@ new class extends \Livewire\Volt\Component
 
         return [
             'invoice' => $invoice,
+            'originalInvoiceAttachments' => $invoice->attachments()
+                ->where('category', SupplierInvoice::ORIGINAL_DOCUMENT_CATEGORY)
+                ->latest()
+                ->get(),
 
             'sourceReceipts' => $invoice->items
                 ->map(
@@ -409,6 +413,27 @@ new class extends \Livewire\Volt\Component
                     {{ $invoice->notes }}
                 </p>
             </div>
+        @endif
+    </section>
+
+    <section class="border-y border-gray-200 bg-white p-5 sm:p-6">
+        <h3 class="text-base font-semibold text-gray-900">
+            {{ __('Facture originale reçue du fournisseur') }}
+        </h3>
+        <p class="mt-1 text-sm text-amber-800">
+            {{ __('Le montant calculé par l’ERP doit être comparé manuellement au montant indiqué sur la facture originale du fournisseur.') }}
+        </p>
+        @if ($originalInvoiceAttachments->isNotEmpty())
+            <ul class="mt-4 divide-y divide-gray-100">
+                @foreach ($originalInvoiceAttachments as $attachment)
+                    <li class="flex flex-wrap items-center justify-between gap-3 py-3" wire:key="supplier-invoice-original-{{ $attachment->id }}">
+                        <span class="break-all text-sm font-medium"><bdi>{{ $attachment->original_name }}</bdi> · {{ number_format($attachment->size / 1024, 1) }} {{ __('Ko') }}</span>
+                        <a href="{{ route('attachments.download', $attachment) }}" class="text-sm font-medium text-indigo-700 underline">{{ __('Télécharger la facture originale') }}</a>
+                    </li>
+                @endforeach
+            </ul>
+        @else
+            <p class="mt-4 text-sm text-gray-600">{{ __('Aucune facture originale jointe.') }}</p>
         @endif
     </section>
 

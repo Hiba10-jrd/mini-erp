@@ -1525,5 +1525,15 @@
     "Ruptures de stock": "Ruptures de stock",
     "Inventaires ouverts": "Inventaires ouverts",
     "Mouvements récents": "Mouvements récents",
-    "Factures brouillon": "Factures brouillon"
+    "Factures brouillon": "Factures brouillon",
+    "Facture originale reçue du fournisseur": "Facture originale reçue du fournisseur",
+    "Importer la facture originale reçue (facultatif)": "Importer la facture originale reçue (facultatif)",
+    "Importez, si disponible, le document reçu du fournisseur. Cet import ne crée ni mouvement de stock ni paiement.": "Importez, si disponible, le document reçu du fournisseur. Cet import ne crée ni mouvement de stock ni paiement.",
+    "Vous pouvez enregistrer le brouillon sans fichier. Pour joindre un document, les autorisations de consultation et de mise à jour des achats sont nécessaires.": "Vous pouvez enregistrer le brouillon sans fichier. Pour joindre un document, les autorisations de consultation et de mise à jour des achats sont nécessaires.",
+    "Le montant calculé par l’ERP doit être comparé manuellement au montant indiqué sur la facture originale du fournisseur.": "Le montant calculé par l’ERP doit être comparé manuellement au montant indiqué sur la facture originale du fournisseur.",
+    "Aucune facture originale jointe.": "Aucune facture originale jointe.",
+    "Télécharger la facture originale": "Télécharger la facture originale",
+    "Choisissez une facture originale au format PDF, JPG, JPEG ou PNG.": "Choisissez une facture originale au format PDF, JPG, JPEG ou PNG.",
+    "Le contenu du fichier ne correspond pas à un format autorisé.": "Le contenu du fichier ne correspond pas à un format autorisé.",
+    "Le fichier ne doit pas dépasser 5 Mo.": "Le fichier ne doit pas dépasser 5 Mo."
 }

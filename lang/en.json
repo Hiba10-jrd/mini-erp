@@ -1525,5 +1525,15 @@
     "Ruptures de stock": "Out of stock",
     "Inventaires ouverts": "Open inventories",
     "Mouvements récents": "Recent stock movements",
-    "Factures brouillon": "Draft invoices"
+    "Factures brouillon": "Draft invoices",
+    "Facture originale reçue du fournisseur": "Original invoice received from supplier",
+    "Importer la facture originale reçue (facultatif)": "Upload the original invoice received (optional)",
+    "Importez, si disponible, le document reçu du fournisseur. Cet import ne crée ni mouvement de stock ni paiement.": "Upload the document received from the supplier, if available. This upload creates no stock movement or payment.",
+    "Vous pouvez enregistrer le brouillon sans fichier. Pour joindre un document, les autorisations de consultation et de mise à jour des achats sont nécessaires.": "You can save the draft without a file. Viewing and updating purchase permissions are required to attach a document.",
+    "Le montant calculé par l’ERP doit être comparé manuellement au montant indiqué sur la facture originale du fournisseur.": "The amount calculated by the ERP must be manually compared with the amount on the supplier's original invoice.",
+    "Aucune facture originale jointe.": "No original invoice attached.",
+    "Télécharger la facture originale": "Download the original invoice",
+    "Choisissez une facture originale au format PDF, JPG, JPEG ou PNG.": "Choose an original invoice in PDF, JPG, JPEG, or PNG format.",
+    "Le contenu du fichier ne correspond pas à un format autorisé.": "The file content does not match an allowed format.",
+    "Le fichier ne doit pas dépasser 5 Mo.": "The file must not exceed 5 MB."
 }
