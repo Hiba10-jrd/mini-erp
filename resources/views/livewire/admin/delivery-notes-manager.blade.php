@@ -114,7 +114,7 @@ new class extends \Livewire\Volt\Component
                                 <span class="inline-block px-2 py-1 text-xs font-medium {{ $statusClasses[$note->status] ?? 'bg-gray-100 text-gray-700' }}">{{ $statusLabels[$note->status] ?? $note->status }}</span>
                             </td>
                             <td class="whitespace-nowrap px-4 py-4 text-end">
-                                <a href="{{ route('sales.delivery-notes.show', $note) }}" wire:navigate class="font-medium text-indigo-700 hover:text-indigo-900">{{ __('Consulter') }}</a>
+                                <a href="{{ route('sales.delivery-notes.show', $note) }}" wire:navigate class="font-medium text-indigo-700 hover:text-indigo-900 erp-action erp-action-view">{{ __('Consulter') }}</a>
                             </td>
                         </tr>
                     @empty

@@ -64,10 +64,10 @@
             @endphp
             @if(count($visible))
                 <details class="erp-nav-group" @if($active) open @endif>
-                    <summary>{{ __($group) }}<span class="erp-group-toggle" aria-hidden="true"><span class="erp-group-plus">+</span><span class="erp-group-minus">−</span></span></summary>
+                    <summary><span class="erp-group-label"><x-premium-icon :name="['sales', 'cart', 'wallet', 'box', 'settings'][array_search($group, array_keys($groups))]" />{{ __($group) }}</span><svg class="erp-group-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="m9 5 7 7-7 7" /></svg></summary>
                     <div class="space-y-1 pb-2">
                         @foreach ($visible as [$label, $route, $pattern, $permission])
-                            <a href="{{ route($route) }}" @class(['erp-sidebar-link', 'is-active' => request()->routeIs($pattern)]) @if(request()->routeIs($pattern)) aria-current="page" @endif>{{ __($label) }}</a>
+                            <a href="{{ route($route) }}" @class(['erp-sidebar-link', 'is-active' => request()->routeIs($pattern)]) @if(request()->routeIs($pattern)) aria-current="page" @endif><span class="erp-nav-dot" aria-hidden="true"></span>{{ __($label) }}</a>
                         @endforeach
                     </div>
                 </details>

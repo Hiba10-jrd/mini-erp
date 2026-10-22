@@ -1,11 +1,11 @@
-    <header class="dashboard-header"><div><span class="dashboard-eyebrow">{{ __('Tableau de bord') }}</span><h1>{{ __('Vue d’ensemble') }}</h1><p>{{ __('Synthèse de votre activité.') }}</p></div></header>
+    <header class="dashboard-header"><div><p class="dashboard-greeting">{{ __('Bonjour, :name', ['name' => auth()->user()->name]) }}</p><span class="dashboard-eyebrow">{{ __('Tableau de bord') }}</span><h1>{{ __('Vue d’ensemble') }}</h1><p>{{ __('Synthèse de votre activité.') }}</p></div></header>
     @if (count($cards) === 0)
         <section class="dashboard-panel"><h2>{{ __('Bienvenue dans votre ERP') }}</h2><p class="dashboard-note">{{ __('Accédez à vos modules depuis la navigation.') }}</p></section>
     @else
         <div class="dashboard-kpis" style="--dashboard-columns: {{ min(4, count($cards)) }}">
             @foreach ($cards as $card)
                 <article class="dashboard-kpi dashboard-tone-{{ $card['color'] }}">
-                    <div class="dashboard-kpi-heading"><h2>{{ __($card['label']) }}</h2><span class="dashboard-icon" aria-hidden="true">•</span></div>
+                    <div class="dashboard-kpi-heading"><h2>{{ __($card['label']) }}</h2><span class="dashboard-icon" aria-hidden="true"><x-premium-icon name="document" /></span></div>
                     <strong><bdi>{{ $card['value'] }}</bdi></strong><p>{{ __('Situation actuelle, toutes périodes') }}</p>
                 </article>
             @endforeach
@@ -29,7 +29,7 @@
                 <div class="dashboard-panel-heading"><div><h2>{{ __('Activité récente') }}</h2><p>{{ __('Dernières opérations et contacts enregistrés') }}</p></div><span class="dashboard-unit">{{ $feed->count() }}</span></div>
                 <ul class="dashboard-feed">
                     @forelse ($feed as $item)
-                        <li wire:key="operational-{{ $item['key'] }}"><span class="dashboard-feed-icon dashboard-tone-blue" aria-hidden="true">•</span>
+                        <li wire:key="operational-{{ $item['key'] }}"><span class="dashboard-feed-icon dashboard-tone-blue" aria-hidden="true"><x-premium-icon name="document" /></span>
                             <div class="dashboard-feed-body"><span class="dashboard-feed-label">{{ __($item['label']) }}</span>
                                 @if ($item['url'])<a href="{{ $item['url'] }}" wire:navigate>{{ $item['reference'] ?? __('Sans référence') }}</a>@else<strong>{{ $item['reference'] ?? __('Sans référence') }}</strong>@endif
                                 @if ($item['detail'])<p>{{ $item['detail'] }}</p>@endif

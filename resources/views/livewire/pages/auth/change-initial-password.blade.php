@@ -96,7 +96,7 @@ new #[Layout('layouts.guest')] class extends Component
         </div>
 
         <div class="flex items-center justify-between gap-4">
-            <button type="button" wire:click="logout" class="text-sm text-gray-600 underline hover:text-gray-900">
+            <button type="button" wire:click="logout" class="text-sm text-gray-600 underline hover:text-gray-900 erp-action erp-action-neutral">
                 {{ __('Se déconnecter') }}
             </button>
 

@@ -142,7 +142,7 @@ new class extends Component
             </div>
             @can('suppliers.manage')
                 @unless ($supplier->isArchived())
-                    <x-secondary-button type="button" wire:click="prepareCreate">{{ __('Ajouter un contact') }}</x-secondary-button>
+                    <x-secondary-button type="button" wire:click="prepareCreate" class="erp-action erp-action-primary">{{ __('Ajouter un contact') }}</x-secondary-button>
                 @endunless
             @endcan
         </div>
@@ -187,7 +187,7 @@ new class extends Component
                 <div class="flex gap-3 sm:col-span-2">
                     <x-primary-button type="submit">{{ $editingId ? __('Modifier') : __('Ajouter') }}</x-primary-button>
                     @if ($editingId)
-                        <x-secondary-button type="button" wire:click="prepareCreate">{{ __('Annuler') }}</x-secondary-button>
+                        <x-secondary-button type="button" wire:click="prepareCreate" class="erp-action erp-action-neutral">{{ __('Annuler') }}</x-secondary-button>
                     @endif
                 </div>
             </form>
@@ -220,8 +220,8 @@ new class extends Component
                         <td class="px-6 py-4 text-end text-sm">
                             @can('suppliers.manage')
                                 @if ($contact->is_active && ! $supplier->isArchived())
-                                    <button type="button" wire:click="editContact({{ $contact->id }})" class="me-3 text-indigo-600 hover:text-indigo-900">{{ __('Modifier') }}</button>
-                                    <button type="button" wire:click="archiveContact({{ $contact->id }})" wire:confirm="{{ __('Désactiver ce contact ?') }}" class="text-red-600 hover:text-red-900">{{ __('Désactiver') }}</button>
+                                    <button type="button" wire:click="editContact({{ $contact->id }})" class="me-3 text-indigo-600 hover:text-indigo-900 erp-action erp-action-edit">{{ __('Modifier') }}</button>
+                                    <button type="button" wire:click="archiveContact({{ $contact->id }})" wire:confirm="{{ __('Désactiver ce contact ?') }}" class="text-red-600 hover:text-red-900 erp-action erp-action-warning">{{ __('Désactiver') }}</button>
                                 @endif
                             @endcan
                         </td>

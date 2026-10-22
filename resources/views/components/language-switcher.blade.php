@@ -1,24 +1,21 @@
 @php
     $locales = [
-        'fr' => ['label' => 'Français', 'short' => 'FR'],
-        'en' => ['label' => 'English', 'short' => 'EN'],
-        'ar' => ['label' => 'العربية', 'short' => 'AR'],
+        'fr' => ['label' => 'Français', 'short' => 'FR', 'flag' => 'fr'],
+        'en' => ['label' => 'English', 'short' => 'EN', 'flag' => 'gb'],
+        'ar' => ['label' => 'العربية', 'short' => 'AR', 'flag' => 'sa'],
     ];
 
     $currentLocale = app()->getLocale();
 @endphp
 
-<div x-data="{ open: false }" class="relative shrink-0">
+<div @keydown.escape.stop="open = false; $refs.languageTrigger.focus()" x-data="{ open: false }" class="relative shrink-0">
     <button
-        type="button"
-        @click="open = !open"
+        x-ref="languageTrigger" type="button"
+        @click="open = !open" :aria-expanded="open" aria-controls="erp-language-menu" aria-label="{{ $locales[$currentLocale]['label'] ?? $currentLocale }}"
         class="erp-language-trigger inline-flex items-center justify-between gap-1.5 px-2.5 text-sm font-semibold text-slate-700 sm:gap-2 sm:px-3.5"
     >
         <span class="flex items-center gap-1.5 sm:gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-[18px] w-[18px] shrink-0 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9 9 0 100-18 9 9 0 000 18z" />
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3.6 9h16.8M3.6 15h16.8M12 3a15 15 0 010 18M12 3a15 15 0 000 18" />
-            </svg>
+            <x-language-flag :country="$locales[$currentLocale]['flag'] ?? 'fr'" />
             <span class="leading-none">{{ $locales[$currentLocale]['short'] ?? strtoupper($currentLocale) }}</span>
         </span>
 
@@ -28,7 +25,7 @@
     </button>
 
     <div
-        x-show="open"
+        id="erp-language-menu" x-show="open"
         @click.away="open = false"
         x-transition:enter="transition ease-out duration-150"
         x-transition:enter-start="opacity-0 translate-y-1 scale-95"
@@ -47,14 +44,14 @@
 
                     <button
                         type="submit"
-                        class="erp-language-option flex h-11 w-full items-center justify-between gap-3 rounded-xl px-3 text-start text-sm leading-6 transition-colors duration-150
+                        aria-current="{{ $currentLocale === $locale ? 'true' : 'false' }}" class="erp-language-option flex h-11 w-full items-center justify-between gap-3 rounded-xl px-3 text-start text-sm leading-6 transition-colors duration-150
                             {{ $currentLocale === $locale
                                 ? 'bg-blue-50 text-blue-700 font-semibold'
                                 : 'font-medium text-slate-600 hover:bg-slate-50 hover:text-slate-900' }}"
                     >
-                        <span class="{{ $locale === 'ar' ? 'font-semibold' : '' }}" lang="{{ $locale }}" dir="{{ $locale === 'ar' ? 'rtl' : 'ltr' }}">
+                        <span class="flex items-center gap-3"><x-language-flag :country="$data['flag']" /><span class="{{ $locale === 'ar' ? 'font-semibold' : '' }}" lang="{{ $locale }}" dir="{{ $locale === 'ar' ? 'rtl' : 'ltr' }}">
                             {{ $data['label'] }}
-                        </span>
+                        </span></span>
 
                         @if($currentLocale === $locale)
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">

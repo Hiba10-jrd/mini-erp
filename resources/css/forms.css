@@ -1,0 +1,128 @@
+/* One field theme for every authenticated workspace, including Clients (which
+   does not use erp-premium-page), dashboard filters, and account forms.
+   The existing main-content ID deliberately outranks legacy light form rules.
+   Keep native buttons, hidden values, checkbox/radio, range and color controls
+   out of the text-field rule. Print/PDF presentation is outside this scope. */
+@media screen {
+    :is(body.erp-shell #main-content, body.erp-premium-auth .erp-auth-card) {
+        --erp-field-bg: #0c1729;
+        --erp-field-text: #f1f5fb;
+        --erp-field-placeholder: #a3b3ca;
+        --erp-field-border: #526787;
+        color-scheme: dark;
+    }
+
+    :is(body.erp-shell #main-content, body.erp-premium-auth .erp-auth-card) :is(input:not([type=checkbox], [type=radio], [type=hidden], [type=button], [type=submit], [type=reset], [type=image], [type=range], [type=color]), select, textarea) {
+        --erp-field-ring: 0 0 0 0 transparent;
+        background-color: var(--erp-field-bg);
+        color: var(--erp-field-text);
+        -webkit-text-fill-color: var(--erp-field-text);
+        caret-color: var(--erp-field-text);
+        color-scheme: dark;
+        border: 1px solid var(--erp-field-border);
+        border-radius: 10px;
+        min-height: 44px;
+        max-width: 100%;
+        box-shadow: var(--erp-field-ring);
+        transition: border-color .18s ease, box-shadow .18s ease;
+    }
+
+    :is(body.erp-shell #main-content, body.erp-premium-auth .erp-auth-card) :is(input, textarea)::placeholder {
+        color: var(--erp-field-placeholder);
+        -webkit-text-fill-color: var(--erp-field-placeholder);
+        opacity: 1;
+    }
+
+    :is(body.erp-shell #main-content, body.erp-premium-auth .erp-auth-card) :is(input:not([type=checkbox], [type=radio], [type=hidden], [type=button], [type=submit], [type=reset], [type=image], [type=range], [type=color]), select, textarea):focus {
+        --erp-field-border: #9a91ff;
+        --erp-field-ring: 0 0 0 3px rgb(113 101 255 / 24%);
+        outline: 2px solid transparent;
+        outline-offset: 2px;
+        border-color: var(--erp-field-border);
+        --tw-ring-color: transparent;
+        box-shadow: var(--erp-field-ring);
+    }
+
+    :is(body.erp-shell #main-content, body.erp-premium-auth .erp-auth-card) :is(input, select, textarea):disabled {
+        --erp-field-bg: #17263e;
+        --erp-field-text: #a3b3ca;
+        --erp-field-border: #405371;
+        cursor: not-allowed;
+    }
+    :is(body.erp-shell #main-content, body.erp-premium-auth .erp-auth-card) :is(input, textarea)[readonly] {
+        --erp-field-bg: #101c30;
+        --erp-field-text: #c4d0e3;
+    }
+    :is(body.erp-shell #main-content, body.erp-premium-auth .erp-auth-card) :is(input, select, textarea)[aria-invalid=true],
+    :is(body.erp-shell #main-content, body.erp-premium-auth .erp-auth-card) :is(input, select, textarea)[aria-invalid=true]:focus {
+        --erp-field-border: #fb7185;
+    }
+
+    /* Native popups remain browser/OS controlled; set both the closed control
+       and its option tree rather than relying on inherited text color alone. */
+    :is(body.erp-shell #main-content, body.erp-premium-auth .erp-auth-card) select :is(option, optgroup) {
+        background-color: #0c1729;
+        color: #f1f5fb;
+        -webkit-text-fill-color: #f1f5fb;
+        color-scheme: dark;
+    }
+    :is(body.erp-shell #main-content, body.erp-premium-auth .erp-auth-card) select option:checked {
+        background-color: #302b58;
+        color: #fff;
+        -webkit-text-fill-color: #fff;
+    }
+    :is(body.erp-shell #main-content, body.erp-premium-auth .erp-auth-card) select option:is(:hover, :focus) {
+        background-color: #263852;
+        color: #fff;
+        -webkit-text-fill-color: #fff;
+    }
+    :is(body.erp-shell #main-content, body.erp-premium-auth .erp-auth-card) select :is(option, optgroup):disabled {
+        color: #8fa0ba;
+        -webkit-text-fill-color: #8fa0ba;
+    }
+    :is(body.erp-shell #main-content, body.erp-premium-auth .erp-auth-card) select:not([multiple]):where(:not([size]), [size="1"]) {
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='m6 8 4 4 4-4' stroke='%23b8c5d8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+        background-position: right .75rem center;
+        background-repeat: no-repeat;
+        background-size: 20px 20px;
+        padding-inline: .8rem 2.5rem;
+    }
+    [dir=rtl] :is(body.erp-shell #main-content, body.erp-premium-auth .erp-auth-card) select:not([multiple]):where(:not([size]), [size="1"]) {
+        background-position: left .75rem center;
+    }
+    :is(body.erp-shell #main-content, body.erp-premium-auth .erp-auth-card) select:is([multiple], [size]:not([size="1"])) {
+        background-image: none;
+        padding-inline: .8rem;
+    }
+
+    /* Chromium/WebKit paint autofill with UA !important colors. An inset fill
+       covers that paint; explicit text fill keeps the actual value legible.
+       The focus ring is retained, with no delayed-animation autofill hack. */
+    :is(body.erp-shell #main-content, body.erp-premium-auth .erp-auth-card) :is(input, select, textarea):is(:autofill, :-webkit-autofill) {
+        -webkit-text-fill-color: var(--erp-field-text) !important;
+        caret-color: var(--erp-field-text);
+        -webkit-box-shadow: 0 0 0 1000px var(--erp-field-bg) inset, var(--erp-field-ring, 0 0 0 0 transparent) !important;
+        box-shadow: 0 0 0 1000px var(--erp-field-bg) inset, var(--erp-field-ring, 0 0 0 0 transparent) !important;
+    }
+
+    :is(body.erp-shell #main-content, body.erp-premium-auth .erp-auth-card) input::-webkit-calendar-picker-indicator {
+        filter: none;
+        opacity: .85;
+    }
+    :is(body.erp-shell #main-content, body.erp-premium-auth .erp-auth-card) input::-webkit-datetime-edit {
+        color: var(--erp-field-text);
+    }
+    :is(body.erp-shell #main-content, body.erp-premium-auth .erp-auth-card) input::file-selector-button {
+        background: #263852;
+        color: #e2e8f0;
+        border: 1px solid #526787;
+        border-radius: 6px;
+        padding: 5px 10px;
+        margin-inline-end: 12px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+        :is(body.erp-shell #main-content, body.erp-premium-auth .erp-auth-card) :is(input:not([type=checkbox], [type=radio], [type=hidden], [type=button], [type=submit], [type=reset], [type=image], [type=range], [type=color]), select, textarea) {
+            transition: none;
+        }
+    }
+}

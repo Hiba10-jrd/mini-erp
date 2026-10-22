@@ -1,0 +1,169 @@
+/* Authenticated workspaces. Keep navigation, Dashboard and print/PDF views out
+   of this scope. Specificity deliberately exceeds the legacy .erp-main rules. */
+@media screen {
+    body.erp-premium-page { background: #090f1e; }
+    .erp-premium-page :is(.erp-main, .erp-page-heading) {
+        --erp-bg: #090f1e;
+        --erp-text: #f8fafc;
+        --erp-muted: #a3b3ca;
+        --erp-border: #263852;
+        --erp-primary: #7165ff;
+        --erp-primary-dark: #c2bcff;
+        --erp-navy: #e2e8f0;
+        color: var(--erp-text);
+    }
+    .erp-premium-page .erp-main { background: #090f1e; padding-top: 24px; }
+    .erp-premium-page .erp-main :where(*) { border-color: #263852; }
+    .erp-premium-page .erp-main .bg-white { background-color: #101c30; }
+    .erp-premium-page .erp-main :is([class~="hover:bg-gray-50"], [class~="hover:bg-gray-100"], [class~="hover:bg-slate-50"]):hover { background-color: #1b2c47; }
+    .erp-premium-page .erp-page-heading > div {
+        padding: 24px 28px;
+        border: 1px solid #263852;
+        border-inline-start: 3px solid #7165ff;
+        border-radius: 16px;
+        background: radial-gradient(ellipse at top right, rgb(56 189 248 / 5%), transparent 44%), linear-gradient(145deg, #17263e, #101c30 55%);
+        box-shadow: 0 12px 32px rgb(2 8 23 / 18%), inset 0 1px 0 rgb(255 255 255 / 3%);
+    }
+    .erp-premium-page .erp-page-heading h2 { color: #f8fafc; font-size: clamp(25px, 2.2vw, 32px); line-height: 1.3; }
+    .erp-premium-page .erp-page-heading p { color: #a3b3ca; line-height: 1.7; }
+    .erp-premium-page .erp-page-heading p.text-indigo-600 { color: #c2bcff; font-weight: 600; }
+    .erp-premium-page .erp-page-heading a { color: #c2bcff; }
+
+    /* Card containers used by list, detail and editing screens. */
+    .erp-premium-page .erp-main :is(section, div, form).bg-white,
+    .erp-premium-page .erp-main :is(.erp-card, .erp-panel, .erp-entity-card, .erp-detail-panel, .erp-kpi, .erp-timeline-card) {
+        background: radial-gradient(ellipse at top right, rgb(56 189 248 / 4%), transparent 44%), linear-gradient(145deg, #17263e, #101c30 55%);
+        border: 1px solid #263852;
+        border-radius: 16px;
+        box-shadow: 0 12px 32px rgb(2 8 23 / 18%), inset 0 1px 0 rgb(255 255 255 / 3%);
+    }
+    .erp-premium-page .erp-main .erp-panel-header { background: #14223a; border-color: #263852; padding: 24px; }
+    .erp-premium-page .erp-main :is(.erp-card-section, .erp-detail-header, .erp-modal-actions) { border-color: #263852; }
+    .erp-premium-page .erp-main :is(.erp-table-shell, .erp-pagination) { background: #101c30; border-color: #263852; }
+    .erp-premium-page .erp-main :is(.erp-entity-shell, .space-y-5, .space-y-6) { min-width: 0; }
+    .erp-premium-page .erp-main :is(h1, h2, h3, h4, .erp-entity-name, .erp-kpi-value) { color: #f8fafc; }
+    .erp-premium-page .erp-main :is(.text-gray-950, .text-gray-900, .text-gray-800, .text-slate-900) { color: #f1f5fb; }
+    .erp-premium-page .erp-main :is(.text-gray-700, .text-gray-600, .text-slate-700, .text-slate-600) { color: #c4d0e3; }
+    .erp-premium-page .erp-main :is(.text-gray-500, .text-gray-400, .text-slate-500, .erp-kpi-label, .erp-kpi-subtitle, .erp-kv-list dd, .erp-detail-panel p, .erp-detail-panel dt, .erp-detail-panel li) { color: #a3b3ca; }
+    .erp-premium-page .erp-main :is(.text-indigo-600, .text-indigo-700, .text-indigo-800, .text-indigo-900, .text-violet-600, .text-violet-700, .erp-table-link, .erp-entity-meta) { color: #c2bcff; }
+    .erp-premium-page .erp-main :is(.bg-gray-50, .bg-gray-100, .bg-gray-200, .bg-slate-50, .bg-slate-100) { background-color: #17263e; }
+    .erp-premium-page .erp-main :is(.border-gray-100, .border-gray-200, .border-gray-300, .border-slate-100, .border-slate-200, .border-slate-300) { border-color: #344662; }
+    .erp-premium-page .erp-main :is(.divide-gray-100, .divide-gray-200, .divide-slate-200) > :not([hidden]) ~ :not([hidden]) { border-color: #263852; }
+
+    /* Forms: override both Tailwind utilities and the old form plugin rules. */
+    body.erp-premium-page .erp-main :is(input:not([type=checkbox]):not([type=radio]):not([type=hidden]), select, textarea) {
+        min-height: 44px;
+        max-width: 100%;
+        border: 1px solid #405371;
+        border-radius: 10px;
+        background-color: #0c1729;
+        color: #f1f5fb;
+        color-scheme: dark;
+        box-shadow: none;
+        transition: border-color .18s ease, box-shadow .18s ease;
+    }
+    .erp-premium-page .erp-main :is(input, textarea)::placeholder { color: #a3b3ca; opacity: 1; }
+    .erp-premium-page .erp-main select option { background: #0c1729; color: #f1f5fb; }
+    body.erp-premium-page .erp-main :is(input:not([type=checkbox]):not([type=radio]):not([type=hidden]), select, textarea):focus { outline: none; border-color: #9a91ff; --tw-ring-color: transparent; box-shadow: 0 0 0 3px rgb(113 101 255 / 22%); }
+    body.erp-premium-page .erp-main :is(input:not([type=checkbox]):not([type=radio]):not([type=hidden]), select, textarea):disabled { background: #17263e; color: #a3b3ca; cursor: not-allowed; }
+    .erp-premium-page .erp-main input:is([type=checkbox], [type=radio]) { background-color: #0c1729; border-color: #647793; color: #7165ff; accent-color: #7165ff; }
+    .erp-premium-page .erp-main input:is([type=checkbox], [type=radio]):checked { background-color: #7165ff; border-color: #9a91ff; }
+    .erp-premium-page .erp-main input[type=file] { padding: 7px; }
+    .erp-premium-page .erp-main input::file-selector-button { background: #263852; color: #e2e8f0; border: 1px solid #526787; border-radius: 6px; padding: 5px 10px; margin-inline-end: 12px; }
+    .erp-premium-page .erp-main :is(label, legend, .erp-kv-list dt) { color: #c4d0e3; }
+    body.erp-premium-page .erp-main :is(input:not([type=checkbox]):not([type=radio]):not([type=hidden]), select, textarea)[aria-invalid=true] { border-color: #fb7185; }
+
+    /* Tables: cell backgrounds must remain transparent for row hover to work. */
+    .erp-premium-page .erp-main :is(.erp-table-scroll, .overflow-x-auto) { border-radius: 12px; scrollbar-color: #526787 #101c30; }
+    .erp-premium-page .erp-main table { background: #101c30; border-collapse: separate; border-spacing: 0; }
+    .erp-premium-page .erp-main table :is(thead, th) { background: #17263e; color: #bac7dc; }
+    .erp-premium-page .erp-main table th { padding: 16px 18px; border-color: #344662; font-weight: 650; text-align: start; }
+    .erp-premium-page .erp-main table td { background: transparent; color: #dce5f4; padding: 17px 18px; border-color: #263852; vertical-align: middle; }
+    .erp-premium-page .erp-main table :is(th, td).text-end { text-align: end; }
+    .erp-premium-page .erp-main table :is(th, td).text-center { text-align: center; }
+    .erp-premium-page .erp-main table tbody tr { transition: background-color .18s ease; }
+    .erp-premium-page .erp-main table tbody tr:hover { background: #1b2c47; }
+    .erp-premium-page .erp-main table tfoot { background: #17263e; color: #f1f5fb; }
+    .erp-premium-page .erp-main table td :is(a, button):not(.erp-badge) { border-radius: 7px; text-underline-offset: 4px; }
+    .erp-premium-page .erp-main table td a:hover { text-decoration: underline; }
+
+    /* Existing actions keep their bindings, permissions and disabled states. */
+    .erp-premium-page .erp-main :is(.erp-button, .erp-primary-button, .erp-secondary-button, .erp-link-button, .erp-link-button-danger, a.inline-flex, button.inline-flex) { border-radius: 10px; transition: background-color .18s, border-color .18s, box-shadow .18s, transform .18s; }
+    .erp-premium-page .erp-main :is(.erp-button-primary, .erp-primary-button, .erp-link-button, a.bg-gray-900, a.bg-gray-800, a.bg-indigo-600, a.bg-indigo-700, button.bg-gray-900, button.bg-gray-800, button.bg-indigo-600, button.bg-indigo-700) {
+        background: linear-gradient(135deg, #6558eb, #5b4cf6);
+        border: 1px solid #9389ff;
+        color: white;
+        box-shadow: 0 6px 20px rgb(91 76 246 / 24%);
+        min-height: 42px;
+        border-radius: 10px;
+    }
+    .erp-premium-page .erp-main :is(.erp-button-secondary, .erp-secondary-button, a.inline-flex.border, button.inline-flex.border) { background: #17263e; color: #e2e8f0; border: 1px solid #405371; }
+    .erp-premium-page .erp-main :is(.erp-button-danger, .erp-link-button-danger) { background: #491f35; color: #fecdd3; border: 1px solid #a34c64; }
+    .erp-premium-page .erp-main :is(.erp-button-primary, .erp-primary-button, a.bg-gray-900):hover { box-shadow: 0 8px 24px rgb(91 76 246 / 35%); transform: translateY(-1px); }
+    .erp-premium-page .erp-main :is(.erp-button-secondary, .erp-secondary-button):hover { background: #263852; border-color: #697e9d; }
+    .erp-premium-page .erp-main :is(button, a):focus-visible { outline: 2px solid #b0a8ff; outline-offset: 3px; }
+    .erp-premium-page .erp-main button:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    /* Semantic feedback and document status tones. */
+    .erp-premium-page .erp-main :is(.erp-badge, .erp-status-pill) { border-radius: 999px; font-weight: 600; }
+    .erp-premium-page .erp-main :is(.erp-badge-success, .erp-status-pill.is-active, .bg-emerald-50, .bg-emerald-100, .bg-green-50, .bg-green-100, [class~="bg-emerald-50/80"]) { background: #12372f; color: #6ee7b7; border-color: #286254; }
+    .erp-premium-page .erp-main :is(.erp-badge-warning, .bg-amber-50, .bg-amber-100, .bg-yellow-100, .bg-orange-100) { background: #3b2d1c; color: #fcd58a; border-color: #806038; }
+    .erp-premium-page .erp-main :is(.erp-badge-danger, .bg-rose-50, .bg-rose-100, .bg-red-50, .bg-red-100) { background: #3c2032; color: #fda4af; border-color: #784353; }
+    .erp-premium-page .erp-main :is(.erp-badge-info, .bg-sky-100, .bg-blue-100, .bg-indigo-50, .bg-indigo-100, .bg-violet-50) { background: #222646; color: #c4beff; border-color: #514c83; }
+    .erp-premium-page .erp-main :is(.erp-badge-neutral, .erp-status-pill.is-archived) { background: #26344b; color: #c1cce0; border-color: #43536e; }
+    .erp-premium-page .erp-main :is(.text-emerald-700, .text-emerald-800, .text-emerald-900, .text-green-600, .text-green-800) { color: #6ee7b7; }
+    .erp-premium-page .erp-main :is(.text-amber-700, .text-amber-800, .text-amber-900) { color: #fcd58a; }
+    .erp-premium-page .erp-main :is(.text-red-600, .text-red-700, .text-red-800, .text-red-900, .text-rose-700, .text-rose-800, .text-rose-900) { color: #fda4af; }
+    .erp-premium-page .erp-main .text-sky-800 { color: #7dd3fc; }
+    .erp-premium-page .erp-main :is(.bg-gray-100.text-gray-700, .bg-gray-100.text-gray-800) { background: #26344b; color: #c1cce0; }
+
+    /* Alpine modal wrappers stay in place; only their presentation changes. */
+    .erp-premium-page .erp-main .fixed > .bg-white { background: #101c30; border: 1px solid #405371; border-radius: 18px; box-shadow: 0 24px 80px rgb(0 0 0 / 55%); }
+    .erp-premium-page .erp-main .fixed .bg-gray-500 { background: #020817; opacity: .85; backdrop-filter: blur(5px); }
+    .erp-premium-page .erp-main .erp-modal-form { background: #101c30; color: #f8fafc; width: 100%; border: 0; border-radius: 18px; box-shadow: none; }
+    .erp-premium-page .erp-main .erp-modal-form h3 { color: #f8fafc; }
+
+    /* Purchasing: invoice reconciliation uses its own CSS rather than utilities. */
+    .erp-premium-page .erp-main .si-workspace .si-panel {
+        background: radial-gradient(ellipse at top right, rgb(56 189 248 / 4%), transparent 44%), linear-gradient(145deg, #17263e, #101c30 55%);
+        border-color: #263852;
+        border-radius: 16px;
+        box-shadow: 0 12px 32px rgb(2 8 23 / 18%);
+    }
+    .erp-premium-page .erp-main .si-workspace :is(.si-document-row, .si-upload, .si-detail-grid, .si-erp-column, .si-charge-confirmation, .si-receipt-tag) { background: #17263e; color: #c4d0e3; border-color: #405371; }
+    .erp-premium-page .erp-main .si-workspace :is(.si-section-heading h3, .si-grand-total dd, .si-computed-total output) { color: #f1f5fb; }
+    .erp-premium-page .erp-main .si-workspace :is(.si-field label, .si-label, .si-readiness) { color: #c4d0e3; }
+    .erp-premium-page .erp-main .si-workspace :is(.si-version-list li, .si-history li, .si-line, .si-secondary, .si-tax-component) { border-color: #263852; }
+    .erp-premium-page .erp-main .si-workspace .si-step { background: #302b58; color: #d3cfff; }
+    .erp-premium-page .erp-main .si-workspace .si-success { background: #12372f; color: #6ee7b7; }
+    .erp-premium-page .erp-main .si-workspace .si-warning { background: #3b2d1c; color: #fcd58a; }
+    .erp-premium-page .erp-main .si-workspace .si-error { background: #3c2032; color: #fda4af; }
+    .erp-premium-page .erp-main .si-workspace .si-neutral { background: #26344b; color: #c1cce0; }
+    .erp-premium-page .erp-main .si-workspace .si-error-text { color: #fda4af; }
+
+    .erp-premium-page .erp-main .erp-pagination { border-radius: 12px; }
+    .erp-premium-page .erp-main [role=tablist] { gap: 8px; padding: 8px; background: #101c30; border: 1px solid #263852; border-radius: 14px; }
+    .erp-premium-page .erp-main [role=tablist] [role=tab] { border-radius: 9px; background: #17263e; border: 1px solid #405371; color: #c4d0e3; transition: background-color .18s, border-color .18s; }
+    .erp-premium-page .erp-main [role=tablist] [role=tab][aria-selected=true] { background: #302b58; color: #e0dcff; border-color: #9389ff; box-shadow: inset 0 1px 0 rgb(255 255 255 / 5%); }
+    .erp-premium-page .erp-main [role=tablist] [role=tab]:hover { border-color: #9389ff; }
+    .erp-premium-page .erp-main .erp-empty-state { color: #a3b3ca; border-color: #405371; background: #101c30; }
+    .erp-premium-page .erp-main .erp-empty-symbol { color: #c2bcff; background: #302b58; }
+    .erp-premium-page .erp-main .erp-json { background: #0c1729; color: #c4d0e3; border-color: #344662; }
+    .erp-premium-page .erp-main .erp-notification-row.is-unread { background: #1c2546; border-inline-start-color: #9389ff; }
+    .erp-premium-page .erp-main .erp-avatar { background: #302b58; color: #d3cfff; }
+    .erp-premium-page .erp-main .text-slate-400 { color: #a3b3ca; }
+    .erp-premium-page .erp-main nav[role=navigation] :is(a, button, span.relative) { background: #17263e; color: #c4d0e3; border-color: #405371; }
+    .erp-premium-page .erp-main nav[role=navigation] [aria-current=page] span { background: #6558eb; color: white; border-color: #9389ff; }
+    .erp-premium-page .erp-main nav[role=navigation] [aria-disabled=true] span { color: #8d9bb5; }
+
+    .erp-premium-page .erp-main > div, .erp-premium-page .erp-page-heading > div { animation: erp-workspace-appear .3s ease-out backwards; }
+    @keyframes erp-workspace-appear { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+    @media (max-width: 639px) {
+        .erp-premium-page .erp-page-heading > div { padding: 20px 16px; }
+        .erp-premium-page .erp-main .erp-panel-header { padding: 20px 16px; }
+        .erp-premium-page .erp-main .erp-inline-actions { gap: 8px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+        .erp-premium-page .erp-main *, .erp-premium-page .erp-main > div, .erp-premium-page .erp-page-heading > div { animation: none; transition: none; }
+    }
+}

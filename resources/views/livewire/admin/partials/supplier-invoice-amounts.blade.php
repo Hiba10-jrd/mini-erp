@@ -85,11 +85,11 @@
                     <x-supplier-invoice-input :model="'breakdown.'.$index.'.tax'" :label="__('TVA du document')" type="number" min="0" step="0.01" />
                     @if ($this->zeroTaxRate((string)($component['rate'] ?? '')) || !empty($component['tax_reason']))<x-supplier-invoice-input :model="'breakdown.'.$index.'.tax_reason'" :label="__('Traitement sans TVA')" maxlength="500" />@endif
                     <x-supplier-invoice-input :model="'breakdown.'.$index.'.rounding_reason'" :label="__('Justification de l’arrondi')" maxlength="500" /></div>
-                    <button type="button" wire:click="removeComponent({{ $index }})" class="si-text-button si-error-text">{{ __('Retirer la composante') }}</button>
+                    <button type="button" wire:click="removeComponent({{ $index }})" class="si-text-button si-error-text erp-action erp-action-danger">{{ __('Retirer la composante') }}</button>
                 </fieldset>
             @endforeach
         @endif
-        <button type="button" wire:click="addComponent" class="erp-button erp-button-secondary">{{ __('Ajouter un taux, une remise ou des frais') }}</button>
+        <button type="button" wire:click="addComponent" class="erp-button erp-button-secondary erp-action erp-action-primary">{{ __('Ajouter un taux, une remise ou des frais') }}</button>
     </details>
 @elseif ($invoice?->reconciliation)
     <details class="si-secondary"><summary>{{ __('Détails des taxes et frais') }}</summary><ul class="si-history">@foreach($invoice->reconciliation->breakdown as $component)<li>{{ $component['label'] }} · {{ $this->money($component['net_ht']) }} HT · {{ $component['rate'] }} % · {{ $this->money($component['tax']) }} TVA @if($component['tax_reason'])· {{ $component['tax_reason'] }}@endif @if($component['rounding_reason'])· {{ $component['rounding_reason'] }}@endif</li>@endforeach</ul></details>

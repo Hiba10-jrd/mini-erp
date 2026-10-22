@@ -384,7 +384,7 @@ new class extends \Livewire\Volt\Component
                 <button
                     type="button"
                     wire:click="prepareCategory"
-                    class="inline-flex min-h-10 items-center justify-center border border-gray-300 bg-white px-4 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+                    class="inline-flex min-h-10 items-center justify-center border border-gray-300 bg-white px-4 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 erp-action erp-action-primary"
                 >
                     {{ __('Nouvelle catégorie') }}
                 </button>
@@ -392,7 +392,7 @@ new class extends \Livewire\Volt\Component
                 <button
                     type="button"
                     wire:click="prepareRegister"
-                    class="inline-flex min-h-10 items-center justify-center bg-gray-900 px-4 text-sm font-semibold text-white transition hover:bg-gray-700"
+                    class="inline-flex min-h-10 items-center justify-center bg-gray-900 px-4 text-sm font-semibold text-white transition hover:bg-gray-700 erp-action erp-action-primary"
                 >
                     {{ __('Nouvelle caisse') }}
                 </button>
@@ -422,7 +422,7 @@ new class extends \Livewire\Volt\Component
                 <button
                     type="button"
                     wire:click="cancelRegister"
-                    class="text-sm font-medium text-gray-500 hover:text-gray-900"
+                    class="text-sm font-medium text-gray-500 hover:text-gray-900 erp-action erp-action-neutral"
                 >
                     {{ __('Fermer') }}
                 </button>
@@ -493,7 +493,7 @@ new class extends \Livewire\Volt\Component
                 <div class="flex justify-end md:col-span-3">
                     <button
                         type="submit"
-                        class="inline-flex min-h-10 items-center justify-center bg-gray-900 px-4 text-sm font-semibold text-white transition hover:bg-gray-700"
+                        class="inline-flex min-h-10 items-center justify-center bg-gray-900 px-4 text-sm font-semibold text-white transition hover:bg-gray-700 erp-action erp-action-primary"
                     >
                         {{ __('Créer la caisse') }}
                     </button>
@@ -518,7 +518,7 @@ new class extends \Livewire\Volt\Component
                 <button
                     type="button"
                     wire:click="cancelCategory"
-                    class="text-sm font-medium text-gray-500 hover:text-gray-900"
+                    class="text-sm font-medium text-gray-500 hover:text-gray-900 erp-action erp-action-neutral"
                 >
                     {{ __('Fermer') }}
                 </button>
@@ -568,14 +568,14 @@ new class extends \Livewire\Volt\Component
                     <button
                         type="button"
                         wire:click="cancelCategory"
-                        class="border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                        class="border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 erp-action erp-action-neutral"
                     >
                         {{ __('Annuler') }}
                     </button>
 
                     <button
                         type="submit"
-                        class="bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700"
+                        class="bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-700 erp-action erp-action-primary"
                     >
                         {{ __('Créer la catégorie') }}
                     </button>
@@ -681,7 +681,7 @@ new class extends \Livewire\Volt\Component
                             <button
                                 type="button"
                                 wire:click="prepareTransaction({{ $register->id }}, 'entry')"
-                                class="flex-1 border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                                class="flex-1 border border-gray-300 bg-white px-3 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50 erp-action erp-action-primary"
                             >
                                 {{ __('Entrée') }}
                             </button>
@@ -689,7 +689,7 @@ new class extends \Livewire\Volt\Component
                             <button
                                 type="button"
                                 wire:click="prepareTransaction({{ $register->id }}, 'exit')"
-                                class="flex-1 bg-gray-900 px-3 py-2 text-sm font-semibold text-white hover:bg-gray-700"
+                                class="flex-1 bg-gray-900 px-3 py-2 text-sm font-semibold text-white hover:bg-gray-700 erp-action erp-action-primary"
                             >
                                 {{ __('Sortie') }}
                             </button>
@@ -722,7 +722,7 @@ new class extends \Livewire\Volt\Component
                 <button
                     type="button"
                     wire:click="cancelTransaction"
-                    class="text-sm font-medium text-gray-500 hover:text-gray-900"
+                    class="text-sm font-medium text-gray-500 hover:text-gray-900 erp-action erp-action-neutral"
                 >
                     {{ __('Fermer') }}
                 </button>
@@ -810,7 +810,7 @@ new class extends \Livewire\Volt\Component
                 <div class="flex justify-end md:col-span-2">
                     <button
                         type="submit"
-                        class="inline-flex min-h-10 items-center justify-center bg-gray-900 px-4 text-sm font-semibold text-white transition hover:bg-gray-700"
+                        class="inline-flex min-h-10 items-center justify-center bg-gray-900 px-4 text-sm font-semibold text-white transition hover:bg-gray-700 erp-action erp-action-primary"
                     >
                         {{ __('Enregistrer le mouvement') }}
                     </button>
@@ -863,7 +863,7 @@ new class extends \Livewire\Volt\Component
                         <button
                             type="button"
                             wire:click="toggleCategory({{ $category->id }})"
-                            class="mt-4 text-sm font-medium text-gray-600 underline hover:text-gray-900"
+                            class="mt-4 text-sm font-medium text-gray-600 underline hover:text-gray-900 erp-action {{ $category->is_active ? 'erp-action-warning' : 'erp-action-success' }}"
                         >
                             {{ $category->is_active
                                 ? __('Désactiver')

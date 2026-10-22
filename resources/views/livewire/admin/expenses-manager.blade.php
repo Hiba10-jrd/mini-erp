@@ -174,7 +174,7 @@ new class extends \Livewire\Volt\Component
                 <a
                     href="{{ route('finance.expenses.create') }}"
                     wire:navigate
-                    class="inline-flex min-h-10 items-center justify-center bg-gray-900 px-4 text-sm font-semibold text-white transition hover:bg-gray-700"
+                    class="inline-flex min-h-10 items-center justify-center bg-gray-900 px-4 text-sm font-semibold text-white transition hover:bg-gray-700 erp-action erp-action-primary"
                 >
                     {{ __('Nouvelle dépense') }}
                 </a>
@@ -302,7 +302,7 @@ new class extends \Livewire\Volt\Component
         <button
             type="button"
             wire:click="resetFilters"
-            class="mt-4 text-sm font-medium text-gray-600 underline hover:text-gray-900"
+            class="mt-4 text-sm font-medium text-gray-600 underline hover:text-gray-900 erp-action erp-action-neutral"
         >
             {{ __('Réinitialiser les filtres') }}
         </button>
@@ -387,7 +387,7 @@ new class extends \Livewire\Volt\Component
 
                             <td class="px-4 py-4 text-gray-600">
                                 {{ $expense->creator?->name ?? '—' }}
-                            <a class="mt-1 block text-indigo-600" href="{{ route('attachments.index', ['parentType' => 'expense', 'parentId' => $expense->id]) }}" wire:navigate>{{ __('Documents') }}</a>
+                            <a class="mt-1 block text-indigo-600 erp-action erp-action-view" href="{{ route('attachments.index', ['parentType' => 'expense', 'parentId' => $expense->id]) }}" wire:navigate>{{ __('Documents') }}</a>
 </td>
                         </tr>
                     @empty

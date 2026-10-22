@@ -194,7 +194,7 @@ new class extends \Livewire\Volt\Component
         </section>
 
         <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-            <a href="{{ route('sales.orders.show', $order) }}" wire:navigate class="inline-flex min-h-10 items-center justify-center border border-gray-300 px-4 text-sm font-medium text-gray-700">{{ __('Annuler') }}</a>
+            <a href="{{ route('sales.orders.show', $order) }}" wire:navigate class="inline-flex min-h-10 items-center justify-center border border-gray-300 px-4 text-sm font-medium text-gray-700 erp-action erp-action-neutral">{{ __('Annuler') }}</a>
             <x-primary-button type="submit" class="justify-center">{{ __('Enregistrer le bon de livraison') }}</x-primary-button>
         </div>
     </form>

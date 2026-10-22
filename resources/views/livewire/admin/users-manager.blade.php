@@ -335,23 +335,23 @@ new class extends Component
                             </td>
                             <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-600">{{ $user->created_at->format('d/m/Y') }}</td>
                             <td class="px-6 py-4 text-end text-sm font-medium">
-                                <div class="flex flex-wrap justify-end gap-x-4 gap-y-2">
+                                <div class="erp-action-group flex flex-wrap justify-end gap-x-4 gap-y-2">
                                     @unless ($user->isArchived())
-                                        <button type="button" wire:click="editUser({{ $user->id }})" class="text-indigo-600 hover:text-indigo-900">{{ __('Modifier') }}</button>
+                                        <button type="button" wire:click="editUser({{ $user->id }})" class="text-indigo-600 hover:text-indigo-900 erp-action erp-action-edit">{{ __('Modifier') }}</button>
                                     @endunless
 
                                     @unless ($isSuperAdministrator || $user->isArchived())
-                                        <button type="button" wire:click="preparePasswordReset({{ $user->id }})" class="text-gray-600 hover:text-gray-900">{{ __('Réinitialiser le mot de passe') }}</button>
+                                        <button type="button" wire:click="preparePasswordReset({{ $user->id }})" class="text-gray-600 hover:text-gray-900 erp-action erp-action-reset">{{ __('Réinitialiser le mot de passe') }}</button>
                                     @endunless
 
                                     @if (! $isSuperAdministrator && $user->isActive())
-                                        <button type="button" wire:click="disableUser({{ $user->id }})" wire:confirm="{{ __('Désactiver ce compte et invalider ses sessions actives ?') }}" class="text-amber-700 hover:text-amber-900">{{ __('Désactiver') }}</button>
+                                        <button type="button" wire:click="disableUser({{ $user->id }})" wire:confirm="{{ __('Désactiver ce compte et invalider ses sessions actives ?') }}" class="text-amber-700 hover:text-amber-900 erp-action erp-action-warning">{{ __('Désactiver') }}</button>
                                     @elseif (! $isSuperAdministrator && $user->isDisabled())
-                                        <button type="button" wire:click="reactivateUser({{ $user->id }})" class="text-emerald-700 hover:text-emerald-900">{{ __('Réactiver') }}</button>
+                                        <button type="button" wire:click="reactivateUser({{ $user->id }})" class="text-emerald-700 hover:text-emerald-900 erp-action erp-action-success">{{ __('Réactiver') }}</button>
                                     @endif
 
                                     @if (! $isSuperAdministrator && ! $user->isArchived())
-                                        <button type="button" wire:click="archiveUser({{ $user->id }})" wire:confirm="{{ __('Archiver définitivement ce compte ? Aucune restauration n’est disponible dans ce lot.') }}" class="text-red-600 hover:text-red-900">{{ __('Archiver') }}</button>
+                                        <button type="button" wire:click="archiveUser({{ $user->id }})" wire:confirm="{{ __('Archiver définitivement ce compte ? Aucune restauration n’est disponible dans ce lot.') }}" class="text-red-600 hover:text-red-900 erp-action erp-action-danger">{{ __('Archiver') }}</button>
                                     @endif
                                 </div>
                             </td>
@@ -421,7 +421,7 @@ new class extends Component
             </div>
 
             <div class="mt-6 flex justify-end gap-3">
-                <x-secondary-button type="button" x-on:click="$dispatch('close')">{{ __('Annuler') }}</x-secondary-button>
+                <x-secondary-button type="button" x-on:click="$dispatch('close')" class="erp-action erp-action-neutral">{{ __('Annuler') }}</x-secondary-button>
                 <x-primary-button wire:loading.attr="disabled" wire:target="saveUser">{{ $editingUserId === null ? __('Créer le compte') : __('Enregistrer') }}</x-primary-button>
             </div>
         </form>
@@ -447,8 +447,8 @@ new class extends Component
             </div>
 
             <div class="mt-6 flex justify-end gap-3">
-                <x-secondary-button type="button" x-on:click="$dispatch('close')">{{ __('Annuler') }}</x-secondary-button>
-                <x-danger-button wire:loading.attr="disabled" wire:target="resetUserPassword">{{ __('Réinitialiser') }}</x-danger-button>
+                <x-secondary-button type="button" x-on:click="$dispatch('close')" class="erp-action erp-action-neutral">{{ __('Annuler') }}</x-secondary-button>
+                <x-danger-button wire:loading.attr="disabled" wire:target="resetUserPassword" class="erp-action erp-action-reset">{{ __('Réinitialiser') }}</x-danger-button>
             </div>
         </form>
     </x-modal>

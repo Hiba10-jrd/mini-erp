@@ -176,7 +176,7 @@ new class extends Component
                             @can('stock.manage')
                                 <td class="px-4 py-4 text-end">
                                     @if ($inventory->isEditable())
-                                        <x-secondary-button type="button" wire:click="saveLine({{ $line->id }})">{{ __('Enregistrer') }}</x-secondary-button>
+                                        <x-secondary-button type="button" wire:click="saveLine({{ $line->id }})" class="erp-action erp-action-primary">{{ __('Enregistrer') }}</x-secondary-button>
                                     @endif
                                 </td>
                             @endcan
@@ -191,8 +191,8 @@ new class extends Component
         <div class="flex flex-col gap-3 rounded-lg border border-gray-200 bg-white p-6 shadow-sm sm:flex-row sm:items-center sm:justify-between">
             <p class="text-sm text-gray-600">{{ __('La validation est définitive. Les corrections utiliseront le stock courant verrouillé au moment de la validation.') }}</p>
             <div class="flex shrink-0 gap-3">
-                <x-secondary-button type="button" wire:click="cancelInventory" wire:confirm="{{ __('Annuler définitivement cet inventaire sans corriger le stock ?') }}">{{ __('Annuler l’inventaire') }}</x-secondary-button>
-                <x-primary-button type="button" wire:click="validateInventory" wire:confirm="{{ __('Valider définitivement cet inventaire et générer les corrections de stock ?') }}">{{ __('VALIDER L’INVENTAIRE') }}</x-primary-button>
+                <x-secondary-button type="button" wire:click="cancelInventory" wire:confirm="{{ __('Annuler définitivement cet inventaire sans corriger le stock ?') }}" class="erp-action erp-action-neutral">{{ __('Annuler l’inventaire') }}</x-secondary-button>
+                <x-primary-button type="button" wire:click="validateInventory" wire:confirm="{{ __('Valider définitivement cet inventaire et générer les corrections de stock ?') }}" class="erp-action erp-action-success">{{ __('VALIDER L’INVENTAIRE') }}</x-primary-button>
             </div>
         </div>
     @endif

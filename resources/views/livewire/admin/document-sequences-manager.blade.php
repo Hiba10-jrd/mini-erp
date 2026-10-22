@@ -314,7 +314,7 @@ new class extends Component
             <x-secondary-button
                 type="button"
                 wire:click="prepareCreate"
-            >
+             class="erp-action erp-action-primary">
                 {{ __('Nouvelle séquence') }}
             </x-secondary-button>
 
@@ -499,7 +499,7 @@ new class extends Component
                 <x-secondary-button
                     type="button"
                     wire:click="prepareCreate"
-                >
+                 class="erp-action erp-action-neutral">
                     {{ __('Annuler') }}
                 </x-secondary-button>
 
@@ -581,7 +581,7 @@ new class extends Component
                             <button
                                 type="button"
                                 wire:click="edit({{ $sequence->id }})"
-                                class="text-sm text-indigo-600 hover:text-indigo-900"
+                                class="text-sm text-indigo-600 hover:text-indigo-900 erp-action erp-action-edit"
                             >
                                 {{ __('Modifier') }}
                             </button>

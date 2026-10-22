@@ -151,7 +151,7 @@ new class extends Component
                             <td class="px-4 py-4 text-gray-600">{{ $inventory->starter?->name ?? __('Compte supprimé') }}</td>
                             <td class="whitespace-nowrap px-4 py-4 text-gray-600">{{ $inventory->validated_at?->format('d/m/Y H:i') ?? '—' }}</td>
                             <td class="px-4 py-4 text-gray-600">{{ $inventory->validator?->name ?? '—' }}</td>
-                            <td class="px-4 py-4 text-end"><a href="{{ route('admin.inventories.show', $inventory) }}" wire:navigate class="text-indigo-600 hover:text-indigo-900">{{ __('Consulter') }}</a></td>
+                            <td class="px-4 py-4 text-end"><a href="{{ route('admin.inventories.show', $inventory) }}" wire:navigate class="text-indigo-600 hover:text-indigo-900 erp-action erp-action-view">{{ __('Consulter') }}</a></td>
                         </tr>
                     @empty
                         <tr><td colspan="8" class="px-6 py-8 text-center text-gray-500">{{ __('Aucun inventaire ne correspond aux filtres.') }}</td></tr>

@@ -17,7 +17,7 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
-    <body class="font-sans antialiased erp-shell">
+    <body @class(['font-sans antialiased erp-shell', 'erp-dashboard-page' => request()->routeIs('dashboard'), 'erp-premium-page' => ! request()->routeIs('dashboard', 'admin.customers.index')])>
         <a href="#main-content" class="erp-skip-link">{{ __('Aller au contenu') }}</a>
         <div
             class="min-h-screen erp-ui-shell"

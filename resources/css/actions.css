@@ -1,0 +1,149 @@
+/* Opt-in action system. Navigation, prose links, pagination and print documents
+   never acquire button styling unless explicitly marked as an ERP action. */
+@media screen {
+    .erp-action-primary {
+        --action-bg: linear-gradient(135deg, #6558eb, #5b4cf6);
+        --action-hover-bg: linear-gradient(135deg, #695ce8, #6558eb);
+        --action-border: #9389ff;
+        --action-hover-border: #c2bcff;
+        --action-text: #fff;
+        --action-height: 42px;
+    }
+    .erp-action-view {
+        --action-bg: #252243;
+        --action-hover-bg: #342e5b;
+        --action-border: #7369bb;
+        --action-hover-border: #a299ef;
+        --action-text: #d3cfff;
+    }
+    .erp-action-edit {
+        --action-bg: #172d49;
+        --action-hover-bg: #203c5e;
+        --action-border: #507fb2;
+        --action-hover-border: #79afe3;
+        --action-text: #b9dbff;
+    }
+    .erp-action-danger {
+        --action-bg: #3a2133;
+        --action-hover-bg: #502a40;
+        --action-border: #a65b70;
+        --action-hover-border: #ef8b9d;
+        --action-text: #fecdd3;
+    }
+    .erp-action-warning {
+        --action-bg: #392e20;
+        --action-hover-bg: #4b3b25;
+        --action-border: #9a753c;
+        --action-hover-border: #e4b569;
+        --action-text: #fcd58a;
+    }
+    .erp-action-success {
+        --action-bg: #15372f;
+        --action-hover-bg: #1b4a3e;
+        --action-border: #3e8c73;
+        --action-hover-border: #73d8ae;
+        --action-text: #a7f3d0;
+    }
+    .erp-action-neutral {
+        --action-bg: #1a2940;
+        --action-hover-bg: #263852;
+        --action-border: #607596;
+        --action-hover-border: #91a5c3;
+        --action-text: #dce5f4;
+    }
+    .erp-action-reset {
+        --action-bg: #222e4e;
+        --action-hover-bg: #303e65;
+        --action-border: #687fbc;
+        --action-hover-border: #a4b7ed;
+        --action-text: #ccd9ff;
+    }
+
+    /* Outrank the legacy table, Customers and Tailwind button declarations.
+       All selectors require the explicit class on the actionable element. */
+    body.erp-shell .erp-main :is(a, button).erp-action[class],
+    body.erp-shell .erp-topbar :is(a, button).erp-action[class],
+    body.erp-premium-auth .erp-auth-card :is(a, button).erp-action[class] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        min-block-size: var(--action-height, 38px);
+        max-inline-size: 100%;
+        padding: 8px 13px;
+        border: 1px solid var(--action-border, #607596);
+        border-radius: 9px;
+        background: var(--action-bg, #1a2940);
+        color: var(--action-text, #dce5f4);
+        box-shadow: inset 0 1px 0 rgb(255 255 255 / 4%), 0 2px 4px rgb(2 8 23 / 12%);
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1.35;
+        letter-spacing: normal;
+        text-align: center;
+        text-transform: none;
+        text-decoration: none;
+        white-space: normal;
+        overflow-wrap: anywhere;
+        vertical-align: middle;
+        cursor: pointer;
+        filter: none;
+        transform: none;
+        transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease, color .18s ease;
+    }
+    body.erp-shell :is(.erp-main, .erp-topbar) :is(a, button).erp-action[class]:hover,
+    body.erp-premium-auth .erp-auth-card :is(a, button).erp-action[class]:hover {
+        background: var(--action-hover-bg, #263852);
+        border-color: var(--action-hover-border, #91a5c3);
+        color: var(--action-text, #dce5f4);
+        box-shadow: inset 0 1px 0 rgb(255 255 255 / 6%), 0 3px 9px rgb(2 8 23 / 22%);
+        text-decoration: none;
+        filter: none;
+        transform: none;
+    }
+    body.erp-shell :is(.erp-main, .erp-topbar) :is(a, button).erp-action[class]:focus-visible,
+    body.erp-premium-auth .erp-auth-card :is(a, button).erp-action[class]:focus-visible {
+        outline: 2px solid #b0a8ff;
+        outline-offset: 3px;
+    }
+    body.erp-shell :is(.erp-main, .erp-topbar) :is(a, button).erp-action[class]:active,
+    body.erp-premium-auth .erp-auth-card :is(a, button).erp-action[class]:active {
+        box-shadow: inset 0 2px 4px rgb(2 8 23 / 25%);
+    }
+    body.erp-shell :is(.erp-main, .erp-topbar) :is(a, button).erp-action[class]:is(:disabled, [aria-disabled=true]),
+    body.erp-premium-auth .erp-auth-card :is(a, button).erp-action[class]:is(:disabled, [aria-disabled=true]) {
+        background: #182338;
+        border-color: #43516a;
+        border-style: dashed;
+        color: #98a7bd;
+        box-shadow: none;
+        opacity: .65;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    body.erp-shell .erp-main td :is(a, button).erp-action[class] {
+        min-block-size: 32px;
+        max-inline-size: min(100%, 12.5rem);
+        padding: 6px 9px;
+        margin-inline: 0 4px;
+        margin-block: 2px;
+        border-radius: 8px;
+        font-size: 12px;
+        line-height: 1.3;
+    }
+    body.erp-shell .erp-main td:has(.erp-action) { white-space: normal; }
+    body.erp-shell .erp-main td .flex:has(> .erp-action) { flex-wrap: wrap; gap: 6px; }
+    body.erp-shell .erp-main :is(.erp-action-group, .erp-inline-actions):has(> .erp-action) {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: center;
+    }
+    body.erp-shell .erp-main :is(.erp-action-group, .erp-inline-actions) > .erp-action[class] { margin: 0; }
+    body.erp-shell .erp-main .erp-action svg { inline-size: 15px; block-size: 15px; flex-shrink: 0; }
+    @media (prefers-reduced-motion: reduce) {
+        body.erp-shell :is(.erp-main, .erp-topbar) :is(a, button).erp-action[class],
+        body.erp-premium-auth .erp-auth-card :is(a, button).erp-action[class] { transition: none; }
+    }
+}

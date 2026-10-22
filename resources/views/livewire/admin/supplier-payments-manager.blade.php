@@ -148,7 +148,7 @@ new class extends \Livewire\Volt\Component
             <a
                 href="{{ route('purchases.payments.create') }}"
                 wire:navigate
-                class="inline-flex min-h-10 items-center justify-center bg-gray-900 px-4 text-sm font-semibold uppercase tracking-widest text-white transition hover:bg-gray-700"
+                class="inline-flex min-h-10 items-center justify-center bg-gray-900 px-4 text-sm font-semibold uppercase tracking-widest text-white transition hover:bg-gray-700 erp-action erp-action-primary"
             >
                 {{ __('Nouveau paiement') }}
             </a>
@@ -305,7 +305,7 @@ new class extends \Livewire\Volt\Component
                                         $payment
                                     ) }}"
                                     wire:navigate
-                                    class="font-medium text-indigo-700 hover:text-indigo-900"
+                                    class="font-medium text-indigo-700 hover:text-indigo-900 erp-action erp-action-view"
                                 >
                                     {{ __('Consulter') }}
                                 </a>

@@ -197,33 +197,33 @@ new class extends Component
     }
 }; ?>
 
-<div class="space-y-6">
+<div class="erp-entity-shell">
     @if ($feedback)
-        <div class="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800" role="status">
+        <div class="rounded-lg border border-emerald-200 bg-emerald-50/80 px-4 py-3 text-sm font-medium text-emerald-800 shadow-sm" role="status">
             {{ $feedback }}
         </div>
     @endif
 
-    <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-        <div class="border-b border-gray-200 p-6">
+    <div class="erp-panel">
+        <div class="erp-panel-header">
             <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div>
-                    <h3 class="text-lg font-semibold text-gray-900">{{ __('Fournisseurs') }}</h3>
-                    <p class="mt-1 text-sm text-gray-600">{{ __('Consultez les fournisseurs actifs et archivés et leurs conditions de paiement.') }}</p>
+                    <h3>{{ __('Fournisseurs') }}</h3>
+                    <p>{{ __('Consultez les fournisseurs actifs et archivés et leurs conditions de paiement.') }}</p>
                 </div>
                 @can('suppliers.manage')
-                    <x-primary-button type="button" wire:click="prepareCreate">{{ __('Nouveau fournisseur') }}</x-primary-button>
+                    <x-primary-button type="button" wire:click="prepareCreate" class="erp-primary-button">{{ __('Nouveau fournisseur') }}</x-primary-button>
                 @endcan
             </div>
 
-            <div class="mt-5 grid gap-4 sm:grid-cols-2">
-                <div>
+            <div class="erp-filter-grid">
+                <div class="erp-filter-field">
                     <x-input-label for="supplier-search" :value="__('Rechercher')" />
-                    <x-text-input id="supplier-search" type="search" wire:model.live.debounce.300ms="search" class="mt-1 block w-full" placeholder="{{ __('Code, nom ou email') }}" />
+                    <x-text-input id="supplier-search" type="search" wire:model.live.debounce.300ms="search" class="erp-input-field mt-1 block w-full" placeholder="{{ __('Code, nom ou email') }}" />
                 </div>
-                <div>
+                <div class="erp-filter-field">
                     <x-input-label for="supplier-status-filter" :value="__('Statut')" />
-                    <select id="supplier-status-filter" wire:model.live="statusFilter" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    <select id="supplier-status-filter" wire:model.live="statusFilter" class="erp-input-field mt-1 block w-full">
                         <option value="active">{{ __('Actifs') }}</option>
                         <option value="archived">{{ __('Archivés') }}</option>
                         <option value="all">{{ __('Tous') }}</option>
@@ -232,113 +232,119 @@ new class extends Component
             </div>
         </div>
 
-        <div class="overflow-x-auto">
-            <div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-600">{{ __('Code') }}</th>
-                        <th class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-600">{{ __('Fournisseur') }}</th>
-                        <th class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-600">{{ __('Email') }}</th>
-                        <th class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-600">{{ __('Condition') }}</th>
-                        <th class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-600">{{ __('Statut') }}</th>
-                        <th class="px-6 py-3 text-end text-xs font-semibold uppercase text-gray-600">{{ __('Actions') }}</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200 bg-white">
-                    @forelse ($suppliers as $supplier)
-                        <tr wire:key="supplier-row-{{ $supplier->id }}">
-                            <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">{{ $supplier->code }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-900">
-                                <a href="{{ route('admin.suppliers.show', $supplier) }}" wire:navigate class="text-indigo-600 hover:text-indigo-900">{{ $supplier->name }}</a>
-                                <div class="text-xs text-gray-500">{{ $supplier->trade_name }}</div>
-                            </td>
-                            <td class="px-6 py-4 text-sm text-gray-600">{{ $supplier->email }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-600">{{ $supplier->paymentTerm?->label ?? __('Aucune') }}</td>
-                            <td class="px-6 py-4 text-sm text-gray-600">{{ $supplier->isArchived() ? __('Archivé') : __('Actif') }}</td>
-                            <td class="px-6 py-4 text-end text-sm">
-                                <div class="flex flex-wrap justify-end gap-3">
-                                    <a href="{{ route('admin.suppliers.show', $supplier) }}" wire:navigate class="text-indigo-600 hover:text-indigo-900">{{ __('Consulter') }}</a>
-                                    @can('suppliers.manage')
-                                        @unless ($supplier->isArchived())
-                                            <button type="button" wire:click="editSupplier({{ $supplier->id }})" class="text-indigo-600 hover:text-indigo-900">{{ __('Modifier') }}</button>
-                                            <button type="button" wire:click="archiveSupplier({{ $supplier->id }})" wire:confirm="{{ __('Archiver ce fournisseur ?') }}" class="text-red-600 hover:text-red-900">{{ __('Archiver') }}</button>
-                                        @endunless
-                                    @endcan
-                                </div>
-                            </td>
-                        </tr>
-                    @empty
+        <div class="erp-table-shell">
+            <div class="overflow-x-auto">
+                <table class="erp-table-base">
+                    <thead>
                         <tr>
-                            <td colspan="6" class="px-6 py-10 text-center text-sm text-gray-500">{{ __('Aucun fournisseur trouvé.') }}</td>
+                            <th>{{ __('Code') }}</th>
+                            <th>{{ __('Fournisseur') }}</th>
+                            <th>{{ __('Email') }}</th>
+                            <th>{{ __('Condition') }}</th>
+                            <th>{{ __('Statut') }}</th>
+                            <th class="text-end">{{ __('Actions') }}</th>
                         </tr>
-                    @endforelse
-                </tbody>
-            </table></div>
+                    </thead>
+                    <tbody>
+                        @forelse ($suppliers as $supplier)
+                            <tr wire:key="supplier-row-{{ $supplier->id }}">
+                                <td class="whitespace-nowrap font-semibold text-slate-900">{{ $supplier->code }}</td>
+                                <td>
+                                    <a href="{{ route('admin.suppliers.show', $supplier) }}" wire:navigate class="erp-table-link">{{ $supplier->name }}</a>
+                                    <div class="mt-1 text-xs text-slate-500">{{ $supplier->trade_name }}</div>
+                                </td>
+                                <td>{{ $supplier->email }}</td>
+                                <td>{{ $supplier->paymentTerm?->label ?? __('Aucune') }}</td>
+                                <td>
+                                    <span class="erp-status-pill {{ $supplier->isArchived() ? 'is-archived' : 'is-active' }}">
+                                        {{ $supplier->isArchived() ? __('Archivé') : __('Actif') }}
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <div class="erp-inline-actions">
+                                        <a href="{{ route('admin.suppliers.show', $supplier) }}" wire:navigate class="erp-link-button erp-action erp-action-view">{{ __('Consulter') }}</a>
+                                        @can('suppliers.manage')
+                                            @unless ($supplier->isArchived())
+                                                <button type="button" wire:click="editSupplier({{ $supplier->id }})" class="erp-secondary-button erp-action erp-action-edit">{{ __('Modifier') }}</button>
+                                                <button type="button" wire:click="archiveSupplier({{ $supplier->id }})" wire:confirm="{{ __('Archiver ce fournisseur ?') }}" class="erp-link-button-danger erp-action erp-action-danger">{{ __('Archiver') }}</button>
+                                            @endunless
+                                        @endcan
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="erp-row-empty">{{ __('Aucun fournisseur trouvé.') }}</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
         </div>
 
         @if ($suppliers->hasPages())
-            <div class="border-t border-gray-200 px-6 py-4">{{ $suppliers->links() }}</div>
+            <div class="erp-pagination">{{ $suppliers->links() }}</div>
         @endif
     </div>
 
     @can('suppliers.manage')
         <x-modal name="manage-supplier" focusable>
-            <form wire:submit="saveSupplier" class="p-6">
-                <h3 class="text-lg font-semibold text-gray-900">{{ $editingId ? __('Modifier le fournisseur') : __('Nouveau fournisseur') }}</h3>
-                <div class="mt-6 grid gap-5 sm:grid-cols-2">
+            <form wire:submit="saveSupplier" class="erp-modal-form">
+                <h3>{{ $editingId ? __('Modifier le fournisseur') : __('Nouveau fournisseur') }}</h3>
+                <div class="erp-form-grid mt-6">
                     <div>
                         <x-input-label for="supplier-name" :value="__('Raison sociale / nom')" />
-                        <x-text-input id="supplier-name" wire:model="name" class="mt-1 block w-full" required />
+                        <x-text-input id="supplier-name" wire:model="name" class="erp-input-field mt-1 block w-full" required />
                         <x-input-error :messages="$errors->get('name')" class="mt-2" />
                     </div>
                     <div>
                         <x-input-label for="supplier-trade-name" :value="__('Nom commercial')" />
-                        <x-text-input id="supplier-trade-name" wire:model="tradeName" class="mt-1 block w-full" />
+                        <x-text-input id="supplier-trade-name" wire:model="tradeName" class="erp-input-field mt-1 block w-full" />
                         <x-input-error :messages="$errors->get('tradeName')" class="mt-2" />
                     </div>
                     <div>
                         <x-input-label for="supplier-email" :value="__('Email')" />
-                        <x-text-input id="supplier-email" type="email" wire:model="email" class="mt-1 block w-full" />
+                        <x-text-input id="supplier-email" type="email" wire:model="email" class="erp-input-field mt-1 block w-full" />
                         <x-input-error :messages="$errors->get('email')" class="mt-2" />
                     </div>
                     <div>
                         <x-input-label for="supplier-phone" :value="__('Téléphone')" />
-                        <x-text-input id="supplier-phone" wire:model="phone" class="mt-1 block w-full" />
+                        <x-text-input id="supplier-phone" wire:model="phone" class="erp-input-field mt-1 block w-full" />
                         <x-input-error :messages="$errors->get('phone')" class="mt-2" />
                     </div>
                     <div>
                         <x-input-label for="supplier-city" :value="__('Ville')" />
-                        <x-text-input id="supplier-city" wire:model="city" class="mt-1 block w-full" />
+                        <x-text-input id="supplier-city" wire:model="city" class="erp-input-field mt-1 block w-full" />
                         <x-input-error :messages="$errors->get('city')" class="mt-2" />
                     </div>
                     <div>
                         <x-input-label for="supplier-country" :value="__('Pays')" />
-                        <x-text-input id="supplier-country" wire:model="country" class="mt-1 block w-full" />
+                        <x-text-input id="supplier-country" wire:model="country" class="erp-input-field mt-1 block w-full" />
                         <x-input-error :messages="$errors->get('country')" class="mt-2" />
                     </div>
-                    <div class="sm:col-span-2">
+                    <div class="erp-span-2">
                         <x-input-label for="supplier-address" :value="__('Adresse')" />
-                        <textarea id="supplier-address" wire:model="address" rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"></textarea>
+                        <textarea id="supplier-address" wire:model="address" rows="2" class="erp-input-field mt-1 block w-full"></textarea>
                         <x-input-error :messages="$errors->get('address')" class="mt-2" />
                     </div>
                     <div>
                         <x-input-label for="supplier-ice" :value="__('ICE')" />
-                        <x-text-input id="supplier-ice" wire:model="ice" class="mt-1 block w-full" />
+                        <x-text-input id="supplier-ice" wire:model="ice" class="erp-input-field mt-1 block w-full" />
                         <x-input-error :messages="$errors->get('ice')" class="mt-2" />
                     </div>
                     <div>
                         <x-input-label for="supplier-if" :value="__('IF')" />
-                        <x-text-input id="supplier-if" wire:model="taxId" class="mt-1 block w-full" />
+                        <x-text-input id="supplier-if" wire:model="taxId" class="erp-input-field mt-1 block w-full" />
                         <x-input-error :messages="$errors->get('taxId')" class="mt-2" />
                     </div>
                     <div>
                         <x-input-label for="supplier-rc" :value="__('RC')" />
-                        <x-text-input id="supplier-rc" wire:model="commercialRegister" class="mt-1 block w-full" />
+                        <x-text-input id="supplier-rc" wire:model="commercialRegister" class="erp-input-field mt-1 block w-full" />
                         <x-input-error :messages="$errors->get('commercialRegister')" class="mt-2" />
                     </div>
                     <div>
                         <x-input-label for="supplier-payment-term" :value="__('Condition de paiement')" />
-                        <select id="supplier-payment-term" wire:model="paymentTermId" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm">
+                        <select id="supplier-payment-term" wire:model="paymentTermId" class="erp-input-field mt-1 block w-full">
                             <option value="">{{ __('Aucune condition') }}</option>
                             @foreach ($paymentTerms as $term)
                                 <option value="{{ $term->id }}">{{ $term->label }}</option>
@@ -346,14 +352,14 @@ new class extends Component
                         </select>
                         <x-input-error :messages="$errors->get('paymentTermId')" class="mt-2" />
                     </div>
-                    <div class="sm:col-span-2">
+                    <div class="erp-span-2">
                         <x-input-label for="supplier-notes" :value="__('Notes internes')" />
-                        <textarea id="supplier-notes" wire:model="notes" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"></textarea>
+                        <textarea id="supplier-notes" wire:model="notes" rows="3" class="erp-input-field mt-1 block w-full"></textarea>
                         <x-input-error :messages="$errors->get('notes')" class="mt-2" />
                     </div>
                 </div>
-                <div class="mt-6 flex justify-end gap-3">
-                    <x-secondary-button type="button" x-on:click="$dispatch('close')">{{ __('Annuler') }}</x-secondary-button>
+                <div class="erp-modal-actions">
+                    <x-secondary-button type="button" x-on:click="$dispatch('close-modal', { name: 'manage-supplier' })" class="erp-action erp-action-neutral">{{ __('Annuler') }}</x-secondary-button>
                     <x-primary-button type="submit">{{ $editingId ? __('Enregistrer') : __('Créer') }}</x-primary-button>
                 </div>
             </form>

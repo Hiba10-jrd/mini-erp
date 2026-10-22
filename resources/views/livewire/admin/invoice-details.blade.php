@@ -96,7 +96,7 @@ new class extends \Livewire\Volt\Component
                     href="{{ route('sales.invoices.pdf', $invoice) }}"
                     target="_blank"
                     rel="noopener"
-                    class="inline-flex min-h-10 items-center border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    class="inline-flex min-h-10 items-center border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 erp-action erp-action-view"
                 >
                     {{ __('Télécharger le PDF') }}
                 </a>
@@ -108,7 +108,7 @@ new class extends \Livewire\Volt\Component
                 $invoice
             ) }}"
             wire:navigate
-            class="inline-flex min-h-10 items-center bg-gray-900 px-4 text-sm font-semibold uppercase tracking-widest text-white transition hover:bg-gray-700"
+            class="inline-flex min-h-10 items-center bg-gray-900 px-4 text-sm font-semibold uppercase tracking-widest text-white transition hover:bg-gray-700 erp-action erp-action-primary"
         >
             {{ __('Enregistrer un paiement') }}
         </a>
@@ -118,7 +118,7 @@ new class extends \Livewire\Volt\Component
                     <a
                         href="{{ route('sales.invoices.credit-notes.create', $invoice) }}"
                         wire:navigate
-                        class="inline-flex min-h-10 items-center bg-gray-800 px-4 text-sm font-semibold uppercase tracking-widest text-white transition hover:bg-gray-700"
+                        class="inline-flex min-h-10 items-center bg-gray-800 px-4 text-sm font-semibold uppercase tracking-widest text-white transition hover:bg-gray-700 erp-action erp-action-primary"
                     >
                         {{ __('Créer un avoir') }}
                     </a>
@@ -131,7 +131,7 @@ new class extends \Livewire\Volt\Component
                         type="button"
                         wire:click="issueInvoice"
                         wire:confirm="{{ __('Émettre définitivement cette facture ? Après émission, elle ne pourra plus être modifiée ni annulée.') }}"
-                    >
+                     class="erp-action erp-action-success">
                         {{ __('Émettre la facture') }}
                     </x-primary-button>
                 @endcan
@@ -141,7 +141,7 @@ new class extends \Livewire\Volt\Component
                         type="button"
                         wire:click="cancelInvoice"
                         wire:confirm="{{ __('Annuler ce brouillon de facture ?') }}"
-                    >
+                     class="erp-action erp-action-neutral">
                         {{ __('Annuler le brouillon') }}
                     </x-danger-button>
                 @endcan

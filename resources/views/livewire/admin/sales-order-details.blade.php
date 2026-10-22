@@ -107,7 +107,7 @@ new class extends \Livewire\Volt\Component
         <a href="{{ route('sales.orders.index') }}" wire:navigate class="text-sm font-medium text-indigo-700 hover:text-indigo-900">{{ __('Retour aux commandes') }}</a>
         <div class="flex flex-wrap gap-2">
             @if ($order->isEditable())
-                @can('sales.update')<a href="{{ route('sales.orders.edit', $order) }}" wire:navigate class="inline-flex min-h-10 items-center border border-gray-300 px-4 text-sm font-medium text-gray-700">{{ __('Modifier') }}</a><x-primary-button type="button" wire:click="confirmOrder">{{ __('Confirmer la commande') }}</x-primary-button>@endcan
+                @can('sales.update')<a href="{{ route('sales.orders.edit', $order) }}" wire:navigate class="inline-flex min-h-10 items-center border border-gray-300 px-4 text-sm font-medium text-gray-700 erp-action erp-action-edit">{{ __('Modifier') }}</a><x-primary-button type="button" wire:click="confirmOrder" class="erp-action erp-action-success">{{ __('Confirmer la commande') }}</x-primary-button>@endcan
             @endif
             @if ($canCreateDeliveryNote)
                 @can('sales.create')<x-primary-button type="button" wire:click="createDeliveryNote">{{ __('Créer un bon de livraison') }}</x-primary-button>@endcan
@@ -120,14 +120,14 @@ new class extends \Livewire\Volt\Component
                 $order
             ) }}"
             wire:navigate
-            class="inline-flex min-h-10 items-center bg-gray-800 px-4 text-sm font-semibold uppercase tracking-widest text-white transition hover:bg-gray-700"
+            class="inline-flex min-h-10 items-center bg-gray-800 px-4 text-sm font-semibold uppercase tracking-widest text-white transition hover:bg-gray-700 erp-action erp-action-primary"
         >
             {{ __('Créer une facture') }}
         </a>
     @endcan
 @endif
             @if ($canCancel)
-                @can('sales.delete')<x-danger-button type="button" wire:click="cancelOrder" wire:confirm="{{ __('Annuler cette commande ?') }}">{{ __('Annuler la commande') }}</x-danger-button>@endcan
+                @can('sales.delete')<x-danger-button type="button" wire:click="cancelOrder" wire:confirm="{{ __('Annuler cette commande ?') }}" class="erp-action erp-action-neutral">{{ __('Annuler la commande') }}</x-danger-button>@endcan
             @endif
         </div>
     </div>

@@ -61,7 +61,7 @@ new #[Layout('layouts.guest')] class extends Component
         </div>
 
         <div class="flex justify-end mt-4">
-            <x-primary-button>
+            <x-primary-button class="erp-action erp-action-success">
                 {{ __('Confirm') }}
             </x-primary-button>
         </div>

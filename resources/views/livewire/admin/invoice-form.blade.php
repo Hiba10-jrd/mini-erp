@@ -464,7 +464,7 @@ new class extends \Livewire\Volt\Component
             <a
                 href="{{ route('sales.orders.show', $order) }}"
                 wire:navigate
-                class="inline-flex min-h-10 items-center justify-center border border-gray-300 px-4 text-sm font-medium text-gray-700"
+                class="inline-flex min-h-10 items-center justify-center border border-gray-300 px-4 text-sm font-medium text-gray-700 erp-action erp-action-neutral"
             >
                 {{ __('Annuler') }}
             </a>
