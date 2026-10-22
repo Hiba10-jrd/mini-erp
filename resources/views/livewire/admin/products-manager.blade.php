@@ -361,10 +361,10 @@ new class extends Component
                             <td class="px-6 py-4 text-sm text-gray-600">{{ $product->is_active ? __('Actif') : __('Inactif') }}</td>
                             <td class="px-6 py-4 text-end text-sm">
                                 <div class="flex flex-wrap justify-end gap-3">
-                                    <a href="{{ route('admin.products.show', $product) }}" wire:navigate class="text-indigo-600 hover:text-indigo-900">{{ __('Consulter') }}</a>
+                                    <a href="{{ route('admin.products.show', $product) }}" wire:navigate class="text-indigo-600 hover:text-indigo-900 erp-action erp-action-view">{{ __('Consulter') }}</a>
                                     @can('stock.manage')
-                                        <button type="button" wire:click="editProduct({{ $product->id }})" class="text-indigo-600 hover:text-indigo-900">{{ __('Modifier') }}</button>
-                                        <button type="button" wire:click="toggleProduct({{ $product->id }})" class="text-gray-600 hover:text-gray-900">{{ $product->is_active ? __('Désactiver') : __('Activer') }}</button>
+                                        <button type="button" wire:click="editProduct({{ $product->id }})" class="text-indigo-600 hover:text-indigo-900 erp-action erp-action-edit">{{ __('Modifier') }}</button>
+                                        <button type="button" wire:click="toggleProduct({{ $product->id }})" class="text-gray-600 hover:text-gray-900 erp-action {{ $product->is_active ? 'erp-action-warning' : 'erp-action-success' }}">{{ $product->is_active ? __('Désactiver') : __('Activer') }}</button>
                                     @endcan
                                 </div>
                             </td>
@@ -485,7 +485,7 @@ new class extends Component
                     @endif
                 </div>
                 <div class="mt-6 flex justify-end gap-3">
-                    <x-secondary-button type="button" x-on:click="$dispatch('close')">{{ __('Annuler') }}</x-secondary-button>
+                    <x-secondary-button type="button" x-on:click="$dispatch('close')" class="erp-action erp-action-neutral">{{ __('Annuler') }}</x-secondary-button>
                     <x-primary-button type="submit">{{ $editingId ? __('Enregistrer') : __('Créer') }}</x-primary-button>
                 </div>
             </form>

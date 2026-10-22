@@ -65,8 +65,8 @@ new class extends \Livewire\Volt\Component
     ];
 @endphp
     <header class="dashboard-header">
-        <div><span class="dashboard-eyebrow">{{ __('Tableau de bord') }}</span><h1>{{ __('Vue d’ensemble') }}</h1><p>{{ __('Suivez en temps réel la performance de votre activité.') }}</p></div>
-        <a class="dashboard-report-link" href="{{ route('reports.index') }}" wire:navigate>{{ __('Consulter les rapports') }} <span aria-hidden="true">↗</span></a>
+        <div><p class="dashboard-greeting">{{ __('Bonjour, :name', ['name' => auth()->user()->name]) }}</p><span class="dashboard-eyebrow">{{ __('Tableau de bord') }}</span><h1>{{ __('Vue d’ensemble') }}</h1><p>{{ __('Suivez en temps réel la performance de votre activité.') }}</p></div>
+        <a class="dashboard-report-link erp-action erp-action-view" href="{{ route('reports.index') }}" wire:navigate>{{ __('Consulter les rapports') }} <span aria-hidden="true">↗</span></a>
     </header>
     <div class="dashboard-filter">
         <div class="dashboard-presets" role="group" aria-label="{{ __('Période') }}">
@@ -88,7 +88,7 @@ new class extends \Livewire\Volt\Component
         <form wire:submit="applyPeriod" class="dashboard-date-form">
             <label><span>{{ __('Du') }}</span><input type="date" value="{{ $from }}" wire:model="from" aria-invalid="{{ $errors->has('from') ? 'true' : 'false' }}" /></label>
             <label><span>{{ __('Au') }}</span><input type="date" value="{{ $to }}" wire:model="to" aria-invalid="{{ $errors->has('to') ? 'true' : 'false' }}" /></label>
-            <button type="submit" wire:loading.attr="disabled">{{ __('Appliquer') }}</button>
+            <button type="submit" wire:loading.attr="disabled" class="erp-action erp-action-primary">{{ __('Appliquer') }}</button>
         </form>
         @error('from')<p class="dashboard-form-error" role="alert">{{ $message }}</p>@enderror
         @error('to')<p class="dashboard-form-error" role="alert">{{ $message }}</p>@enderror
@@ -96,7 +96,7 @@ new class extends \Livewire\Volt\Component
     <div class="dashboard-kpis">
         @foreach ($cards as [$label, $amount, $hint, $color, $icon])
             <article class="dashboard-kpi dashboard-tone-{{ $color }}">
-                <div class="dashboard-kpi-heading"><h2>{{ __($label) }}</h2><span class="dashboard-icon" aria-hidden="true">{{ $icon }}</span></div>
+                <div class="dashboard-kpi-heading"><h2>{{ __($label) }}</h2><span class="dashboard-icon" aria-hidden="true"><x-premium-icon :name="['blue' => 'sales', 'green' => 'wallet', 'red' => 'cart', 'violet' => 'bank'][$color]" /></span></div>
                 <strong><bdi>{{ $money($amount) }}</bdi></strong><p>{{ __($hint) }}</p>
             </article>
         @endforeach
@@ -136,7 +136,7 @@ new class extends \Livewire\Volt\Component
             <ul class="dashboard-feed">
                 @forelse ($feed as $item)
                     <li wire:key="activity-{{ $item['key'] }}">
-                        <span class="dashboard-feed-icon dashboard-tone-{{ $item['color'] }}" aria-hidden="true">•</span>
+                        <span class="dashboard-feed-icon dashboard-tone-{{ $item['color'] }}" aria-hidden="true"><x-premium-icon :name="['green' => 'wallet', 'violet' => 'cart', 'orange' => 'box'][$item['color']] ?? 'document'" /></span>
                         <div class="dashboard-feed-body"><span class="dashboard-feed-label">{{ __($item['label']) }}</span>
                             @if ($item['url'])<a href="{{ $item['url'] }}" wire:navigate><bdi>{{ $item['reference'] ?? __('Sans référence') }}</bdi></a>@else<strong><bdi>{{ $item['reference'] ?? __('Sans référence') }}</bdi></strong>@endif
                             <p>{{ $item['party'] }} <span aria-hidden="true">·</span> <time datetime="{{ $item['date']?->toDateString() }}"><bdi>{{ $item['date']?->format('d/m/Y') }}</bdi></time></p>

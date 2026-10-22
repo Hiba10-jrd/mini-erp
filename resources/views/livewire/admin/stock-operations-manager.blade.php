@@ -190,7 +190,7 @@ new class extends Component
                 <x-input-error :messages="$errors->get('notes')" class="mt-2" />
             </div>
             <div class="md:col-span-2 lg:col-span-3">
-                <x-primary-button type="submit">{{ __('Valider l’opération') }}</x-primary-button>
+                <x-primary-button type="submit" class="erp-action erp-action-success">{{ __('Valider l’opération') }}</x-primary-button>
             </div>
         </form>
     @else

@@ -77,7 +77,7 @@ new class extends \Livewire\Volt\Component
         </div>
 
         @can('purchases.create')
-            <a href="{{ route('purchases.invoices.create') }}" wire:navigate class="inline-flex min-h-10 items-center justify-center bg-gray-900 px-4 text-sm font-medium text-white hover:bg-gray-700">
+            <a href="{{ route('purchases.invoices.create') }}" wire:navigate class="inline-flex min-h-10 items-center justify-center bg-gray-900 px-4 text-sm font-medium text-white hover:bg-gray-700 erp-action erp-action-primary">
                 {{ __('Créer une facture fournisseur') }}
             </a>
         @endcan
@@ -141,10 +141,10 @@ new class extends \Livewire\Volt\Component
                             <td class="whitespace-nowrap px-4 py-4 text-end font-medium">{{ str_replace('.', ',', ($invoice->status === SupplierInvoice::STATUS_VALIDATED ? $invoice->payableAmount() : $invoice->total_ttc)) }}</td>
                             <td class="px-4 py-4"><span class="px-2 py-1 text-xs font-medium {{ $statusClasses[$invoice->status] ?? 'bg-gray-100 text-gray-700' }}">{{ $statusLabels[$invoice->status] ?? $invoice->status }}</span></td>
                             <td class="whitespace-nowrap px-4 py-4 text-end">
-                                <a href="{{ route('purchases.invoices.show', $invoice) }}" wire:navigate class="font-medium text-indigo-700">{{ __('Consulter') }}</a>
+                                <a href="{{ route('purchases.invoices.show', $invoice) }}" wire:navigate class="font-medium text-indigo-700 erp-action erp-action-view">{{ __('Consulter') }}</a>
                                 @if ($invoice->isEditable())
                                     @can('purchases.update')
-                                        <a href="{{ route('purchases.invoices.edit', $invoice) }}" wire:navigate class="ms-3 text-gray-700">{{ __('Modifier') }}</a>
+                                        <a href="{{ route('purchases.invoices.edit', $invoice) }}" wire:navigate class="ms-3 text-gray-700 erp-action erp-action-edit">{{ __('Modifier') }}</a>
                                     @endcan
                                 @endif
                             </td>

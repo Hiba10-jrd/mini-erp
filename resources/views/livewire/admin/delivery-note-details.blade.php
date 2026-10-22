@@ -44,14 +44,14 @@ new class extends \Livewire\Volt\Component
     <div class="flex flex-wrap items-center justify-between gap-3">
         <a href="{{ route('sales.delivery-notes.index') }}" wire:navigate class="text-sm font-medium text-indigo-700 hover:text-indigo-900">{{ __('Retour aux bons de livraison') }}</a>
         <div class="flex flex-wrap gap-2">
-            <a href="{{ route('sales.delivery-notes.pdf', $deliveryNote) }}" target="_blank" rel="noopener" class="inline-flex min-h-10 items-center border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50">{{ __('Télécharger le PDF') }}</a>
+            <a href="{{ route('sales.delivery-notes.pdf', $deliveryNote) }}" target="_blank" rel="noopener" class="inline-flex min-h-10 items-center border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 erp-action erp-action-view">{{ __('Télécharger le PDF') }}</a>
             @if ($deliveryNote->isEditable())
                 @can('sales.update')
-                    <a href="{{ route('sales.delivery-notes.edit', $deliveryNote) }}" wire:navigate class="inline-flex min-h-10 items-center border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50">{{ __('Modifier') }}</a>
-                    <x-primary-button type="button" wire:click="validateNote">{{ __('Valider la livraison') }}</x-primary-button>
+                    <a href="{{ route('sales.delivery-notes.edit', $deliveryNote) }}" wire:navigate class="inline-flex min-h-10 items-center border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 erp-action erp-action-edit">{{ __('Modifier') }}</a>
+                    <x-primary-button type="button" wire:click="validateNote" class="erp-action erp-action-success">{{ __('Valider la livraison') }}</x-primary-button>
                 @endcan
                 @can('sales.delete')
-                    <x-danger-button type="button" wire:click="cancelNote" wire:confirm="{{ __('Annuler ce bon de livraison ?') }}">{{ __('Annuler') }}</x-danger-button>
+                    <x-danger-button type="button" wire:click="cancelNote" wire:confirm="{{ __('Annuler ce bon de livraison ?') }}" class="erp-action erp-action-neutral">{{ __('Annuler') }}</x-danger-button>
                 @endcan
             @endif
         </div>

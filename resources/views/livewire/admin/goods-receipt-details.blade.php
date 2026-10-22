@@ -101,7 +101,7 @@ new class extends \Livewire\Volt\Component
                     <a
                         href="{{ route('purchases.receipts.edit', $receipt) }}"
                         wire:navigate
-                        class="inline-flex min-h-10 items-center border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                        class="inline-flex min-h-10 items-center border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 erp-action erp-action-edit"
                     >
                         {{ __('Modifier') }}
                     </a>
@@ -112,7 +112,7 @@ new class extends \Livewire\Volt\Component
                         wire:confirm="{{ __('Valider définitivement cette réception et mettre à jour le stock ?') }}"
                         wire:loading.attr="disabled"
                         wire:target="validateReceipt"
-                    >
+                     class="erp-action erp-action-success">
                         {{ __('Valider la réception') }}
                     </x-primary-button>
                 @endcan
@@ -124,7 +124,7 @@ new class extends \Livewire\Volt\Component
                         wire:confirm="{{ __('Annuler ce brouillon ?') }}"
                         wire:loading.attr="disabled"
                         wire:target="cancelReceipt"
-                    >
+                     class="erp-action erp-action-neutral">
                         {{ __('Annuler') }}
                     </x-danger-button>
                 @endcan

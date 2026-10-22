@@ -65,7 +65,7 @@ new class extends \Livewire\Volt\Component
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h3 class="text-lg font-semibold text-gray-900">{{ __('Tous les devis') }}</h3>
         @can('sales.create')
-            <a href="{{ route('sales.quotes.create') }}" wire:navigate class="inline-flex min-h-10 items-center justify-center bg-gray-900 px-4 text-sm font-medium text-white hover:bg-gray-700">{{ __('Créer un devis') }}</a>
+            <a href="{{ route('sales.quotes.create') }}" wire:navigate class="inline-flex min-h-10 items-center justify-center bg-gray-900 px-4 text-sm font-medium text-white hover:bg-gray-700 erp-action erp-action-primary">{{ __('Créer un devis') }}</a>
         @endcan
     </div>
 
@@ -108,10 +108,10 @@ new class extends \Livewire\Volt\Component
                             <td class="whitespace-nowrap px-4 py-4"><span class="inline-block px-2 py-1 text-xs font-medium {{ $statusClasses[$quote->status] }}">{{ $statusLabels[$quote->status] }}</span></td>
                             <td class="whitespace-nowrap px-4 py-4 text-gray-600">{{ $quote->creator?->name ?? '—' }}</td>
                             <td class="whitespace-nowrap px-4 py-4 text-end">
-                                <a href="{{ route('sales.quotes.show', $quote) }}" wire:navigate class="font-medium text-indigo-700 hover:text-indigo-900">{{ __('Consulter') }}</a>
+                                <a href="{{ route('sales.quotes.show', $quote) }}" wire:navigate class="font-medium text-indigo-700 hover:text-indigo-900 erp-action erp-action-view">{{ __('Consulter') }}</a>
                                 @if ($quote->isEditable())
-                                    @can('sales.update')<a href="{{ route('sales.quotes.edit', $quote) }}" wire:navigate class="ms-3 text-gray-700 hover:text-gray-950">{{ __('Modifier') }}</a>@endcan
-                                    @can('sales.delete')<button type="button" wire:click="archive({{ $quote->id }})" wire:confirm="{{ __('Archiver ce brouillon ?') }}" class="ms-3 text-rose-700 hover:text-rose-900">{{ __('Archiver') }}</button>@endcan
+                                    @can('sales.update')<a href="{{ route('sales.quotes.edit', $quote) }}" wire:navigate class="ms-3 text-gray-700 hover:text-gray-950 erp-action erp-action-edit">{{ __('Modifier') }}</a>@endcan
+                                    @can('sales.delete')<button type="button" wire:click="archive({{ $quote->id }})" wire:confirm="{{ __('Archiver ce brouillon ?') }}" class="ms-3 text-rose-700 hover:text-rose-900 erp-action erp-action-danger">{{ __('Archiver') }}</button>@endcan
                                 @endif
                             </td>
                         </tr>

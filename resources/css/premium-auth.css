@@ -1,0 +1,19 @@
+/* Sign-in and account recovery use the same palette as the workspaces. */
+@media screen {
+    body.erp-premium-auth { background: radial-gradient(ellipse at top, rgb(113 101 255 / 12%), transparent 55%), #090f1e; color: #f8fafc; }
+    .erp-premium-auth .erp-auth-card { background: linear-gradient(145deg, #17263e, #101c30 55%); border: 1px solid #263852; border-radius: 18px; box-shadow: 0 20px 60px rgb(2 8 23 / 30%); }
+    .erp-premium-auth .erp-auth-card :is(label, .text-gray-700, .text-gray-600) { color: #c4d0e3; }
+    .erp-premium-auth .erp-auth-card :is(.text-gray-900, h1, h2, h3) { color: #f8fafc; }
+    .erp-premium-auth .erp-auth-card a { color: #c2bcff; text-underline-offset: 4px; }
+    .erp-premium-auth .erp-auth-card a:hover { color: #e0dcff; }
+    .erp-premium-auth .erp-auth-card input:not([type=checkbox]):not([type=hidden]) { background: #0c1729; border: 1px solid #405371; color: #f1f5fb; border-radius: 10px; min-height: 44px; color-scheme: dark; }
+    .erp-premium-auth .erp-auth-card input::placeholder { color: #a3b3ca; opacity: 1; }
+    .erp-premium-auth .erp-auth-card input:focus { outline: none; border-color: #9a91ff; --tw-ring-color: transparent; box-shadow: 0 0 0 3px rgb(113 101 255 / 22%); }
+    .erp-premium-auth .erp-auth-card input[type=checkbox] { background-color: #0c1729; border-color: #647793; color: #7165ff; }
+    .erp-premium-auth .erp-auth-card input[type=checkbox]:checked { background-color: #7165ff; border-color: #9a91ff; }
+    .erp-premium-auth .erp-auth-card .erp-button-primary { background: linear-gradient(135deg, #6558eb, #5b4cf6); border: 1px solid #9389ff; color: white; min-height: 44px; border-radius: 10px; box-shadow: 0 6px 20px rgb(91 76 246 / 24%); }
+    .erp-premium-auth .erp-auth-card :is(.text-red-600, .text-red-500) { color: #fda4af; }
+    .erp-premium-auth .erp-auth-card .text-green-600 { color: #6ee7b7; }
+    .erp-premium-auth .erp-auth-card :is(a, button):focus-visible { outline: 2px solid #b0a8ff; outline-offset: 3px; }
+    @media (max-width: 420px) { .erp-premium-auth .erp-auth-card { padding: 24px 20px; } }
+}

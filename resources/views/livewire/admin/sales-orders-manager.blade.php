@@ -59,7 +59,7 @@ new class extends \Livewire\Volt\Component
     <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h3 class="text-lg font-semibold text-gray-900">{{ __('Toutes les commandes') }}</h3>
         @can('sales.create')
-            <a href="{{ route('sales.orders.create') }}" wire:navigate class="inline-flex min-h-10 items-center justify-center bg-gray-900 px-4 text-sm font-medium text-white hover:bg-gray-700">{{ __('Créer une commande') }}</a>
+            <a href="{{ route('sales.orders.create') }}" wire:navigate class="inline-flex min-h-10 items-center justify-center bg-gray-900 px-4 text-sm font-medium text-white hover:bg-gray-700 erp-action erp-action-primary">{{ __('Créer une commande') }}</a>
         @endcan
     </div>
 
@@ -89,7 +89,7 @@ new class extends \Livewire\Volt\Component
                         <td class="whitespace-nowrap px-4 py-4"><span class="inline-block px-2 py-1 text-xs font-medium {{ $statusClasses[$order->status] ?? 'bg-gray-100 text-gray-700' }}">{{ $statusLabels[$order->status] ?? $order->status }}</span></td>
                         <td class="whitespace-nowrap px-4 py-4 text-end font-medium text-gray-900">{{ str_replace('.', ',', $order->total_ttc) }}</td>
                         <td class="whitespace-nowrap px-4 py-4 text-gray-600">{{ $order->creator?->name ?? '—' }}</td>
-                        <td class="whitespace-nowrap px-4 py-4 text-end"><a href="{{ route('sales.orders.show', $order) }}" wire:navigate class="font-medium text-indigo-700 hover:text-indigo-900">{{ __('Consulter') }}</a>@if ($order->isEditable()) @can('sales.update')<a href="{{ route('sales.orders.edit', $order) }}" wire:navigate class="ms-3 text-gray-700 hover:text-gray-950">{{ __('Modifier') }}</a>@endcan @endif</td>
+                        <td class="whitespace-nowrap px-4 py-4 text-end"><a href="{{ route('sales.orders.show', $order) }}" wire:navigate class="font-medium text-indigo-700 hover:text-indigo-900 erp-action erp-action-view">{{ __('Consulter') }}</a>@if ($order->isEditable()) @can('sales.update')<a href="{{ route('sales.orders.edit', $order) }}" wire:navigate class="ms-3 text-gray-700 hover:text-gray-950 erp-action erp-action-edit">{{ __('Modifier') }}</a>@endcan @endif</td>
                     </tr>
                 @empty
                     <tr><td colspan="8" class="px-6 py-10 text-center text-gray-500">{{ __('Aucune commande ne correspond aux filtres.') }}</td></tr>

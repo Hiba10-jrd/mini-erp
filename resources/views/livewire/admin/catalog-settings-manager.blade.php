@@ -194,7 +194,7 @@ new class extends Component
                         <div class="flex gap-3">
                             <x-primary-button type="submit">{{ $editingCategoryId ? __('Enregistrer') : __('Ajouter') }}</x-primary-button>
                             @if ($editingCategoryId)
-                                <x-secondary-button type="button" wire:click="resetCategoryForm">{{ __('Annuler') }}</x-secondary-button>
+                                <x-secondary-button type="button" wire:click="resetCategoryForm" class="erp-action erp-action-neutral">{{ __('Annuler') }}</x-secondary-button>
                             @endif
                         </div>
                     </form>
@@ -210,8 +210,8 @@ new class extends Component
                         </div>
                         @can('stock.manage')
                             <div class="flex shrink-0 gap-3 text-sm">
-                                <button type="button" wire:click="editCategory({{ $category->id }})" class="text-indigo-600 hover:text-indigo-900">{{ __('Modifier') }}</button>
-                                <button type="button" wire:click="toggleCategory({{ $category->id }})" class="text-gray-600 hover:text-gray-900">{{ $category->is_active ? __('Désactiver') : __('Activer') }}</button>
+                                <button type="button" wire:click="editCategory({{ $category->id }})" class="text-indigo-600 hover:text-indigo-900 erp-action erp-action-edit">{{ __('Modifier') }}</button>
+                                <button type="button" wire:click="toggleCategory({{ $category->id }})" class="text-gray-600 hover:text-gray-900 erp-action {{ $category->is_active ? 'erp-action-warning' : 'erp-action-success' }}">{{ $category->is_active ? __('Désactiver') : __('Activer') }}</button>
                             </div>
                         @endcan
                     </li>
@@ -239,7 +239,7 @@ new class extends Component
                         <div class="flex gap-3 sm:col-span-2">
                             <x-primary-button type="submit">{{ $editingUnitId ? __('Enregistrer') : __('Ajouter') }}</x-primary-button>
                             @if ($editingUnitId)
-                                <x-secondary-button type="button" wire:click="resetUnitForm">{{ __('Annuler') }}</x-secondary-button>
+                                <x-secondary-button type="button" wire:click="resetUnitForm" class="erp-action erp-action-neutral">{{ __('Annuler') }}</x-secondary-button>
                             @endif
                         </div>
                     </form>
@@ -254,8 +254,8 @@ new class extends Component
                         </div>
                         @can('stock.manage')
                             <div class="flex shrink-0 gap-3 text-sm">
-                                <button type="button" wire:click="editUnit({{ $unit->id }})" class="text-indigo-600 hover:text-indigo-900">{{ __('Modifier') }}</button>
-                                <button type="button" wire:click="toggleUnit({{ $unit->id }})" class="text-gray-600 hover:text-gray-900">{{ $unit->is_active ? __('Désactiver') : __('Activer') }}</button>
+                                <button type="button" wire:click="editUnit({{ $unit->id }})" class="text-indigo-600 hover:text-indigo-900 erp-action erp-action-edit">{{ __('Modifier') }}</button>
+                                <button type="button" wire:click="toggleUnit({{ $unit->id }})" class="text-gray-600 hover:text-gray-900 erp-action {{ $unit->is_active ? 'erp-action-warning' : 'erp-action-success' }}">{{ $unit->is_active ? __('Désactiver') : __('Activer') }}</button>
                             </div>
                         @endcan
                     </li>

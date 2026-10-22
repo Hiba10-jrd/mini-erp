@@ -47,18 +47,18 @@ new class extends \Livewire\Volt\Component
     <div class="flex flex-wrap items-center justify-between gap-3">
         <a href="{{ route('sales.quotes.index') }}" wire:navigate class="text-sm font-medium text-indigo-700 hover:text-indigo-900">{{ __('Retour aux devis') }}</a>
         <div class="flex flex-wrap gap-2">
-            <a href="{{ route('sales.quotes.pdf', $quote) }}" target="_blank" rel="noopener" class="inline-flex min-h-10 items-center border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50">{{ __('Télécharger le PDF') }}</a>
+            <a href="{{ route('sales.quotes.pdf', $quote) }}" target="_blank" rel="noopener" class="inline-flex min-h-10 items-center border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 erp-action erp-action-view">{{ __('Télécharger le PDF') }}</a>
             @if ($quote->salesOrder)
                 <a href="{{ route('sales.orders.show', $quote->salesOrder) }}" wire:navigate class="inline-flex min-h-10 items-center border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50">{{ __('Voir la commande') }} {{ $quote->salesOrder->number }}</a>
             @elseif ($quote->status === 'accepted' && $quote->archived_at === null)
                 @can('sales.create')<x-primary-button type="button" wire:click="createOrder">{{ __('Créer la commande') }}</x-primary-button>@endcan
             @endif
             @if ($quote->isEditable())
-                @can('sales.update')<a href="{{ route('sales.quotes.edit', $quote) }}" wire:navigate class="inline-flex min-h-10 items-center border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50">{{ __('Modifier') }}</a>@endcan
-                @can('sales.delete')<x-danger-button type="button" wire:click="archive" wire:confirm="{{ __('Archiver ce brouillon ?') }}">{{ __('Archiver') }}</x-danger-button>@endcan
+                @can('sales.update')<a href="{{ route('sales.quotes.edit', $quote) }}" wire:navigate class="inline-flex min-h-10 items-center border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 erp-action erp-action-edit">{{ __('Modifier') }}</a>@endcan
+                @can('sales.delete')<x-danger-button type="button" wire:click="archive" wire:confirm="{{ __('Archiver ce brouillon ?') }}" class="erp-action erp-action-danger">{{ __('Archiver') }}</x-danger-button>@endcan
                 @can('sales.update')<x-primary-button type="button" wire:click="transition('sent')">{{ __('Marquer comme envoyé') }}</x-primary-button>@endcan
             @elseif ($quote->status === 'sent')
-                @can('sales.update')<x-primary-button type="button" wire:click="transition('accepted')">{{ __('Accepter') }}</x-primary-button><x-secondary-button type="button" wire:click="transition('refused')">{{ __('Refuser') }}</x-secondary-button>@if ($quote->valid_until && $quote->valid_until->isBefore(today()))<x-secondary-button type="button" wire:click="transition('expired')">{{ __('Marquer expiré') }}</x-secondary-button>@endif @endcan
+                @can('sales.update')<x-primary-button type="button" wire:click="transition('accepted')" class="erp-action erp-action-success">{{ __('Accepter') }}</x-primary-button><x-secondary-button type="button" wire:click="transition('refused')" class="erp-action erp-action-danger">{{ __('Refuser') }}</x-secondary-button>@if ($quote->valid_until && $quote->valid_until->isBefore(today()))<x-secondary-button type="button" wire:click="transition('expired')" class="erp-action erp-action-warning">{{ __('Marquer expiré') }}</x-secondary-button>@endif @endcan
             @endif
         </div>
     </div>

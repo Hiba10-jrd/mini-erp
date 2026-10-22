@@ -112,7 +112,7 @@ new class extends \Livewire\Volt\Component
     </header>
     @if (session('attachment-status'))<p role="status" class="rounded-lg bg-green-50 p-3 text-sm text-green-800">{{ session('attachment-status') }}</p>@endif
     @if ($legacyExpense)
-        <a class="block text-indigo-600 underline" href="{{ route('attachments.expense-legacy', $legacyExpense) }}">{{ __('Télécharger le justificatif historique') }}</a>
+        <a class="block text-indigo-600 underline erp-action erp-action-view" href="{{ route('attachments.expense-legacy', $legacyExpense) }}">{{ __('Télécharger le justificatif historique') }}</a>
     @endif
     @if ($canUpload)
         <form wire:submit="saveDocument" class="space-y-4" x-data="{ dragging: false, uploading: false, progress: 0, failed: false }"
@@ -135,7 +135,7 @@ new class extends \Livewire\Volt\Component
                 @if ($file)
                     <div class="mt-3 flex flex-wrap items-center justify-center gap-3">
                         <p class="min-w-0 break-all text-sm font-medium" role="status">{{ __('Fichier sélectionné :') }} <bdi>{{ $file->getClientOriginalName() }}</bdi></p>
-                        <button type="button" wire:click="clearSelectedFile" wire:loading.attr="disabled" :disabled="uploading" class="rounded px-2 py-1 text-sm text-red-600 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">{{ __('Retirer') }}</button>
+                        <button type="button" wire:click="clearSelectedFile" wire:loading.attr="disabled" :disabled="uploading" class="rounded px-2 py-1 text-sm text-red-600 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 erp-action erp-action-danger">{{ __('Retirer') }}</button>
                     </div>
                 @endif
                 <div x-cloak x-show="uploading" class="mt-3" role="status">
@@ -165,7 +165,7 @@ new class extends \Livewire\Volt\Component
                     <x-input-error id="description-error-{{ $this->getId() }}" role="alert" :messages="$errors->get('description')" />
                 </label>
             </div>
-            <button type="submit" class="erp-button erp-button-primary w-full sm:w-auto" wire:loading.attr="disabled" :disabled="uploading">
+            <button type="submit" class="erp-button erp-button-primary w-full sm:w-auto erp-action erp-action-primary" wire:loading.attr="disabled" :disabled="uploading">
                 <span wire:loading.remove wire:target="saveDocument">{{ __('Ajouter le document') }}</span>
                 <span wire:loading wire:target="saveDocument" role="status">{{ __('Ajout en cours…') }}</span>
             </button>
@@ -189,8 +189,8 @@ new class extends \Livewire\Volt\Component
                     </div>
                 </div>
                 <div class="flex shrink-0 flex-wrap gap-2">
-                    <a href="{{ route('attachments.download', $document) }}" class="erp-button erp-button-secondary" aria-label="{{ __('Télécharger') }} {{ $document->original_name }}">{{ __('Télécharger') }}</a>
-                    @if ($canRemove)<button type="button" wire:click="remove({{ $document->id }})" wire:confirm="{{ __('Supprimer ce document ? Il ne sera plus disponible dans cette liste.') }}" wire:loading.attr="disabled" class="erp-button text-red-600" aria-label="{{ __('Supprimer') }} {{ $document->original_name }}">{{ __('Supprimer') }}</button>@endif
+                    <a href="{{ route('attachments.download', $document) }}" class="erp-button erp-button-secondary erp-action erp-action-view" aria-label="{{ __('Télécharger') }} {{ $document->original_name }}">{{ __('Télécharger') }}</a>
+                    @if ($canRemove)<button type="button" wire:click="remove({{ $document->id }})" wire:confirm="{{ __('Supprimer ce document ? Il ne sera plus disponible dans cette liste.') }}" wire:loading.attr="disabled" class="erp-button text-red-600 erp-action erp-action-danger" aria-label="{{ __('Supprimer') }} {{ $document->original_name }}">{{ __('Supprimer') }}</button>@endif
                 </div>
             </li>
         @empty

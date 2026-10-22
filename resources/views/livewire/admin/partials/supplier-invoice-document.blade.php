@@ -1,8 +1,8 @@
 @if ($originalInvoiceFile)
-    <div class="si-document-row"><div><p class="font-semibold break-words"><bdi>{{ $originalInvoiceFile->getClientOriginalName() }}</bdi></p><p class="si-muted">{{ number_format($originalInvoiceFile->getSize() / 1024, 1) }} {{ __('Ko') }} · {{ __('Sera enregistré avec la facture') }}</p></div><button type="button" wire:click="clearOriginalInvoiceFile" class="erp-button erp-button-secondary">{{ __('Retirer') }}</button></div>
+    <div class="si-document-row"><div><p class="font-semibold break-words"><bdi>{{ $originalInvoiceFile->getClientOriginalName() }}</bdi></p><p class="si-muted">{{ number_format($originalInvoiceFile->getSize() / 1024, 1) }} {{ __('Ko') }} · {{ __('Sera enregistré avec la facture') }}</p></div><button type="button" wire:click="clearOriginalInvoiceFile" class="erp-button erp-button-secondary erp-action erp-action-danger">{{ __('Retirer') }}</button></div>
 @elseif ($activeDocument)
-    <div class="si-document-row"><div><p class="font-semibold break-words"><bdi>{{ $activeDocument->original_name }}</bdi></p><p class="si-muted">{{ number_format($activeDocument->size / 1024, 1) }} {{ __('Ko') }} · {{ $activeDocument->created_at->format('d/m/Y H:i') }}</p></div><a href="{{ route('attachments.download', $activeDocument) }}" class="erp-button erp-button-secondary">{{ __('Télécharger la facture originale') }}</a></div>
-    @if ($canAttachOriginal)<button type="button" wire:click="$toggle('showCorrection')" aria-expanded="{{ $showCorrection ? 'true' : 'false' }}" aria-controls="si-upload-area" class="si-text-button">{{ __('Ajouter une version corrigée') }}</button>@endif
+    <div class="si-document-row"><div><p class="font-semibold break-words"><bdi>{{ $activeDocument->original_name }}</bdi></p><p class="si-muted">{{ number_format($activeDocument->size / 1024, 1) }} {{ __('Ko') }} · {{ $activeDocument->created_at->format('d/m/Y H:i') }}</p></div><a href="{{ route('attachments.download', $activeDocument) }}" class="erp-button erp-button-secondary erp-action erp-action-view">{{ __('Télécharger la facture originale') }}</a></div>
+    @if ($canAttachOriginal)<button type="button" wire:click="$toggle('showCorrection')" aria-expanded="{{ $showCorrection ? 'true' : 'false' }}" aria-controls="si-upload-area" class="si-text-button erp-action erp-action-primary">{{ __('Ajouter une version corrigée') }}</button>@endif
 @else
     <p class="si-muted">{{ __('Aucune facture originale jointe.') }}</p>
 @endif
@@ -23,7 +23,7 @@
 @if ($documents->count() > 1 || ($originalInvoiceFile && $documents->isNotEmpty()))
     <details class="si-secondary"><summary>{{ __('Versions précédentes') }} ({{ $documents->count() - ($originalInvoiceFile ? 0 : 1) }})</summary>
         @if ($canEdit && !$originalInvoiceFile)<label for="si-active-document" class="si-label">{{ __('Document à vérifier') }}</label><select id="si-active-document" wire:model.live="attachmentId">@foreach($documents as $document)<option value="{{ $document->id }}">{{ $document->original_name }} · {{ $document->created_at->format('d/m/Y H:i') }}</option>@endforeach</select>@endif
-        <ul class="si-version-list">@foreach ($documents->where('id', '!=', $originalInvoiceFile ? null : $activeDocument?->id) as $document)<li><span><bdi>{{ $document->original_name }}</bdi> · {{ $document->created_at->format('d/m/Y H:i') }}</span><a href="{{ route('attachments.download', $document) }}" class="text-indigo-700">{{ __('Télécharger') }}</a></li>@endforeach</ul>
+        <ul class="si-version-list">@foreach ($documents->where('id', '!=', $originalInvoiceFile ? null : $activeDocument?->id) as $document)<li><span><bdi>{{ $document->original_name }}</bdi> · {{ $document->created_at->format('d/m/Y H:i') }}</span><a href="{{ route('attachments.download', $document) }}" class="text-indigo-700 erp-action erp-action-view">{{ __('Télécharger') }}</a></li>@endforeach</ul>
     </details>
 @endif
 @if ($invoice && Gate::allows('purchases.view'))

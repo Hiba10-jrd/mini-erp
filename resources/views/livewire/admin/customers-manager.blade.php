@@ -212,18 +212,170 @@ new class extends VoltComponent
     }
 }; ?>
 
-<div class="space-y-6">
-    @if ($feedback)<div class="rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800" role="status">{{ $feedback }}</div>@endif
-    <div class="overflow-hidden bg-white shadow-sm sm:rounded-lg">
-        <div class="border-b border-gray-200 p-6">
-            <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"><div><h3 class="text-lg font-semibold text-gray-900">{{ __('Clients') }}</h3><p class="mt-1 text-sm text-gray-600">{{ __('Consultez les clients actifs et archivés sans afficher de données commerciales inexistantes.') }}</p></div>@can('customers.manage')<x-primary-button type="button" wire:click="prepareCreate">{{ __('Nouveau client') }}</x-primary-button>@endcan</div>
-            <div class="mt-5 grid gap-4 sm:grid-cols-3"><div><x-input-label for="customer-search" :value="__('Rechercher')" /><x-text-input id="customer-search" type="search" wire:model.live.debounce.300ms="search" class="mt-1 block w-full" placeholder="{{ __('Code, nom ou email') }}" /></div><div><x-input-label for="customer-type-filter" :value="__('Type')" /><select id="customer-type-filter" wire:model.live="typeFilter" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"><option value="all">{{ __('Tous') }}</option><option value="individual">{{ __('Particuliers') }}</option><option value="company">{{ __('Entreprises') }}</option></select></div><div><x-input-label for="customer-status-filter" :value="__('Statut')" /><select id="customer-status-filter" wire:model.live="statusFilter" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"><option value="active">{{ __('Actifs') }}</option><option value="archived">{{ __('Archivés') }}</option><option value="all">{{ __('Tous') }}</option></select></div></div>
+<div class="erp-entity-shell customers-premium">
+    @if ($feedback)
+        <div class="rounded-lg border border-emerald-200 bg-emerald-50/80 px-4 py-3 text-sm font-medium text-emerald-800 shadow-sm" role="status">
+            {{ $feedback }}
         </div>
-        <div class="overflow-x-auto"><div class="erp-table-scroll"><table class="min-w-full divide-y divide-gray-200"><thead class="bg-gray-50"><tr><th class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-600">{{ __('Code') }}</th><th class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-600">{{ __('Client') }}</th><th class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-600">{{ __('Type') }}</th><th class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-600">{{ __('Email') }}</th><th class="px-6 py-3 text-start text-xs font-semibold uppercase text-gray-600">{{ __('Statut') }}</th><th class="px-6 py-3 text-end text-xs font-semibold uppercase text-gray-600">{{ __('Actions') }}</th></tr></thead><tbody class="divide-y divide-gray-200 bg-white">@forelse($customers as $customer)<tr wire:key="customer-row-{{ $customer->id }}"><td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">{{ $customer->code }}</td><td class="px-6 py-4 text-sm text-gray-900"><a href="{{ route('admin.customers.show', $customer) }}" wire:navigate class="text-indigo-600 hover:text-indigo-900">{{ $customer->name }}</a><div class="text-xs text-gray-500">{{ $customer->trade_name }}</div></td><td class="px-6 py-4 text-sm text-gray-600">{{ $customer->customer_type === 'company' ? __('Entreprise') : __('Particulier') }}</td><td class="px-6 py-4 text-sm text-gray-600">{{ $customer->email }}</td><td class="px-6 py-4 text-sm text-gray-600">{{ $customer->isArchived() ? __('Archivé') : __('Actif') }}</td><td class="px-6 py-4 text-end text-sm"><div class="flex flex-wrap justify-end gap-3"><a href="{{ route('admin.customers.show', $customer) }}" wire:navigate class="text-indigo-600 hover:text-indigo-900">{{ __('Consulter') }}</a>@can('customers.manage') @unless($customer->isArchived())<button type="button" wire:click="editCustomer({{ $customer->id }})" class="text-indigo-600 hover:text-indigo-900">{{ __('Modifier') }}</button><button type="button" wire:click="archiveCustomer({{ $customer->id }})" wire:confirm="{{ __('Archiver ce client ?') }}" class="text-red-600 hover:text-red-900">{{ __('Archiver') }}</button>@endunless @endcan</div></td></tr>@empty<tr><td colspan="6" class="px-6 py-10 text-center text-sm text-gray-500">{{ __('Aucun client trouvé.') }}</td></tr>@endforelse</tbody></table></div></div>
-        @if($customers->hasPages())<div class="border-t border-gray-200 px-6 py-4">{{ $customers->links() }}</div>@endif
+    @endif
+
+    <header class="customers-heading"><div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                    <h1>{{ __('Clients') }}</h1>
+                    <p>{{ __('Consultez les clients actifs et archivés sans afficher de données commerciales inexistantes.') }}</p>
+                </div>
+                @can('customers.manage')
+                    <x-primary-button type="button" wire:click="prepareCreate" class="erp-primary-button">{{ __('Nouveau client') }}</x-primary-button>
+                @endcan
+            </div>
+
+            </header>
+    <div class="erp-panel">
+        <div class="erp-panel-header">
+            <div class="erp-filter-grid">
+                <div class="erp-filter-field">
+                    <x-input-label for="customer-search" :value="__('Rechercher')" />
+                    <x-text-input id="customer-search" type="search" wire:model.live.debounce.300ms="search" class="erp-input-field mt-1 block w-full" placeholder="{{ __('Code, nom ou email') }}" />
+                </div>
+                <div class="erp-filter-field">
+                    <x-input-label for="customer-type-filter" :value="__('Type')" />
+                    <select id="customer-type-filter" wire:model.live="typeFilter" class="erp-input-field mt-1 block w-full"><option value="all">{{ __('Tous') }}</option><option value="individual">{{ __('Particuliers') }}</option><option value="company">{{ __('Entreprises') }}</option></select>
+                </div>
+                <div class="erp-filter-field">
+                    <x-input-label for="customer-status-filter" :value="__('Statut')" />
+                    <select id="customer-status-filter" wire:model.live="statusFilter" class="erp-input-field mt-1 block w-full"><option value="active">{{ __('Actifs') }}</option><option value="archived">{{ __('Archivés') }}</option><option value="all">{{ __('Tous') }}</option></select>
+                </div>
+            </div>
+        </div>
+        <div class="erp-table-shell">
+            <div class="overflow-x-auto">
+                <table class="erp-table-base">
+                    <thead>
+                        <tr>
+                            <th>{{ __('Code') }}</th>
+                            <th>{{ __('Client') }}</th>
+                            <th>{{ __('Type') }}</th>
+                            <th>{{ __('Email') }}</th>
+                            <th>{{ __('Statut') }}</th>
+                            <th class="text-end">{{ __('Actions') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($customers as $customer)
+                            <tr wire:key="customer-row-{{ $customer->id }}">
+                                <td class="whitespace-nowrap font-semibold text-slate-900">{{ $customer->code }}</td>
+                                <td>
+                                    <a href="{{ route('admin.customers.show', $customer) }}" wire:navigate class="erp-table-link">{{ $customer->name }}</a>
+                                    <div class="mt-1 text-xs text-slate-500">{{ $customer->trade_name }}</div>
+                                </td>
+                                <td>{{ $customer->customer_type === 'company' ? __('Entreprise') : __('Particulier') }}</td>
+                                <td>{{ $customer->email }}</td>
+                                <td>
+                                    <span class="erp-status-pill {{ $customer->isArchived() ? 'is-archived' : 'is-active' }}">
+                                        {{ $customer->isArchived() ? __('Archivé') : __('Actif') }}
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <div class="erp-inline-actions">
+                                        <a href="{{ route('admin.customers.show', $customer) }}" wire:navigate class="erp-link-button erp-action erp-action-view">{{ __('Consulter') }}</a>
+                                        @can('customers.manage')
+                                            @unless($customer->isArchived())
+                                                <button type="button" wire:click="editCustomer({{ $customer->id }})" class="erp-secondary-button erp-action erp-action-edit">{{ __('Modifier') }}</button>
+                                                <button type="button" wire:click="archiveCustomer({{ $customer->id }})" wire:confirm="{{ __('Archiver ce client ?') }}" class="erp-link-button-danger erp-action erp-action-danger">{{ __('Archiver') }}</button>
+                                            @endunless
+                                        @endcan
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="erp-row-empty">{{ __('Aucun client trouvé.') }}</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        @if($customers->hasPages())
+            <div class="erp-pagination">{{ $customers->links() }}</div>
+        @endif
     </div>
 
     @can('customers.manage')
-    <x-modal name="manage-customer" focusable><form wire:submit="saveCustomer" class="p-6"><h3 class="text-lg font-semibold text-gray-900">{{ $editingId ? __('Modifier le client') : __('Nouveau client') }}</h3><div class="mt-6 grid gap-5 sm:grid-cols-2"><div><x-input-label for="customer-type" :value="__('Type')" /><select id="customer-type" wire:model="customerType" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"><option value="individual">{{ __('Particulier') }}</option><option value="company">{{ __('Entreprise') }}</option></select><x-input-error :messages="$errors->get('customerType')" class="mt-2" /></div><div><x-input-label for="customer-name" :value="$customerType === 'company' ? __('Raison sociale') : __('Nom complet')" /><x-text-input id="customer-name" wire:model="name" class="mt-1 block w-full" required /><x-input-error :messages="$errors->get('name')" class="mt-2" /></div><div><x-input-label for="customer-trade-name" :value="__('Nom commercial')" /><x-text-input id="customer-trade-name" wire:model="tradeName" class="mt-1 block w-full" /><x-input-error :messages="$errors->get('tradeName')" class="mt-2" /></div><div><x-input-label for="customer-email" :value="__('Email')" /><x-text-input id="customer-email" type="email" wire:model="email" class="mt-1 block w-full" /><x-input-error :messages="$errors->get('email')" class="mt-2" /></div><div><x-input-label for="customer-phone" :value="__('Téléphone')" /><x-text-input id="customer-phone" wire:model="phone" class="mt-1 block w-full" /><x-input-error :messages="$errors->get('phone')" class="mt-2" /></div><div><x-input-label for="customer-city" :value="__('Ville')" /><x-text-input id="customer-city" wire:model="city" class="mt-1 block w-full" /></div><div><x-input-label for="customer-country" :value="__('Pays')" /><x-text-input id="customer-country" wire:model="country" class="mt-1 block w-full" /></div><div class="sm:col-span-2"><x-input-label for="customer-address" :value="__('Adresse')" /><textarea id="customer-address" wire:model="address" rows="2" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"></textarea></div><div><x-input-label for="customer-ice" :value="__('ICE')" /><x-text-input id="customer-ice" wire:model="ice" class="mt-1 block w-full" /></div><div><x-input-label for="customer-if" :value="__('IF')" /><x-text-input id="customer-if" wire:model="taxId" class="mt-1 block w-full" /></div><div><x-input-label for="customer-rc" :value="__('RC')" /><x-text-input id="customer-rc" wire:model="commercialRegister" class="mt-1 block w-full" /></div><div><x-input-label for="customer-credit-limit" :value="__('Plafond de crédit')" /><x-text-input id="customer-credit-limit" type="number" step="0.01" min="0" wire:model="creditLimit" class="mt-1 block w-full" placeholder="{{ __('Laisser vide si non défini') }}" /><x-input-error :messages="$errors->get('creditLimit')" class="mt-2" /></div><div class="sm:col-span-2"><x-input-label for="customer-payment-term" :value="__('Condition de paiement')" /><select id="customer-payment-term" wire:model="paymentTermId" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"><option value="">{{ __('Aucune condition') }}</option>@foreach($paymentTerms as $term)<option value="{{ $term->id }}">{{ $term->label }}</option>@endforeach</select><x-input-error :messages="$errors->get('paymentTermId')" class="mt-2" /></div><div class="sm:col-span-2"><x-input-label for="customer-notes" :value="__('Notes internes')" /><textarea id="customer-notes" wire:model="notes" rows="3" class="mt-1 block w-full rounded-md border-gray-300 shadow-sm"></textarea></div></div><div class="mt-6 flex justify-end gap-3"><x-secondary-button type="button" x-on:click="$dispatch('close')">{{ __('Annuler') }}</x-secondary-button><x-primary-button type="submit">{{ $editingId ? __('Enregistrer') : __('Créer') }}</x-primary-button></div></form></x-modal>
+        <x-modal name="manage-customer" focusable>
+            <form wire:submit="saveCustomer" class="erp-modal-form">
+                <h3>{{ $editingId ? __('Modifier le client') : __('Nouveau client') }}</h3>
+                <div class="erp-form-grid mt-6">
+                    <div>
+                        <x-input-label for="customer-type" :value="__('Type')" />
+                        <select id="customer-type" wire:model="customerType" class="erp-input-field mt-1 block w-full"><option value="individual">{{ __('Particulier') }}</option><option value="company">{{ __('Entreprise') }}</option></select>
+                        <x-input-error :messages="$errors->get('customerType')" class="mt-2" />
+                    </div>
+                    <div>
+                        <x-input-label for="customer-name" :value="$customerType === 'company' ? __('Raison sociale') : __('Nom complet')" />
+                        <x-text-input id="customer-name" wire:model="name" class="erp-input-field mt-1 block w-full" required />
+                        <x-input-error :messages="$errors->get('name')" class="mt-2" />
+                    </div>
+                    <div>
+                        <x-input-label for="customer-trade-name" :value="__('Nom commercial')" />
+                        <x-text-input id="customer-trade-name" wire:model="tradeName" class="erp-input-field mt-1 block w-full" />
+                        <x-input-error :messages="$errors->get('tradeName')" class="mt-2" />
+                    </div>
+                    <div>
+                        <x-input-label for="customer-email" :value="__('Email')" />
+                        <x-text-input id="customer-email" type="email" wire:model="email" class="erp-input-field mt-1 block w-full" />
+                        <x-input-error :messages="$errors->get('email')" class="mt-2" />
+                    </div>
+                    <div>
+                        <x-input-label for="customer-phone" :value="__('Téléphone')" />
+                        <x-text-input id="customer-phone" wire:model="phone" class="erp-input-field mt-1 block w-full" />
+                        <x-input-error :messages="$errors->get('phone')" class="mt-2" />
+                    </div>
+                    <div>
+                        <x-input-label for="customer-city" :value="__('Ville')" />
+                        <x-text-input id="customer-city" wire:model="city" class="erp-input-field mt-1 block w-full" />
+                    </div>
+                    <div>
+                        <x-input-label for="customer-country" :value="__('Pays')" />
+                        <x-text-input id="customer-country" wire:model="country" class="erp-input-field mt-1 block w-full" />
+                    </div>
+                    <div class="erp-span-2">
+                        <x-input-label for="customer-address" :value="__('Adresse')" />
+                        <textarea id="customer-address" wire:model="address" rows="2" class="erp-input-field mt-1 block w-full"></textarea>
+                    </div>
+                    <div>
+                        <x-input-label for="customer-ice" :value="__('ICE')" />
+                        <x-text-input id="customer-ice" wire:model="ice" class="erp-input-field mt-1 block w-full" />
+                    </div>
+                    <div>
+                        <x-input-label for="customer-if" :value="__('IF')" />
+                        <x-text-input id="customer-if" wire:model="taxId" class="erp-input-field mt-1 block w-full" />
+                    </div>
+                    <div>
+                        <x-input-label for="customer-rc" :value="__('RC')" />
+                        <x-text-input id="customer-rc" wire:model="commercialRegister" class="erp-input-field mt-1 block w-full" />
+                    </div>
+                    <div>
+                        <x-input-label for="customer-credit-limit" :value="__('Plafond de crédit')" />
+                        <x-text-input id="customer-credit-limit" type="number" step="0.01" min="0" wire:model="creditLimit" class="erp-input-field mt-1 block w-full" placeholder="{{ __('Laisser vide si non défini') }}" />
+                        <x-input-error :messages="$errors->get('creditLimit')" class="mt-2" />
+                    </div>
+                    <div class="erp-span-2">
+                        <x-input-label for="customer-payment-term" :value="__('Condition de paiement')" />
+                        <select id="customer-payment-term" wire:model="paymentTermId" class="erp-input-field mt-1 block w-full"><option value="">{{ __('Aucune condition') }}</option>@foreach($paymentTerms as $term)<option value="{{ $term->id }}">{{ $term->label }}</option>@endforeach</select>
+                        <x-input-error :messages="$errors->get('paymentTermId')" class="mt-2" />
+                    </div>
+                    <div class="erp-span-2">
+                        <x-input-label for="customer-notes" :value="__('Notes')" />
+                        <textarea id="customer-notes" wire:model="notes" rows="3" class="erp-input-field mt-1 block w-full"></textarea>
+                    </div>
+                </div>
+                <div class="erp-modal-actions">
+                    <x-secondary-button type="button" x-on:click="$dispatch('close-modal', { name: 'manage-customer' })" class="erp-action erp-action-neutral">{{ __('Annuler') }}</x-secondary-button>
+                    <x-primary-button type="submit">{{ $editingId ? __('Enregistrer') : __('Créer') }}</x-primary-button>
+                </div>
+            </form>
+        </x-modal>
     @endcan
 </div>

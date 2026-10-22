@@ -135,7 +135,7 @@ new class extends \Livewire\Volt\Component
             <a
                 href="{{ route('sales.payments.create') }}"
                 wire:navigate
-                class="inline-flex min-h-10 items-center justify-center bg-gray-900 px-4 text-sm font-semibold uppercase tracking-widest text-white transition hover:bg-gray-700"
+                class="inline-flex min-h-10 items-center justify-center bg-gray-900 px-4 text-sm font-semibold uppercase tracking-widest text-white transition hover:bg-gray-700 erp-action erp-action-primary"
             >
                 {{ __('Nouveau paiement') }}
             </a>
@@ -286,7 +286,7 @@ new class extends \Livewire\Volt\Component
                         </p>
                     </div>
                 @endif
-                <a class="mt-3 block text-indigo-600" href="{{ route('attachments.index', ['parentType' => 'payment', 'parentId' => $payment->id]) }}" wire:navigate>{{ __('Documents') }}</a>
+                <a class="mt-3 block text-indigo-600 erp-action erp-action-view" href="{{ route('attachments.index', ['parentType' => 'payment', 'parentId' => $payment->id]) }}" wire:navigate>{{ __('Documents') }}</a>
             </article>
         @empty
             <div class="p-6 text-sm text-gray-500">

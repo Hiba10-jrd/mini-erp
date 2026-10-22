@@ -57,120 +57,83 @@ new class extends Component
 };
 ?>
 
-<section class="space-y-6">
+<section class="erp-entity-shell">
     <div class="flex justify-end">
         <a
             href="{{ route('admin.suppliers.index') }}"
             wire:navigate
-            class="text-sm text-indigo-600 hover:text-indigo-900"
+            class="erp-link-button"
         >
             {{ __('Retour à la liste') }}
         </a>
     </div>
 
-    <div class="bg-white p-6 shadow-sm sm:rounded-lg">
-        <div class="flex flex-col gap-2 border-b border-gray-200 pb-5 sm:flex-row sm:items-start sm:justify-between">
+    <div class="erp-detail-panel">
+        <div class="erp-detail-header">
             <div>
-                <p class="text-sm font-medium text-indigo-600">
+                <p class="text-sm font-semibold uppercase tracking-[0.16em] text-violet-600">
                     {{ $supplier->code }}
                 </p>
 
-                <h3 class="text-xl font-semibold text-gray-900">
+                <h3 class="erp-entity-name">
                     {{ $supplier->name }}
                 </h3>
 
                 @if ($supplier->trade_name)
-                    <p class="text-sm text-gray-500">
+                    <p class="mt-2 text-sm text-slate-500">
                         {{ $supplier->trade_name }}
                     </p>
                 @endif
             </div>
 
-            <span
-                class="rounded-full px-3 py-1 text-sm {{ $supplier->isArchived()
-                    ? 'bg-gray-100 text-gray-700'
-                    : 'bg-emerald-50 text-emerald-700' }}"
-            >
-                {{ $supplier->isArchived()
-                    ? __('Archivé')
-                    : __('Actif') }}
+            <span class="erp-status-pill {{ $supplier->isArchived() ? 'is-archived' : 'is-active' }}">
+                {{ $supplier->isArchived() ? __('Archivé') : __('Actif') }}
             </span>
         </div>
 
-        <div class="mt-6 grid gap-5 sm:grid-cols-2">
+        <div class="erp-detail-grid">
             <div>
-                <h4 class="font-medium text-gray-900">
-                    {{ __('Coordonnées') }}
-                </h4>
+                <h4>{{ __('Coordonnées') }}</h4>
 
-                <dl class="mt-2 space-y-1 text-sm text-gray-600">
+                <dl class="erp-kv-list">
                     <div>
-                        <dt class="inline font-medium">
-                            {{ __('Email :') }}
-                        </dt>
-
-                        <dd class="inline">
-                            {{ $supplier->email ?? __('Non renseigné') }}
-                        </dd>
+                        <dt>{{ __('Email :') }}</dt>
+                        <dd>{{ $supplier->email ?? __('Non renseigné') }}</dd>
                     </div>
 
                     <div>
-                        <dt class="inline font-medium">
-                            {{ __('Téléphone :') }}
-                        </dt>
-
-                        <dd class="inline">
-                            {{ $supplier->phone ?? __('Non renseigné') }}
-                        </dd>
+                        <dt>{{ __('Téléphone :') }}</dt>
+                        <dd>{{ $supplier->phone ?? __('Non renseigné') }}</dd>
                     </div>
 
                     <div>
-                        <dt class="inline font-medium">
-                            {{ __('Adresse :') }}
-                        </dt>
-
-                        <dd class="inline">
-                            {{
-                                collect([
-                                    $supplier->address,
-                                    $supplier->city,
-                                    $supplier->country,
-                                ])
-                                    ->filter()
-                                    ->join(', ')
-                                ?: __('Non renseignée')
-                            }}
-                        </dd>
+                        <dt>{{ __('Adresse :') }}</dt>
+                        <dd>{{ collect([ $supplier->address, $supplier->city, $supplier->country ])->filter()->join(', ') ?: __('Non renseignée') }}</dd>
                     </div>
                 </dl>
             </div>
 
             <div>
-                <h4 class="font-medium text-gray-900">
-                    {{ __('Informations commerciales') }}
-                </h4>
+                <h4>{{ __('Informations commerciales') }}</h4>
 
-                <dl class="mt-2 space-y-1 text-sm text-gray-600">
+                <dl class="erp-kv-list">
                     <div>
-                        <dt class="inline font-medium">
-                            {{ __('Condition :') }}
-                        </dt>
-
-                        <dd class="inline">
-                            {{ $supplier->paymentTerm?->label ?? __('Aucune') }}
-                        </dd>
+                        <dt>{{ __('Condition :') }}</dt>
+                        <dd>{{ $supplier->paymentTerm?->label ?? __('Aucune') }}</dd>
                     </div>
                 </dl>
             </div>
         </div>
 
         @if ($supplier->notes)
-            <div class="mt-5 border-t border-gray-200 pt-5">
-                <h4 class="font-medium text-gray-900">
-                    {{ __('Notes internes') }}
-                </h4>
+            <div class="erp-card-section">
+                <div class="erp-card-section-header">
+                    <div>
+                        <h4>{{ __('Notes internes') }}</h4>
+                    </div>
+                </div>
 
-                <p class="mt-2 whitespace-pre-line text-sm text-gray-600">
+                <p class="mt-4 whitespace-pre-line text-sm text-slate-600">
                     {{ $supplier->notes }}
                 </p>
             </div>
@@ -182,45 +145,27 @@ new class extends Component
         || $supplier->tax_id
         || $supplier->commercial_register
     )
-        <div class="bg-white p-6 shadow-sm sm:rounded-lg">
-            <h4 class="font-medium text-gray-900">
-                {{ __('Identifiants légaux') }}
-            </h4>
+        <div class="erp-detail-panel">
+            <h4>{{ __('Identifiants légaux') }}</h4>
 
-            <dl class="mt-3 grid gap-3 text-sm text-gray-600 sm:grid-cols-3">
+            <dl class="erp-legal-grid">
                 <div>
-                    <dt class="font-medium">
-                        {{ __('ICE') }}
-                    </dt>
-
-                    <dd>
-                        {{ $supplier->ice ?? __('Non renseigné') }}
-                    </dd>
+                    <dt>{{ __('ICE') }}</dt>
+                    <dd>{{ $supplier->ice ?? __('Non renseigné') }}</dd>
                 </div>
 
                 <div>
-                    <dt class="font-medium">
-                        {{ __('IF') }}
-                    </dt>
-
-                    <dd>
-                        {{ $supplier->tax_id ?? __('Non renseigné') }}
-                    </dd>
+                    <dt>{{ __('IF') }}</dt>
+                    <dd>{{ $supplier->tax_id ?? __('Non renseigné') }}</dd>
                 </div>
 
                 <div>
-                    <dt class="font-medium">
-                        {{ __('RC') }}
-                    </dt>
-
-                    <dd>
-                        {{ $supplier->commercial_register ?? __('Non renseigné') }}
-                    </dd>
+                    <dt>{{ __('RC') }}</dt>
+                    <dd>{{ $supplier->commercial_register ?? __('Non renseigné') }}</dd>
                 </div>
             </dl>
         </div>
     @endif
-
     @can('purchases.view')
         <div class="bg-white p-6 shadow-sm sm:rounded-lg">
             <div class="flex items-center justify-between gap-4">

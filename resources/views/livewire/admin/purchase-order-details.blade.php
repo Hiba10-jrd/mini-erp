@@ -55,11 +55,11 @@ new class extends \Livewire\Volt\Component
         <a href="{{ route('purchases.orders.index') }}" wire:navigate class="text-sm font-medium text-indigo-700 hover:text-indigo-900">{{ __('Retour aux commandes fournisseurs') }}</a>
         <div class="flex flex-wrap gap-2">
             @if ($order->isEditable())
-                @can('purchases.update')<a href="{{ route('purchases.orders.edit', $order) }}" wire:navigate class="inline-flex min-h-10 items-center border border-gray-300 px-4 text-sm font-medium text-gray-700">{{ __('Modifier') }}</a><x-primary-button type="button" wire:click="confirmOrder">{{ __('Confirmer la commande') }}</x-primary-button>@endcan
-                @can('purchases.delete')<x-danger-button type="button" wire:click="cancelOrder" wire:confirm="{{ __('Annuler cette commande fournisseur ?') }}">{{ __('Annuler la commande') }}</x-danger-button>@endcan
+                @can('purchases.update')<a href="{{ route('purchases.orders.edit', $order) }}" wire:navigate class="inline-flex min-h-10 items-center border border-gray-300 px-4 text-sm font-medium text-gray-700 erp-action erp-action-edit">{{ __('Modifier') }}</a><x-primary-button type="button" wire:click="confirmOrder" class="erp-action erp-action-success">{{ __('Confirmer la commande') }}</x-primary-button>@endcan
+                @can('purchases.delete')<x-danger-button type="button" wire:click="cancelOrder" wire:confirm="{{ __('Annuler cette commande fournisseur ?') }}" class="erp-action erp-action-neutral">{{ __('Annuler la commande') }}</x-danger-button>@endcan
             @endif
-            @if($canCreateReceipt) @can('purchases.create')<a href="{{ route('purchases.orders.receipts.create', $order) }}" wire:navigate class="inline-flex min-h-10 items-center bg-gray-900 px-4 text-sm font-medium text-white">{{ __('Créer une réception') }}</a>@endcan @endif
-            @if($canCreateSupplierInvoice) @can('purchases.create')<a href="{{ route('purchases.orders.invoices.create', $order) }}" wire:navigate class="inline-flex min-h-10 items-center bg-indigo-700 px-4 text-sm font-medium text-white hover:bg-indigo-600">{{ __('Créer une facture fournisseur') }}</a>@endcan @endif
+            @if($canCreateReceipt) @can('purchases.create')<a href="{{ route('purchases.orders.receipts.create', $order) }}" wire:navigate class="inline-flex min-h-10 items-center bg-gray-900 px-4 text-sm font-medium text-white erp-action erp-action-primary">{{ __('Créer une réception') }}</a>@endcan @endif
+            @if($canCreateSupplierInvoice) @can('purchases.create')<a href="{{ route('purchases.orders.invoices.create', $order) }}" wire:navigate class="inline-flex min-h-10 items-center bg-indigo-700 px-4 text-sm font-medium text-white hover:bg-indigo-600 erp-action erp-action-primary">{{ __('Créer une facture fournisseur') }}</a>@endcan @endif
         </div>
     </div>
     <x-input-error :messages="$errors->get('status')" /><x-input-error :messages="$errors->get('order')" />

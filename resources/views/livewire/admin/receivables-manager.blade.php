@@ -190,7 +190,7 @@ new class extends \Livewire\Volt\Component
             <div><x-input-label for="receivable-from" :value="__('Échéance du')" /><x-text-input id="receivable-from" type="date" wire:model.live="dateFrom" class="mt-1 w-full" /></div>
             <div><x-input-label for="receivable-to" :value="__('Échéance au')" /><x-text-input id="receivable-to" type="date" wire:model.live="dateTo" class="mt-1 w-full" /></div>
         </div>
-        <x-secondary-button type="button" wire:click="resetFilters" class="mt-4">{{ __('Réinitialiser les filtres') }}</x-secondary-button>
+        <x-secondary-button type="button" wire:click="resetFilters" class="mt-4 erp-action erp-action-neutral">{{ __('Réinitialiser les filtres') }}</x-secondary-button>
     </div>
 
     @if ($selectedInvoiceId !== null)
@@ -203,7 +203,7 @@ new class extends \Livewire\Volt\Component
             </div>
             <div><x-input-label for="reminder-note" :value="__('Note')" /><textarea id="reminder-note" wire:model="note" rows="3" class="mt-1 w-full border-gray-300 shadow-sm"></textarea><x-input-error :messages="$errors->get('note')" class="mt-2" /></div>
             <p class="text-sm text-gray-500">{{ __('Enregistre une action de relance déjà effectuée. Aucun message n’est envoyé.') }}</p>
-            <div class="flex gap-3"><x-primary-button wire:loading.attr="disabled" wire:target="saveReminder">{{ __('Enregistrer la relance') }}</x-primary-button><x-secondary-button type="button" wire:click="closeReminder">{{ __('Annuler') }}</x-secondary-button></div>
+            <div class="flex gap-3"><x-primary-button wire:loading.attr="disabled" wire:target="saveReminder">{{ __('Enregistrer la relance') }}</x-primary-button><x-secondary-button type="button" wire:click="closeReminder" class="erp-action erp-action-neutral">{{ __('Annuler') }}</x-secondary-button></div>
         </form>
     @endif
 
@@ -223,7 +223,7 @@ new class extends \Livewire\Volt\Component
                         <td class="whitespace-nowrap px-4 py-4"><span @class(['px-2 py-1 text-xs font-medium', 'bg-emerald-100 text-emerald-800' => $row['payment'] === 'paid', 'bg-amber-100 text-amber-800' => $row['payment'] === 'partially_paid', 'bg-gray-100 text-gray-700' => $row['payment'] === 'unpaid'])>{{ ['paid' => __('Soldée'), 'partially_paid' => __('Partiellement payée'), 'unpaid' => __('Impayée')][$row['payment']] }}</span></td>
                         <td class="whitespace-nowrap px-4 py-4"><span @class(['px-2 py-1 text-xs font-medium', 'bg-rose-100 text-rose-800' => $row['due'] === 'overdue', 'bg-gray-100 text-gray-700' => $row['due'] !== 'overdue'])>{{ ['settled' => __('Soldée'), 'overdue' => __('En retard'), 'upcoming' => __('À échoir'), 'no_due_date' => __('Sans échéance')][$row['due']] }}</span></td>
                         <td class="whitespace-nowrap px-4 py-4">@if ($invoice->latestReminder){{ $invoice->latestReminder->reminder_date->format('d/m/Y') }}<span class="block text-xs text-gray-500">{{ $invoice->latestReminder->channel }}</span>@else{{ __('Aucune') }}@endif</td>
-                        <td class="px-4 py-4">@can('payments.create')@if ($row['payment'] !== 'paid')<x-secondary-button type="button" wire:click="openReminder({{ $invoice->id }})">{{ __('Relancer') }}</x-secondary-button>@endif@endcan</td>
+                        <td class="px-4 py-4">@can('payments.create')@if ($row['payment'] !== 'paid')<x-secondary-button type="button" wire:click="openReminder({{ $invoice->id }})" class="erp-action erp-action-view">{{ __('Relancer') }}</x-secondary-button>@endif@endcan</td>
                     </tr>
                 @empty
                     <tr><td colspan="12" class="px-6 py-12 text-center text-gray-500">{{ __('Aucune facture trouvée.') }}</td></tr>

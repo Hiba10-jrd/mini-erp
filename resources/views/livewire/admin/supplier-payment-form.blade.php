@@ -866,7 +866,7 @@ new class extends \Livewire\Volt\Component
                                 <button
                                     type="button"
                                     wire:click="addAllocation({{ $invoice['id'] }})"
-                                    class="text-sm font-semibold text-indigo-700 hover:text-indigo-900"
+                                    class="text-sm font-semibold text-indigo-700 hover:text-indigo-900 erp-action erp-action-primary"
                                 >
                                     {{ __('Affecter') }}
                                 </button>
@@ -935,7 +935,7 @@ new class extends \Livewire\Volt\Component
                                     <button
                                         type="button"
                                         wire:click="removeAllocation({{ $index }})"
-                                        class="pb-2 text-sm font-semibold text-rose-700 hover:text-rose-900"
+                                        class="pb-2 text-sm font-semibold text-rose-700 hover:text-rose-900 erp-action erp-action-danger"
                                     >
                                         {{ __('Retirer') }}
                                     </button>
@@ -952,7 +952,7 @@ new class extends \Livewire\Volt\Component
         <a
             href="{{ route('purchases.payments.index') }}"
             wire:navigate
-            class="inline-flex min-h-10 items-center justify-center border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            class="inline-flex min-h-10 items-center justify-center border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 erp-action erp-action-neutral"
         >
             {{ __('Annuler') }}
         </a>

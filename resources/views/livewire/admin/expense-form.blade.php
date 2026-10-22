@@ -525,7 +525,7 @@ new class extends \Livewire\Volt\Component
             <a
                 href="{{ route('finance.expenses.index') }}"
                 wire:navigate
-                class="inline-flex min-h-11 items-center justify-center border border-gray-300 bg-white px-5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50"
+                class="inline-flex min-h-11 items-center justify-center border border-gray-300 bg-white px-5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 erp-action erp-action-neutral"
             >
                 {{ __('Annuler') }}
             </a>
@@ -534,7 +534,7 @@ new class extends \Livewire\Volt\Component
                 type="submit"
                 wire:loading.attr="disabled"
                 wire:target="save"
-                class="inline-flex min-h-11 items-center justify-center bg-gray-900 px-5 text-sm font-semibold text-white transition hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-60"
+                class="inline-flex min-h-11 items-center justify-center bg-gray-900 px-5 text-sm font-semibold text-white transition hover:bg-gray-700 disabled:cursor-not-allowed disabled:opacity-60 erp-action erp-action-primary"
             >
                 <span
                     wire:loading.remove

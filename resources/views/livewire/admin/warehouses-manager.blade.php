@@ -143,7 +143,7 @@ new class extends Component
                 <div class="flex gap-3 md:col-span-2">
                     <x-primary-button type="submit">{{ $editingWarehouseId ? __('Enregistrer') : __('Ajouter le dépôt') }}</x-primary-button>
                     @if ($editingWarehouseId)
-                        <x-secondary-button type="button" wire:click="resetWarehouseForm">{{ __('Annuler') }}</x-secondary-button>
+                        <x-secondary-button type="button" wire:click="resetWarehouseForm" class="erp-action erp-action-neutral">{{ __('Annuler') }}</x-secondary-button>
                     @endif
                 </div>
             </form>
@@ -164,8 +164,8 @@ new class extends Component
                         <td class="px-6 py-4"><span class="rounded-full px-2 py-1 text-xs {{ $warehouse->is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-100 text-gray-600' }}">{{ $warehouse->is_active ? __('Actif') : __('Inactif') }}</span></td>
                         <td class="whitespace-nowrap px-6 py-4 text-end">
                             @can('stock.manage')
-                                <button type="button" wire:click="editWarehouse({{ $warehouse->id }})" class="text-indigo-600 hover:text-indigo-900">{{ __('Modifier') }}</button>
-                                <button type="button" wire:click="toggleWarehouse({{ $warehouse->id }})" class="ms-3 text-gray-600 hover:text-gray-900">{{ $warehouse->is_active ? __('Désactiver') : __('Activer') }}</button>
+                                <button type="button" wire:click="editWarehouse({{ $warehouse->id }})" class="text-indigo-600 hover:text-indigo-900 erp-action erp-action-edit">{{ __('Modifier') }}</button>
+                                <button type="button" wire:click="toggleWarehouse({{ $warehouse->id }})" class="ms-3 text-gray-600 hover:text-gray-900 erp-action {{ $warehouse->is_active ? 'erp-action-warning' : 'erp-action-success' }}">{{ $warehouse->is_active ? __('Désactiver') : __('Activer') }}</button>
                             @endcan
                         </td>
                     </tr>

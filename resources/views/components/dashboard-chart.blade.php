@@ -1,10 +1,10 @@
 @props(['chart', 'currency'])
 @php
     $series = [
-        ['key' => 'net_ht', 'label' => __('Chiffre d’affaires HT'), 'color' => '#2563eb'],
-        ['key' => 'purchases', 'label' => __('Achats facturés TTC'), 'color' => '#8b5cf6'],
+        ['key' => 'net_ht', 'label' => __('Chiffre d’affaires HT'), 'color' => '#38bdf8'],
+        ['key' => 'purchases', 'label' => __('Achats facturés TTC'), 'color' => '#a78bfa'],
         ['key' => 'payments', 'label' => __('Encaissements'), 'color' => '#10b981'],
-        ['key' => 'expenses', 'label' => __('Dépenses TTC'), 'color' => '#ef6464'],
+        ['key' => 'expenses', 'label' => __('Dépenses TTC'), 'color' => '#fb7185'],
     ];
     $rows = $chart['rows'];
     $values = collect($rows)->flatMap(fn ($row) => array_map(fn ($series) => (float) $row[$series['key']], $series));
@@ -32,16 +32,16 @@
     </ul>
     <div class="dashboard-chart-stage" dir="ltr" x-data="{ point: null, rows: @js($rows), formatter: new Intl.NumberFormat(@js($locale), { style: 'currency', currency: @js($currency), maximumFractionDigits: 2 }) }" @mouseleave="if (!$el.contains(document.activeElement)) point = null" @keydown.escape="point = null">
         <svg viewBox="0 0 820 292" class="dashboard-chart-svg" role="group" aria-label="{{ __('Montants par période') }}">
-            <defs><linearGradient id="dashboard-revenue-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#3b82f6" stop-opacity=".16" /><stop offset="100%" stop-color="#3b82f6" stop-opacity=".01" /></linearGradient></defs>
+            <defs><linearGradient id="dashboard-revenue-fill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#38bdf8" stop-opacity=".16" /><stop offset="100%" stop-color="#38bdf8" stop-opacity=".01" /></linearGradient></defs>
             @for ($tick = 0; $tick <= 4; $tick++)
                 @php $value = $low + ($high - $low) * $tick / 4; @endphp
-                <line x1="66" x2="794" y1="{{ $y($value) }}" y2="{{ $y($value) }}" stroke="#edf1f7" stroke-dasharray="3 5" />
+                <line x1="66" x2="794" y1="{{ $y($value) }}" y2="{{ $y($value) }}" stroke="#283750" stroke-dasharray="3 5" />
                 <text x="52" y="{{ $y($value) + 4 }}" text-anchor="end" class="dashboard-chart-axis">{{ number_format($value, 0, app()->getLocale() === 'en' ? '.' : ',', ' ') }}</text>
             @endfor
             <path d="{{ $paths['net_ht'] }} L{{ $x(count($rows) - 1) }},{{ $y(0) }} L{{ $x(0) }},{{ $y(0) }} Z" fill="url(#dashboard-revenue-fill)" />
             @foreach ($series as $line)
                 <path d="{{ $paths[$line['key']] }}" fill="none" stroke="{{ $line['color'] }}" stroke-width="{{ $line['key'] === 'net_ht' ? 2.8 : 2 }}" stroke-linejoin="round" stroke-linecap="round" />
-                @foreach ($rows as $index => $row)<circle cx="{{ $x($index) }}" cy="{{ $y($row[$line['key']]) }}" r="{{ count($rows) <= 15 ? 2.7 : 1.6 }}" fill="{{ $line['color'] }}" />@endforeach
+                @foreach ($rows as $index => $row)<circle class="dashboard-chart-point" :class="{ 'is-active': point === {{ $index }} }" cx="{{ $x($index) }}" cy="{{ $y($row[$line['key']]) }}" r="{{ count($rows) <= 15 ? 2.7 : 1.6 }}" fill="{{ $line['color'] }}" />@endforeach
             @endforeach
             @foreach ($rows as $index => $row)
                 @if ($index === 0 || $index === count($rows) - 1 || $index % max(1, (int) ceil(count($rows) / 6)) === 0)

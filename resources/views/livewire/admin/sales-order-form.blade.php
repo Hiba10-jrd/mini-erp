@@ -164,7 +164,7 @@ new class extends \Livewire\Volt\Component
         </section>
 
         <section class="border-y border-gray-200 bg-white">
-            <div class="flex items-center justify-between gap-4 border-b border-gray-200 px-5 py-4 sm:px-6"><h3 class="text-base font-semibold text-gray-900">{{ __('Lignes de commande') }}</h3><x-secondary-button type="button" wire:click="addLine">{{ __('Ajouter une ligne') }}</x-secondary-button></div>
+            <div class="flex items-center justify-between gap-4 border-b border-gray-200 px-5 py-4 sm:px-6"><h3 class="text-base font-semibold text-gray-900">{{ __('Lignes de commande') }}</h3><x-secondary-button type="button" wire:click="addLine" class="erp-action erp-action-primary">{{ __('Ajouter une ligne') }}</x-secondary-button></div>
             <x-input-error :messages="$errors->get('lines')" class="mx-5 mt-3 sm:mx-6" />
             <div class="divide-y divide-gray-200">
                 @foreach ($lines as $index => $line)
@@ -178,7 +178,7 @@ new class extends \Livewire\Volt\Component
                             <div><x-input-label :for="'order-discount-'.$index" :value="__('Remise %')" /><x-text-input id="order-discount-{{ $index }}" type="number" min="0" max="100" step="0.01" wire:model.live="lines.{{ $index }}.discount_percent" class="mt-1 block w-full" /><x-input-error :messages="$errors->get('lines.'.$index.'.discount_percent')" class="mt-1" /></div>
                             <div><x-input-label :for="'order-tax-'.$index" :value="__('TVA')" /><select id="order-tax-{{ $index }}" wire:model.live="lines.{{ $index }}.tax_rate_id" class="mt-1 block w-full border-gray-300 shadow-sm"><option value="">{{ __('Automatique') }}</option><option value="none">{{ __('0 %') }}</option>@foreach ($taxRates as $taxRate)<option value="{{ $taxRate->id }}">{{ $taxRate->label }} · {{ str_replace('.', ',', $taxRate->rate) }} %</option>@endforeach</select></div>
                         </div>
-                        <div class="flex items-end justify-between gap-3 lg:col-span-2 lg:flex-col lg:items-end lg:justify-center"><div class="text-end"><span class="block text-xs text-gray-500">{{ __('HT net / TTC') }}</span><strong class="text-sm text-gray-900">{{ $lineTotals[$index]['subtotal_ht'] ?? '—' }} / {{ $lineTotals[$index]['total_ttc'] ?? '—' }}</strong></div><button type="button" wire:click="removeLine({{ $index }})" class="text-sm font-medium text-rose-700 hover:text-rose-900">{{ __('Supprimer') }}</button></div>
+                        <div class="flex items-end justify-between gap-3 lg:col-span-2 lg:flex-col lg:items-end lg:justify-center"><div class="text-end"><span class="block text-xs text-gray-500">{{ __('HT net / TTC') }}</span><strong class="text-sm text-gray-900">{{ $lineTotals[$index]['subtotal_ht'] ?? '—' }} / {{ $lineTotals[$index]['total_ttc'] ?? '—' }}</strong></div><button type="button" wire:click="removeLine({{ $index }})" class="text-sm font-medium text-rose-700 hover:text-rose-900 erp-action erp-action-danger">{{ __('Supprimer') }}</button></div>
                     </div>
                 @endforeach
             </div>
@@ -194,6 +194,6 @@ new class extends \Livewire\Volt\Component
                 <div><dt class="text-gray-500">{{ __('TTC') }}</dt><dd class="text-lg font-semibold text-gray-950">{{ str_replace('.', ',', $previewTotals['total_ttc']) }}</dd></div>
             </dl>
         </section>
-        <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end"><a href="{{ route('sales.orders.index') }}" wire:navigate class="inline-flex min-h-10 items-center justify-center border border-gray-300 px-4 text-sm font-medium text-gray-700">{{ __('Annuler') }}</a><x-primary-button type="submit" class="justify-center">{{ __('Enregistrer le brouillon') }}</x-primary-button></div>
+        <div class="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end"><a href="{{ route('sales.orders.index') }}" wire:navigate class="inline-flex min-h-10 items-center justify-center border border-gray-300 px-4 text-sm font-medium text-gray-700 erp-action erp-action-neutral">{{ __('Annuler') }}</a><x-primary-button type="submit" class="justify-center">{{ __('Enregistrer le brouillon') }}</x-primary-button></div>
     </form>
 </section>

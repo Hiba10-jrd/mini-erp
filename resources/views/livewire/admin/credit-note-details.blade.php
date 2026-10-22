@@ -85,7 +85,7 @@ new class extends Component
                     <a
                         href="{{ route('sales.credit-notes.edit', $creditNote) }}"
                         wire:navigate
-                        class="inline-flex min-h-10 items-center border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                        class="inline-flex min-h-10 items-center border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 erp-action erp-action-edit"
                     >
                         {{ __('Modifier') }}
                     </a>
@@ -94,7 +94,7 @@ new class extends Component
                         type="button"
                         wire:click="cancelCreditNote"
                         wire:confirm="{{ __('Annuler ce brouillon d’avoir ?') }}"
-                    >
+                     class="erp-action erp-action-neutral">
                         {{ __('Annuler le brouillon') }}
                     </x-danger-button>
                 @endcan
@@ -104,7 +104,7 @@ new class extends Component
                         type="button"
                         wire:click="issueCreditNote"
                         wire:confirm="{{ __('Émettre définitivement cet avoir ? Après émission, il sera immuable.') }}"
-                    >
+                     class="erp-action erp-action-success">
                         {{ __('Émettre l’avoir') }}
                     </x-primary-button>
                 @endcan
@@ -115,7 +115,7 @@ new class extends Component
                     href="{{ route('sales.credit-notes.pdf', $creditNote) }}"
                     target="_blank"
                     rel="noopener"
-                    class="inline-flex min-h-10 items-center border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    class="inline-flex min-h-10 items-center border border-gray-300 px-4 text-sm font-medium text-gray-700 hover:bg-gray-50 erp-action erp-action-view"
                 >
                     {{ __('Télécharger le PDF') }}
                 </a>

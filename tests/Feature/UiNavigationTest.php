@@ -32,6 +32,38 @@ class UiNavigationTest extends TestCase
             ->assertSee('Aller au contenu');
     }
 
+    public function test_dashboard_shell_and_language_menu_preserve_localized_navigation(): void
+    {
+        $this->actingAs($this->userWithPermissions(['stock.view']));
+
+        foreach (['fr' => 'ltr', 'en' => 'ltr', 'ar' => 'rtl'] as $locale => $direction) {
+            $response = $this->withSession(['locale' => $locale])->get(route('dashboard'))->assertOk();
+            $dom = new \DOMDocument;
+            @$dom->loadHTML('<?xml encoding="UTF-8">'.$response->getContent());
+            $xpath = new \DOMXPath($dom);
+
+            $this->assertSame($locale, $dom->documentElement->getAttribute('lang'));
+            $this->assertSame($direction, $dom->documentElement->getAttribute('dir'));
+            $this->assertStringContainsString('erp-dashboard-page', $xpath->query('//body')->item(0)->getAttribute('class'));
+            $options = $xpath->query('//div[@id="erp-language-menu"]//form');
+            $this->assertCount(3, $options);
+            foreach ($options as $form) {
+                $this->assertSame(route('locale.update'), $form->getAttribute('action'));
+                $this->assertSame('POST', $form->getAttribute('method'));
+                $this->assertSame(1, $xpath->query('.//input[@name="_token"]', $form)->length);
+                $this->assertSame(1, $xpath->query('.//svg[contains(@class,"erp-language-flag")]', $form)->length);
+            }
+            $selected = $xpath->query('//div[@id="erp-language-menu"]//button[@aria-current="true"]');
+            $this->assertCount(1, $selected);
+            $this->assertSame($locale, $xpath->query('../input[@name="locale"]', $selected->item(0))->item(0)->getAttribute('value'));
+        }
+
+        $response = $this->get(route('admin.stock.index'))->assertOk();
+        $dom = new \DOMDocument;
+        @$dom->loadHTML('<?xml encoding="UTF-8">'.$response->getContent());
+        $this->assertStringNotContainsString('erp-dashboard-page', $dom->getElementsByTagName('body')->item(0)->getAttribute('class'));
+    }
+
     public function test_finance_user_keeps_supplier_payments_without_purchase_permission(): void
     {
         $this->actingAs($this->userWithPermissions(['payments.view']));
