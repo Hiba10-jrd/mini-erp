@@ -126,4 +126,15 @@ class SetLocaleTest extends TestCase
 
         $this->assertSame('fr', App::getLocale());
     }
+
+    public function test_middleware_normalizes_session_locale_to_valid_value(): void
+    {
+        $response = $this->withSession(['locale' => 'de'])
+            ->get(route('login'));
+
+        $response->assertOk();
+        $this->assertSame('fr', session()->get('locale'));
+        $this->assertSame('fr', App::getLocale());
+        $this->assertSame('fr', Carbon::getLocale());
+    }
 }

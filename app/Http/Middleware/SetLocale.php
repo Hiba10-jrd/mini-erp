@@ -36,6 +36,8 @@ class SetLocale
             $locale = (string) config('app.fallback_locale', 'fr');
         }
 
+        $request->session()->put('locale', $locale);
+
         App::setLocale($locale);
         Carbon::setLocale($locale);
 
