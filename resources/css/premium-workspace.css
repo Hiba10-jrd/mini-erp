@@ -156,8 +156,6 @@
     .erp-premium-page .erp-main nav[role=navigation] [aria-current=page] span { background: #6558eb; color: white; border-color: #9389ff; }
     .erp-premium-page .erp-main nav[role=navigation] [aria-disabled=true] span { color: #8d9bb5; }
 
-    .erp-premium-page .erp-main > div, .erp-premium-page .erp-page-heading > div { animation: erp-workspace-appear .3s ease-out backwards; }
-    @keyframes erp-workspace-appear { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
     @media (max-width: 639px) {
         .erp-premium-page .erp-page-heading > div { padding: 20px 16px; }
         .erp-premium-page .erp-main .erp-panel-header { padding: 20px 16px; }

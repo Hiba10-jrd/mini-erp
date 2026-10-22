@@ -5,6 +5,7 @@
 @import './premium-auth.css';
 @import './actions.css';
 @import './forms.css';
+@import './premium-motion.css';
 
 @tailwind base;
 @tailwind components;

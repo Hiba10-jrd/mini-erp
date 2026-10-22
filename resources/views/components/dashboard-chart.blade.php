@@ -39,9 +39,20 @@
                 <text x="52" y="{{ $y($value) + 4 }}" text-anchor="end" class="dashboard-chart-axis">{{ number_format($value, 0, app()->getLocale() === 'en' ? '.' : ',', ' ') }}</text>
             @endfor
             <path d="{{ $paths['net_ht'] }} L{{ $x(count($rows) - 1) }},{{ $y(0) }} L{{ $x(0) }},{{ $y(0) }} Z" fill="url(#dashboard-revenue-fill)" />
-            @foreach ($series as $line)
-                <path d="{{ $paths[$line['key']] }}" fill="none" stroke="{{ $line['color'] }}" stroke-width="{{ $line['key'] === 'net_ht' ? 2.8 : 2 }}" stroke-linejoin="round" stroke-linecap="round" />
-                @foreach ($rows as $index => $row)<circle class="dashboard-chart-point" :class="{ 'is-active': point === {{ $index }} }" cx="{{ $x($index) }}" cy="{{ $y($row[$line['key']]) }}" r="{{ count($rows) <= 15 ? 2.7 : 1.6 }}" fill="{{ $line['color'] }}" />@endforeach
+            @foreach ($series as $seriesIndex => $line)
+                <path class="dashboard-chart-series dashboard-chart-series-{{ $seriesIndex }}" pathLength="1" d="{{ $paths[$line['key']] }}" fill="none" stroke="{{ $line['color'] }}" stroke-width="{{ $line['key'] === 'net_ht' ? 2.8 : 2 }}" stroke-linejoin="round" stroke-linecap="round" />
+                <g class="dashboard-chart-points dashboard-chart-points-{{ $seriesIndex }}">
+                    @foreach ($rows as $index => $row)
+                        <circle
+                            class="dashboard-chart-point"
+                            :class="{ 'is-active': point === {{ $index }} }"
+                            cx="{{ $x($index) }}"
+                            cy="{{ $y($row[$line['key']]) }}"
+                            r="{{ count($rows) <= 15 ? 2.7 : 1.6 }}"
+                            fill="{{ $line['color'] }}"
+                        />
+                    @endforeach
+                </g>
             @endforeach
             @foreach ($rows as $index => $row)
                 @if ($index === 0 || $index === count($rows) - 1 || $index % max(1, (int) ceil(count($rows) / 6)) === 0)

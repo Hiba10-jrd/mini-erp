@@ -33,7 +33,7 @@
         x-transition:leave="transition ease-in duration-100"
         x-transition:leave-start="opacity-100 translate-y-0 scale-100"
         x-transition:leave-end="opacity-0 translate-y-1 scale-95"
-        class="erp-language-menu absolute end-0 z-50 mt-2.5 w-[208px] max-w-[calc(100vw-24px)] rounded-2xl border border-slate-200 bg-white p-2 ltr:origin-top-right rtl:origin-top-left"
+        class="erp-motion-dropdown erp-language-menu absolute end-0 z-50 mt-2.5 w-[208px] max-w-[calc(100vw-24px)] rounded-2xl border border-slate-200 bg-white p-2 ltr:origin-top-right rtl:origin-top-left"
         style="display: none;"
     >
         <div class="space-y-1.5">

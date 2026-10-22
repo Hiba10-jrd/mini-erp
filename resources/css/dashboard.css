@@ -632,15 +632,6 @@
     border-bottom: 1px solid rgb(163 179 202 / 10%);
 }
 
-.dashboard-feed li:not(.dashboard-empty) {
-    animation: dashboard-feed-in .32s cubic-bezier(.2, .7, .25, 1) both;
-}
-
-.dashboard-feed li:nth-child(2) { animation-delay: 35ms; }
-.dashboard-feed li:nth-child(3) { animation-delay: 70ms; }
-.dashboard-feed li:nth-child(4) { animation-delay: 105ms; }
-.dashboard-feed li:nth-child(5) { animation-delay: 140ms; }
-
 .dashboard-feed li:last-child {
     border: 0;
 }
@@ -863,29 +854,6 @@
     grid-template-columns: minmax(0, 1fr);
 }
 
-.dashboard-executive:not(.dashboard-operational) > .dashboard-header,
-.dashboard-executive:not(.dashboard-operational) > .dashboard-filter,
-.dashboard-executive:not(.dashboard-operational) > .dashboard-kpis,
-.dashboard-executive:not(.dashboard-operational) > .dashboard-main-grid,
-.dashboard-executive:not(.dashboard-operational) > .dashboard-pending,
-.dashboard-executive:not(.dashboard-operational) > .dashboard-bottom-grid,
-.dashboard-executive:not(.dashboard-operational) > .dashboard-details-grid,
-.dashboard-operational > .dashboard-header,
-.dashboard-operational > .dashboard-kpis,
-.dashboard-operational > .dashboard-panel,
-.dashboard-operational > .dashboard-bottom-grid {
-    animation: dashboard-enter .38s cubic-bezier(.2, .7, .25, 1) both;
-}
-
-.dashboard-executive:not(.dashboard-operational) > .dashboard-filter { animation-delay: 35ms; }
-.dashboard-executive:not(.dashboard-operational) > .dashboard-kpis,
-.dashboard-operational > .dashboard-kpis { animation-delay: 70ms; }
-.dashboard-executive:not(.dashboard-operational) > .dashboard-main-grid { animation-delay: 105ms; }
-.dashboard-executive:not(.dashboard-operational) > .dashboard-pending { animation-delay: 140ms; }
-.dashboard-executive:not(.dashboard-operational) > .dashboard-bottom-grid,
-.dashboard-operational > .dashboard-bottom-grid { animation-delay: 175ms; }
-.dashboard-executive:not(.dashboard-operational) > .dashboard-details-grid { animation-delay: 210ms; }
-
 @media (hover: hover) and (pointer: fine) {
     .dashboard-kpi:hover {
         transform: translateY(-3px);
@@ -1083,17 +1051,6 @@
     }
 }
 
-@keyframes dashboard-enter {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
 @keyframes dashboard-tooltip-in {
     from {
         opacity: 0;
@@ -1102,17 +1059,6 @@
     to {
         opacity: 1;
         transform: translate(-50%, 0) scale(1);
-    }
-}
-
-@keyframes dashboard-feed-in {
-    from {
-        opacity: 0;
-        transform: translateY(6px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
     }
 }
 
@@ -1126,43 +1072,6 @@
         transition-duration: .01ms !important;
     }
 }
-
-/* Motion-only refinements: stable Livewire nodes animate once on insertion. */
-.dashboard-executive:not(.dashboard-operational) > .dashboard-header,
-.dashboard-executive:not(.dashboard-operational) > .dashboard-filter,
-.dashboard-executive:not(.dashboard-operational) > .dashboard-main-grid,
-.dashboard-executive:not(.dashboard-operational) > .dashboard-pending,
-.dashboard-executive:not(.dashboard-operational) > .dashboard-bottom-grid,
-.dashboard-executive:not(.dashboard-operational) > .dashboard-details-grid,
-.dashboard-operational > .dashboard-header,
-.dashboard-operational > .dashboard-panel,
-.dashboard-operational > .dashboard-bottom-grid {
-    animation-duration: 440ms;
-    animation-timing-function: cubic-bezier(.22, 1, .36, 1);
-}
-
-.dashboard-executive:not(.dashboard-operational) > .dashboard-header { animation-delay: 0ms; }
-.dashboard-executive:not(.dashboard-operational) > .dashboard-filter { animation-delay: 55ms; }
-.dashboard-executive:not(.dashboard-operational) > .dashboard-main-grid { animation-delay: 165ms; }
-.dashboard-executive:not(.dashboard-operational) > .dashboard-pending { animation-delay: 220ms; }
-.dashboard-executive:not(.dashboard-operational) > .dashboard-bottom-grid,
-.dashboard-operational > .dashboard-bottom-grid { animation-delay: 275ms; }
-.dashboard-executive:not(.dashboard-operational) > .dashboard-details-grid { animation-delay: 330ms; }
-
-.dashboard-executive > .dashboard-kpis {
-    animation: none;
-}
-
-.dashboard-kpi {
-    animation: dashboard-enter 430ms cubic-bezier(.22, 1, .36, 1) both;
-}
-
-.dashboard-kpi:nth-child(2) { animation-delay: 55ms; }
-.dashboard-kpi:nth-child(3) { animation-delay: 110ms; }
-.dashboard-kpi:nth-child(4) { animation-delay: 165ms; }
-.dashboard-kpi:nth-child(5) { animation-delay: 220ms; }
-.dashboard-kpi:nth-child(6) { animation-delay: 275ms; }
-.dashboard-kpi:nth-child(7) { animation-delay: 330ms; }
 
 .dashboard-kpi .dashboard-icon {
     transition: transform 220ms cubic-bezier(.22, 1, .36, 1), color 220ms ease, border-color 220ms ease, background-color 220ms ease;
@@ -1207,19 +1116,9 @@
     animation-timing-function: cubic-bezier(.22, 1, .36, 1);
 }
 
-.dashboard-feed li:not(.dashboard-empty) {
-    animation-duration: 390ms;
-    animation-timing-function: cubic-bezier(.22, 1, .36, 1);
-}
-
 .dashboard-alert-group {
-    animation: dashboard-enter 390ms cubic-bezier(.22, 1, .36, 1) both;
     transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease, background-color 200ms ease;
 }
-
-.dashboard-alert-group:nth-child(2) { animation-delay: 45ms; }
-.dashboard-alert-group:nth-child(3) { animation-delay: 90ms; }
-.dashboard-alert-group:nth-child(4) { animation-delay: 135ms; }
 
 .dashboard-presets button,
 .dashboard-date-form button,
@@ -1295,5 +1194,68 @@
         animation-delay: 0ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: .01ms !important;
+    }
+}
+
+.dashboard-chart-svg .dashboard-chart-series {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+    animation: dashboard-chart-draw var(--erp-motion-chart) linear backwards;
+}
+
+.dashboard-chart-svg .dashboard-chart-series-1 { animation-delay: 110ms; }
+.dashboard-chart-svg .dashboard-chart-series-2 { animation-delay: 220ms; }
+.dashboard-chart-svg .dashboard-chart-series-3 { animation-delay: 330ms; }
+
+.dashboard-chart-svg .dashboard-chart-points {
+    animation: dashboard-chart-points-in 240ms var(--erp-motion-ease) backwards;
+}
+
+.dashboard-chart-svg .dashboard-chart-points-0 { animation-delay: var(--erp-motion-chart); }
+.dashboard-chart-svg .dashboard-chart-points-1 { animation-delay: calc(var(--erp-motion-chart) + 110ms); }
+.dashboard-chart-svg .dashboard-chart-points-2 { animation-delay: calc(var(--erp-motion-chart) + 220ms); }
+.dashboard-chart-svg .dashboard-chart-points-3 { animation-delay: calc(var(--erp-motion-chart) + 330ms); }
+
+.dashboard-chart-svg > line,
+.dashboard-chart-svg .dashboard-chart-axis {
+    animation: dashboard-chart-axis-in 450ms var(--erp-motion-ease) both;
+}
+
+.dashboard-chart-legend li {
+    animation: dashboard-chart-axis-in 420ms var(--erp-motion-ease) both;
+}
+
+.dashboard-chart-legend li:nth-child(2) { animation-delay: 70ms; }
+.dashboard-chart-legend li:nth-child(3) { animation-delay: 140ms; }
+.dashboard-chart-legend li:nth-child(4) { animation-delay: 210ms; }
+
+@keyframes dashboard-chart-draw {
+    from { stroke-dashoffset: 1; }
+    to { stroke-dashoffset: 0; }
+}
+
+@keyframes dashboard-chart-points-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes dashboard-chart-axis-in {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .dashboard-chart-svg .dashboard-chart-series {
+        animation: none !important;
+        stroke-dashoffset: 0;
+    }
+
+    .dashboard-chart-svg .dashboard-chart-points,
+    .dashboard-chart-svg > line,
+    .dashboard-chart-svg .dashboard-chart-axis,
+    .dashboard-chart-legend li {
+        animation: none !important;
+        opacity: 1;
+        transform: none;
     }
 }
