@@ -1,4 +1,15 @@
 <x-app-layout>
-    <x-slot name="header"><h2 class="text-xl font-semibold text-gray-800">{{ __('Rapports') }}</h2><p class="mt-2 text-sm text-slate-500">{{ __('Analysez votre activité sur la période sélectionnée.') }}</p></x-slot>
-    <div class="py-8"><div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8"><livewire:admin.reports-manager /></div></div>
+    <div class="reports-page">
+        <header class="reports-hero">
+            <span class="reports-hero-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3v18h17M8 16v-4m5 4V7m5 9v-6" /></svg>
+            </span>
+            <div class="reports-hero-copy">
+                <h1>{{ __('Rapports') }}</h1>
+                <p>{{ __('Analysez votre activité sur la période sélectionnée.') }}</p>
+            </div>
+            <div class="reports-hero-art" aria-hidden="true"><span></span><span></span><span></span></div>
+        </header>
+        <livewire:admin.reports-manager />
+    </div>
 </x-app-layout>

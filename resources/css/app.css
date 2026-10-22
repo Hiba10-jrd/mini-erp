@@ -6,6 +6,7 @@
 @import './actions.css';
 @import './forms.css';
 @import './premium-motion.css';
+@import './premium-reports.css';
 
 @tailwind base;
 @tailwind components;
