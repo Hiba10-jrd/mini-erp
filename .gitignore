@@ -28,3 +28,4 @@ Thumbs.db
 /storage/debugbar/
 /storage/framework/performance-views/
 /tools/performance/results/*.json
+/storage/framework/testing-warmup-*/
