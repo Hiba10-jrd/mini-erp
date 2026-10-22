@@ -67,9 +67,6 @@ body.erp-shell:has(.customers-premium) { background: #090f1e; }
 .erp-main .customers-premium .text-red-600 { color: #fda4af; }
 .customers-premium :is(button, a) { transition: transform .18s, background-color .18s, border-color .18s; }
 .customers-premium :is(button, a):hover { filter: brightness(1.12); }
-.customers-premium > header, .customers-premium > .erp-panel { animation: customers-appear .35s ease-out both; }
-.customers-premium > .erp-panel { animation-delay: .06s; }
-@keyframes customers-appear { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 @media (min-width: 768px) { .erp-main .customers-premium .erp-filter-grid { grid-template-columns: 2fr 1fr 1fr; } }
 @media (max-width: 639px) {
     .customers-premium .customers-heading, .erp-main .customers-premium .erp-panel-header, .erp-main .customers-premium .erp-modal-form { padding: 20px 16px; }

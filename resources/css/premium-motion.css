@@ -1,0 +1,160 @@
+:root {
+    --erp-motion-ease: cubic-bezier(.22, 1, .36, 1);
+    --erp-motion-fast: 180ms;
+    --erp-motion-control: 200ms;
+    --erp-motion-card: 230ms;
+    --erp-motion-dropdown: 200ms;
+    --erp-motion-modal: 250ms;
+    --erp-motion-page: 600ms;
+    --erp-motion-page-delay: 80ms;
+    --erp-motion-chart: 1250ms;
+}
+
+@media screen {
+    .erp-motion-enter {
+        animation: erp-motion-page-enter var(--erp-motion-page) var(--erp-motion-ease) backwards;
+    }
+
+    .erp-motion-stagger > * {
+        animation: erp-motion-page-enter var(--erp-motion-page) var(--erp-motion-ease) backwards;
+    }
+
+    .erp-motion-stagger > :nth-child(2) { animation-delay: 80ms; }
+    .erp-motion-stagger > :nth-child(3) { animation-delay: 160ms; }
+    .erp-motion-stagger > :nth-child(4) { animation-delay: 240ms; }
+    .erp-motion-stagger > :nth-child(5) { animation-delay: 320ms; }
+
+    .erp-shell .erp-main .erp-motion-page-reveal,
+    .erp-shell .erp-page-heading .erp-motion-page-reveal,
+    .erp-premium-auth .erp-auth-card.erp-motion-page-reveal {
+        animation: erp-motion-page-enter var(--erp-motion-page) var(--erp-motion-ease) backwards;
+        animation-delay: var(--erp-motion-delay, 0ms);
+    }
+
+    .erp-shell :is(.erp-sidebar-link, .erp-nav-group > summary, .erp-topbar .erp-icon-button, .erp-topbar .erp-language-trigger, .erp-topbar .erp-profile-trigger) {
+        transition-duration: var(--erp-motion-control);
+        transition-timing-function: var(--erp-motion-ease);
+    }
+
+    .erp-shell :is(.erp-sidebar-link svg, .erp-nav-group > summary .premium-icon, .erp-topbar .erp-icon-button svg, .erp-language-trigger svg) {
+        transition: transform var(--erp-motion-control) var(--erp-motion-ease), color var(--erp-motion-control) ease;
+    }
+
+    .erp-shell .erp-motion-dropdown {
+        transition-duration: var(--erp-motion-dropdown) !important;
+        transition-timing-function: var(--erp-motion-ease) !important;
+    }
+
+    .erp-shell .erp-motion-modal {
+        transition-duration: var(--erp-motion-modal) !important;
+        transition-timing-function: var(--erp-motion-ease) !important;
+    }
+
+    .erp-shell .erp-motion-modal-backdrop {
+        transition-duration: var(--erp-motion-modal) !important;
+        transition-timing-function: var(--erp-motion-ease) !important;
+    }
+
+    .erp-shell .erp-main :is(.erp-card, .erp-panel, .erp-entity-card, .erp-detail-panel, .erp-kpi, .erp-timeline-card, .erp-table-shell) {
+        transition:
+            transform var(--erp-motion-card) var(--erp-motion-ease),
+            border-color var(--erp-motion-card) ease,
+            box-shadow var(--erp-motion-card) ease,
+            background-color var(--erp-motion-card) ease;
+    }
+
+    .erp-shell .erp-main table tbody tr {
+        transition: background-color var(--erp-motion-fast) ease;
+    }
+
+    .erp-shell .erp-main :is(.erp-badge, .erp-status-pill) {
+        transition: color var(--erp-motion-fast) ease, background-color var(--erp-motion-fast) ease, border-color var(--erp-motion-fast) ease;
+    }
+
+    .erp-shell .erp-notification-menu {
+        animation: erp-motion-dropdown-enter var(--erp-motion-dropdown) var(--erp-motion-ease) both;
+        transform-origin: top right;
+    }
+
+    [dir="rtl"] .erp-shell .erp-notification-menu {
+        transform-origin: top left;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+        .erp-shell .erp-main :is(.erp-card, .erp-panel, .erp-entity-card, .erp-detail-panel, .erp-kpi, .erp-timeline-card):hover {
+            transform: translateY(-2px);
+            border-color: #405371;
+            box-shadow: 0 14px 34px rgb(2 8 23 / 22%), inset 0 1px 0 rgb(255 255 255 / 3%);
+        }
+
+        .erp-shell :is(.erp-sidebar-link, .erp-nav-group > summary):hover svg,
+        .erp-shell .erp-topbar .erp-icon-button:hover svg {
+            transform: translateY(-1px);
+        }
+    }
+}
+
+@keyframes erp-motion-enter {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes erp-motion-page-enter {
+    from {
+        opacity: 0;
+        transform: translateY(18px) scale(.99);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes erp-motion-dropdown-enter {
+    from {
+        opacity: 0;
+        transform: translateY(-4px) scale(.99);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .erp-shell *,
+    .erp-shell *::before,
+    .erp-shell *::after,
+    .erp-guest *,
+    .erp-guest *::before,
+    .erp-guest *::after,
+    .erp-premium-auth *,
+    .erp-premium-auth *::before,
+    .erp-premium-auth *::after {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+    }
+
+    @media (hover: hover) and (pointer: fine) {
+        .erp-shell .erp-main :is(.erp-card, .erp-panel, .erp-entity-card, .erp-detail-panel, .erp-kpi, .erp-timeline-card):hover,
+        .erp-shell :is(.erp-sidebar-link, .erp-nav-group > summary):hover svg,
+        .erp-shell .erp-topbar .erp-icon-button:hover svg,
+        .erp-shell .dashboard-alert-group:hover,
+        .erp-shell .dashboard-kpi:hover .dashboard-icon,
+        .erp-shell :is(.dashboard-presets button, .dashboard-date-form button, .dashboard-report-link):hover {
+            transform: none !important;
+        }
+    }
+
+    .erp-shell .dashboard-chart-legend li:hover > span,
+    .erp-shell .dashboard-chart-svg .dashboard-chart-point.is-active {
+        transform: none !important;
+    }
+}
